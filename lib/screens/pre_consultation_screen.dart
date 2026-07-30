@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../application/authentication/authentication_session.dart';
+import '../application/booking/booking_creation_application_service.dart';
+import '../application/booking/booking_creation_failure.dart';
 import '../widgets/session_progress.dart';
 import '../ai/mentora_ai_service.dart';
 import 'payment_screen.dart';
@@ -87,6 +87,7 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
   final MentoraAiService aiService = MentoraAiService();
   AiBrief? aiBrief;
   bool isGeneratingBrief = false;
+  bool isCreatingBooking = false;
 
   static const navy = Color(0xFF061A3D);
   static const gold = Color(0xFFF5A400);
@@ -361,76 +362,13 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
               width: double.infinity,
               height: 55,
               child: ElevatedButton.icon(
-                onPressed: () async {
-                  final userId = context
-                      .read<AuthenticationSession>()
-                      .currentUserId;
-
-                  if (userId == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Utilisateur non connecté')),
-                    );
-                    return;
-                  }
-
-                  final existingBooking = await FirebaseFirestore.instance
-                      .collection('bookings')
-                      .where('expertId', isEqualTo: widget.expertId)
-                      .where('bookingDate', isEqualTo: widget.selectedDate)
-                      .where('bookingTime', isEqualTo: widget.selectedTime)
-                      .where(
-                        'status',
-                        whereIn: ['pending', 'confirmed', 'paid'],
-                      )
-                      .get();
-
-                  if (existingBooking.docs.isNotEmpty) {
-                    if (!mounted) return;
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Ce créneau vient d’être réservé. Choisissez un autre créneau.',
-                        ),
-                      ),
-                    );
-
-                    return;
-                  }
-
-                  final bookingRef = await FirebaseFirestore.instance
-                      .collection('bookings')
-                      .add({
-                        'clientId': userId,
-                        'expertName': widget.expertName,
-                        'bookingDate': widget.selectedDate,
-                        'bookingTime': widget.selectedTime,
-                        'duration': 30,
-                        'amount': 15000,
-                        'paymentStatus': 'pending',
-                        'status': 'pending_payment',
-                        'agoraChannel':
-                            'mentora_${DateTime.now().millisecondsSinceEpoch}',
-                        'clientNeed': needController.text.trim(),
-                        'aiSummary': aiBrief?.summary ?? '',
-                        'createdAt': FieldValue.serverTimestamp(),
-                      });
-
-                  if (!context.mounted) return;
-
-                  AppRouter.openPayment(
-                    context: context,
-                    bookingId: bookingRef.id,
-                    expertName: widget.expertName,
-                    selectedDate: widget.selectedDate,
-                    selectedTime: widget.selectedTime,
-                    aiSummary: aiBrief?.summary ?? needController.text.trim(),
-                  );
-                },
+                onPressed: isCreatingBooking ? null : _createBooking,
                 icon: const Icon(Icons.payment),
-                label: const Text(
-                  'Continuer vers le paiement',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Text(
+                  isCreatingBooking
+                      ? 'Création en cours...'
+                      : 'Continuer vers le paiement',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -438,6 +376,64 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _createBooking() async {
+    setState(() => isCreatingBooking = true);
+
+    try {
+      final bookingId = await context
+          .read<BookingCreationApplicationService>()
+          .create(
+            expertId: widget.expertId,
+            expertName: widget.expertName,
+            bookingDate: widget.selectedDate,
+            bookingTime: widget.selectedTime,
+            clientNeed: needController.text.trim(),
+            aiSummary: aiBrief?.summary ?? '',
+          );
+
+      if (!mounted) return;
+      AppRouter.openPayment(
+        context: context,
+        bookingId: bookingId,
+        expertName: widget.expertName,
+        selectedDate: widget.selectedDate,
+        selectedTime: widget.selectedTime,
+        aiSummary: aiBrief?.summary ?? needController.text.trim(),
+      );
+    } on BookingCreationSlotConflictFailure {
+      _showCreationFailure(
+        'Ce créneau vient d’être réservé. Choisissez un autre créneau.',
+      );
+    } on BookingCreationUnauthenticatedFailure {
+      _showCreationFailure('Utilisateur non connecté');
+    } on BookingCreationInvalidRequestFailure {
+      _showCreationFailure('La demande de réservation est invalide.');
+    } on BookingCreationMalformedDataFailure {
+      _showCreationFailure(
+        'Les données de réservation sont invalides. Réessayez plus tard.',
+      );
+    } on BookingCreationInfrastructureUnavailableFailure {
+      _showCreationFailure(
+        'Le service de réservation est indisponible. Réessayez plus tard.',
+      );
+    } on BookingCreationPersistenceFailure {
+      _showCreationFailure(
+        'La réservation n’a pas pu être créée. Réessayez plus tard.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isCreatingBooking = false);
+      }
+    }
+  }
+
+  void _showCreationFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 

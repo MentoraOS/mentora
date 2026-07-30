@@ -1,4 +1,5 @@
 import '../application/authentication/authentication_session.dart';
+import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
@@ -13,6 +14,7 @@ import '../domain/workspace/workspace_repository.dart';
 final class MentoraDependencies {
   const MentoraDependencies({
     required this.authenticationSession,
+    required this.bookingCreation,
     required this.expertBookingOccupancy,
     required this.expertAvailability,
     required this.expertCatalog,
@@ -25,6 +27,7 @@ final class MentoraDependencies {
   });
 
   final AuthenticationSession authenticationSession;
+  final BookingCreationApplicationService bookingCreation;
   final ExpertBookingOccupancyApplicationService expertBookingOccupancy;
   final ExpertAvailabilityApplicationService expertAvailability;
   final ExpertCatalogApplicationService expertCatalog;
