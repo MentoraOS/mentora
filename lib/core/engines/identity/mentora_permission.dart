@@ -1,0 +1,18 @@
+enum MentoraPermission {
+  manageUsers,
+  manageExperts,
+  manageBookings,
+  managePayments,
+  manageCountries,
+  manageLanguages,
+  manageAI,
+  manageFoundation,
+  manageAnalytics,
+  manageSettings,
+  viewReports,
+  createConsultation,
+  joinConsultation,
+  uploadDocuments,
+  createCourses,
+  hostEvents,
+}

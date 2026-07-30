@@ -1,0 +1,1 @@
+enum LedgerEntrySide { debit, credit }

@@ -1,0 +1,135 @@
+# Initiative Atlas — Mentora Core
+
+## Mission
+
+Atlas est le socle technique de Mentora OS.
+
+Son rôle est de fournir les moteurs fondamentaux utilisés par toute la plateforme Mentora, indépendamment de Flutter, Firebase, Agora, PayDunya, CinetPay ou tout autre fournisseur externe.
+
+Atlas ne construit pas des écrans.
+Atlas construit les capacités de base de Mentora.
+
+---
+
+## Principe fondateur
+
+> Si Mentora est présente dans 120 pays en 2050, avec 20 moyens de paiement, 50 langues, plusieurs fournisseurs d’IA et des millions d’utilisateurs, cette architecture fonctionnera-t-elle encore sans être reconstruite ?
+
+Tout Engine d’Atlas doit respecter cette règle.
+
+---
+
+## Engines inclus
+
+### 1. Constants
+
+Centralise les valeurs fondamentales de Mentora :
+- nom de l’application ;
+- statuts ;
+- devises par défaut ;
+- durées ;
+- constantes globales.
+
+Objectif : éviter les valeurs codées en dur dans les écrans.
+
+---
+
+### 2. Identity Engine
+
+Gère :
+- utilisateurs ;
+- rôles ;
+- permissions ;
+- accès.
+
+Règle : le code doit raisonner en permissions, pas uniquement en rôles.
+
+---
+
+### 3. Country Engine
+
+Gère :
+- pays ;
+- devises ;
+- langues ;
+- fuseaux horaires ;
+- moyens de paiement ;
+- préfixes téléphoniques ;
+- commissions ;
+- Mobile Money.
+
+Objectif : permettre à Mentora de s’adapter à plusieurs pays sans modifier les écrans.
+
+---
+
+### 4. Event Engine
+
+Permet aux moteurs de communiquer sans dépendance directe.
+
+Exemples :
+- booking.created
+- payment.succeeded
+- consultation.started
+- review.submitted
+
+Règle : les Engines communiquent par événements, pas par appels directs inutiles.
+
+---
+
+### 5. Logging Engine
+
+Gère les journaux techniques de la plateforme.
+
+Objectif :
+- comprendre les erreurs ;
+- suivre le comportement des Engines ;
+- préparer Mentora Observatory.
+
+Règle : aucun Engine ne travaille dans le silence.
+
+---
+
+### 6. Audit Engine
+
+Garde une trace des actions importantes.
+
+Exemples :
+- modification d’un pays ;
+- validation d’un expert ;
+- paiement remboursé ;
+- configuration modifiée.
+
+Règle : toute action critique doit pouvoir être auditée.
+
+---
+
+### 7. Feature Flag Engine
+
+Gouverne l’activation progressive des fonctionnalités.
+
+Permet :
+- activation par pays ;
+- activation par rôle ;
+- activation par cible ;
+- rollout progressif ;
+- expérimentation contrôlée.
+
+Règle : une fonctionnalité stratégique est gouvernée, pas codée en dur.
+
+---
+
+## Règles d’utilisation
+
+### Les écrans Flutter
+
+Un écran Flutter peut appeler un Engine.
+
+Mais un écran Flutter ne doit pas contenir de logique métier lourde.
+
+Exemple correct :
+
+```dart
+final canUseWallet = FeatureEngine.isAvailable(
+  feature: Feature.wallet,
+  user: currentUser,
+);

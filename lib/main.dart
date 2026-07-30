@@ -1,0 +1,238 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'application/authentication/authentication_session.dart';
+import 'application/expert_availability/expert_availability_application_service.dart';
+import 'application/expert_catalog/expert_catalog_application_service.dart';
+import 'application/favorites/favorite_experts_application_service.dart';
+import 'application/profile/profile_application_service.dart';
+import 'application/startup/mentora_startup.dart';
+import 'application/workspace/workspace_state.dart';
+import 'core/bootstrap/mentora_os.dart';
+
+import 'core/routing/app_router.dart';
+
+import 'screens/client_dashboard_screen.dart';
+import 'screens/expert_dashboard_screen.dart';
+import 'theme/mentora_theme.dart';
+import 'theme/theme_provider.dart';
+import 'composition/composition.dart';
+import 'presentation/authentication/authentication_screens.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final dependencies = await MentoraCompositionRoot.production();
+
+  final startupResult = await dependencies.startup.execute();
+
+  if (startupResult.isFailure) {
+    debugPrint('Mentora startup failed: ${startupResult.error}');
+  }
+
+  await MentoraOS.initialize();
+  await MentoraOS.start();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<MentoraStartup>.value(value: dependencies.startup),
+        Provider<AuthenticationSession>.value(
+          value: dependencies.authenticationSession,
+        ),
+        Provider<ExpertAvailabilityApplicationService>.value(
+          value: dependencies.expertAvailability,
+        ),
+        Provider<ExpertCatalogApplicationService>.value(
+          value: dependencies.expertCatalog,
+        ),
+        Provider<FavoriteExpertsApplicationService>.value(
+          value: dependencies.favoriteExperts,
+        ),
+        Provider<ProfileApplicationService>.value(value: dependencies.profile),
+        Provider<WorkspaceState>.value(value: dependencies.workspaceState),
+        ChangeNotifierProvider(create: (_) => MentoraThemeProvider()),
+      ],
+      child: const MentoraApp(),
+    ),
+  );
+}
+
+class MentoraApp extends StatelessWidget {
+  const MentoraApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<MentoraThemeProvider>(
+      builder: (context, theme, child) {
+        return MaterialApp(
+          title: 'Mentora',
+          debugShowCheckedModeBanner: false,
+          theme: MentoraTheme.lightTheme,
+          darkTheme: MentoraTheme.darkTheme,
+          themeMode: theme.themeMode,
+          home: const _InitialSessionGate(),
+        );
+      },
+    );
+  }
+}
+
+class _InitialSessionGate extends StatelessWidget {
+  const _InitialSessionGate();
+
+  @override
+  Widget build(BuildContext context) {
+    final session = context.read<AuthenticationSession>();
+
+    if (session.status == AuthenticationSessionStatus.loading) {
+      return const Scaffold(
+        backgroundColor: navy,
+        body: Center(child: CircularProgressIndicator(color: gold)),
+      );
+    }
+
+    if (!session.isAuthenticated) {
+      return const LoginScreen();
+    }
+
+    if (session.isExpert) {
+      final expertId = session.currentUserId;
+
+      if (expertId == null || expertId.isEmpty) {
+        return const LoginScreen();
+      }
+
+      return ExpertDashboardScreen(expertId: expertId);
+    }
+
+    return const ClientDashboardScreen();
+  }
+}
+
+/* SPLASH SCREEN */
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _scale = Tween<double>(
+      begin: 0.88,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+
+    _controller.forward();
+
+    Timer(const Duration(seconds: 3), () {
+      AppRouter.replaceWithOnboardingOne(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: navy,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topRight,
+            radius: 1.3,
+            colors: [Color(0xFF173A70), Color(0xFF061A3D), Color(0xFF020B1F)],
+          ),
+        ),
+        child: SafeArea(
+          child: FadeTransition(
+            opacity: _fade,
+            child: ScaleTransition(
+              scale: _scale,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/logo_mentora.png', width: 240),
+                  const SizedBox(height: 28),
+                  const Text(
+                    'MENTORA',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 42,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'CONNECTER • ÉCHANGER • RÉUSSIR',
+                    style: TextStyle(
+                      color: gold,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 44),
+                  Container(width: 42, height: 3, color: gold),
+                  const SizedBox(height: 28),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 38),
+                    child: Text(
+                      'La plateforme africaine de référence\n'
+                      'pour des consultations privées avec\n'
+                      'des experts et des masterclass exclusives.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        height: 1.55,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 80),
+                  const SizedBox(
+                    width: 42,
+                    height: 42,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(gold),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  const Text(
+                    'Chargement...',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
