@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'application/authentication/authentication_session.dart';
+import 'application/booking/expert_booking_occupancy_application_service.dart';
 import 'application/expert_availability/expert_availability_application_service.dart';
 import 'application/expert_catalog/expert_catalog_application_service.dart';
 import 'application/favorites/favorite_experts_application_service.dart';
@@ -41,6 +42,9 @@ void main() async {
         Provider<MentoraStartup>.value(value: dependencies.startup),
         Provider<AuthenticationSession>.value(
           value: dependencies.authenticationSession,
+        ),
+        Provider<ExpertBookingOccupancyApplicationService>.value(
+          value: dependencies.expertBookingOccupancy,
         ),
         Provider<ExpertAvailabilityApplicationService>.value(
           value: dependencies.expertAvailability,

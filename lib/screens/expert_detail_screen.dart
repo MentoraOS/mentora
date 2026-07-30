@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import '../application/booking/expert_booking_occupancy_application_service.dart';
+import '../domain/booking/expert_booking_occupancy.dart';
 import '../theme/mentora_theme.dart';
 import 'pre_consultation_screen.dart';
 import 'package:intl/intl.dart';
@@ -15,37 +17,43 @@ class ExpertDetailScreen extends StatefulWidget {
   State<ExpertDetailScreen> createState() => _ExpertDetailScreenState();
 }
 
+enum _OccupancyLoadState { loading, loaded, failed }
+
 class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
   String? selectedDate;
   String? selectedTime;
 
-  List<String> bookedSlots = [];
-  bool loadingBookedSlots = false;
+  List<ExpertBookingOccupancy> bookedSlots = const [];
+  _OccupancyLoadState _occupancyLoadState = _OccupancyLoadState.loading;
+  bool _occupancyLoadStarted = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_occupancyLoadStarted) return;
+    _occupancyLoadStarted = true;
     loadBookedSlots();
   }
 
   Future<void> loadBookedSlots() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('bookings')
-        .where('expertId', isEqualTo: widget.expert.id)
-        .where('status', whereIn: ['pending', 'confirmed', 'paid'])
-        .get();
-
-    final slots = snapshot.docs.map((doc) {
-      final data = doc.data();
-      return '${data['bookingDate']}|${data['bookingTime']}';
-    }).toList();
-
-    if (!mounted) return;
-
-    setState(() {
-      bookedSlots = slots;
-      loadingBookedSlots = false;
-    });
+    try {
+      final slots = await context
+          .read<ExpertBookingOccupancyApplicationService>()
+          .loadForExpert(widget.expert.id);
+      if (!mounted) return;
+      setState(() {
+        bookedSlots = slots;
+        _occupancyLoadState = _OccupancyLoadState.loaded;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        bookedSlots = const [];
+        selectedDate = null;
+        selectedTime = null;
+        _occupancyLoadState = _OccupancyLoadState.failed;
+      });
+    }
   }
 
   @override
@@ -77,7 +85,7 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
               selectedDate: selectedDate,
               selectedTime: selectedTime,
               bookedSlots: bookedSlots,
-              loadingBookedSlots: loadingBookedSlots,
+              occupancyLoadState: _occupancyLoadState,
               onSlotSelected: (day, hour) {
                 setState(() {
                   selectedDate = day;
@@ -563,8 +571,8 @@ class _AvailabilitySection extends StatelessWidget {
   final String? selectedDate;
   final String? selectedTime;
   final void Function(String day, String hour) onSlotSelected;
-  final List<String> bookedSlots;
-  final bool loadingBookedSlots;
+  final List<ExpertBookingOccupancy> bookedSlots;
+  final _OccupancyLoadState occupancyLoadState;
 
   const _AvailabilitySection({
     required this.expert,
@@ -572,7 +580,7 @@ class _AvailabilitySection extends StatelessWidget {
     required this.selectedTime,
     required this.onSlotSelected,
     required this.bookedSlots,
-    required this.loadingBookedSlots,
+    required this.occupancyLoadState,
   });
 
   @override
@@ -607,10 +615,14 @@ class _AvailabilitySection extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          if (loadingBookedSlots)
+          if (occupancyLoadState == _OccupancyLoadState.failed)
             const Padding(
               padding: EdgeInsets.only(bottom: 14),
-              child: LinearProgressIndicator(color: MentoraColors.gold),
+              child: Text(
+                'Impossible de vérifier les créneaux réservés. '
+                'La réservation est temporairement indisponible.',
+                style: TextStyle(color: Colors.redAccent),
+              ),
             ),
 
           if (availability.isEmpty)
@@ -644,12 +656,17 @@ class _AvailabilitySection extends StatelessWidget {
                       children: hours.map((hour) {
                         final selected =
                             selectedDate == day && selectedTime == hour;
-                        final isBooked = bookedSlots.contains('$day|$hour');
+                        final isBooked = bookedSlots.any(
+                          (occupancy) => occupancy.slotIdentity == '$day|$hour',
+                        );
+                        final canSelect =
+                            occupancyLoadState == _OccupancyLoadState.loaded &&
+                            !isBooked;
 
                         return GestureDetector(
-                          onTap: isBooked
-                              ? null
-                              : () => onSlotSelected(day, hour),
+                          onTap: canSelect
+                              ? () => onSlotSelected(day, hour)
+                              : null,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,

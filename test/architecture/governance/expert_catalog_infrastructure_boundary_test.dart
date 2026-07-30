@@ -37,13 +37,17 @@ void main() {
       expect(source, isNot(contains('QuerySnapshot')));
     });
 
-    test('ARC-A43 Expert Detail performs no direct Catalog access', () {
-      final source = _readLib('screens/expert_detail_screen.dart');
+    test(
+      'ARC-A43 Expert Detail performs no direct Catalog or Booking access',
+      () {
+        final source = _readLib('screens/expert_detail_screen.dart');
 
-      expect(source, isNot(contains("collection('experts')")));
-      expect(source, contains("collection('bookings')"));
-      expect(source, contains('final ExpertCatalogEntry expert;'));
-    });
+        expect(source, isNot(contains("collection('experts')")));
+        expect(source, isNot(contains("collection('bookings')")));
+        expect(source, contains('final ExpertCatalogEntry expert;'));
+        expect(source, contains('ExpertBookingOccupancyApplicationService'));
+      },
+    );
 
     test('ARC-A44 Catalog adapter receives Firestore by constructor', () {
       final source = _readLib(

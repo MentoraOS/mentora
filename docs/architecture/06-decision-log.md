@@ -76,6 +76,27 @@ main.dart → AppBootstrap → AppContainer → MentoraApp
 Discovery → Scheduling → Booking → Payment → Consultation → Settlement → Review
 ```
 
+### AD-019 — Expert Booking Occupancy Read Ownership
+**ACCEPTED.** ARCH-007 Wave 2C établit une frontière moderne, additive et
+strictement en lecture seule : Booking possède les faits d’occupation dérivés
+des réservations. Scheduling conserve l’interprétation des disponibilités, la
+génération des créneaux, les règles de timezone, les conflits et la décision
+finale de réservabilité.
+
+La représentation Genesis `bookingDate|bookingTime` et les statuts
+`pending`, `confirmed`, `paid` sont conservés sans normalisation ni nouvelle
+sémantique. `lib/core/booking/` reste legacy et n’est pas migré par Wave 2C.
+La dette de schéma temporel et l’intégration future avec Scheduling restent
+explicitement hors périmètre.
+
+Une réservation pertinente pour l’occupation dont `bookingDate` ou
+`bookingTime` est absent, vide ou invalide fait échouer la lecture complète.
+Elle n’est ni ignorée ni transformée en résultat partiel, afin d’éviter qu’un
+créneau potentiellement occupé apparaisse disponible. La Presentation traite
+alors l’occupation comme inconnue, distincte d’un résultat vide réussi, et
+interdit la réservation. Il s’agit d’une politique de sûreté des lectures
+Booking, pas d’une règle de conflit Scheduling.
+
 ## 3. Gouvernance
 
 Toute nouvelle décision structurante doit :

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 
 import '../application/authentication/default_authentication_session.dart';
+import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
@@ -9,6 +10,7 @@ import '../application/startup/mentora_startup.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
+import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
@@ -71,6 +73,15 @@ final class MentoraCompositionRoot {
       firestore: firebase.firestore,
     );
 
+    final expertBookingOccupancyRepository =
+        FirestoreExpertBookingOccupancyRepository(
+          firestore: firebase.firestore,
+        );
+
+    final expertBookingOccupancy = ExpertBookingOccupancyApplicationService(
+      repository: expertBookingOccupancyRepository,
+    );
+
     final expertAvailability = ExpertAvailabilityApplicationService(
       session: authenticationSession,
       repository: expertAvailabilityRepository,
@@ -98,6 +109,7 @@ final class MentoraCompositionRoot {
 
     return MentoraDependencies(
       authenticationSession: authenticationSession,
+      expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       expertCatalog: expertCatalog,
       favoriteExperts: favoriteExperts,
