@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_creation_failure.dart';
+import '../application/scheduling/civil_selection.dart';
 import '../domain/expert_catalog/consultation_offer.dart';
 import '../widgets/session_progress.dart';
 import '../ai/mentora_ai_service.dart';
@@ -10,21 +11,23 @@ import '../core/routing/app_router.dart';
 
 class PreConsultationScreen extends StatefulWidget {
   final String expertName;
-  final String selectedDate;
-  final String selectedTime;
   final String expertId;
 
   /// The Consultation Offer the client selected, carried unchanged from the
   /// expert profile (AD-021 decision 15).
   final ConsultationOffer offer;
 
+  /// The revalidated structured civil occurrence the client selected
+  /// (AD-022 Clarification C). Carries explicit year/month/day/hour/minute;
+  /// no localized string is ever parsed back into temporal truth.
+  final CivilSelection occurrence;
+
   const PreConsultationScreen({
     super.key,
     required this.expertName,
-    required this.selectedDate,
-    required this.selectedTime,
     required this.expertId,
     required this.offer,
+    required this.occurrence,
   });
 
   @override
@@ -32,6 +35,27 @@ class PreConsultationScreen extends StatefulWidget {
 }
 
 class _PreConsultationScreenState extends State<PreConsultationScreen> {
+  static String _two(int value) => value.toString().padLeft(2, '0');
+
+  /// Deterministic date transport for the legacy `bookingDate` field. Derived
+  /// from the structured occurrence; never parsed back from a localized
+  /// string.
+  String get _bookingDate {
+    final start = widget.occurrence;
+    return '${start.year}-${_two(start.month)}-${_two(start.day)}';
+  }
+
+  String get _bookingTime {
+    final start = widget.occurrence;
+    return '${_two(start.hour)}:${_two(start.minute)}';
+  }
+
+  /// Display-only rendering of the selected civil date.
+  String get _displayDate {
+    final start = widget.occurrence;
+    return '${_two(start.day)}/${_two(start.month)}/${start.year}';
+  }
+
   final TextEditingController needController = TextEditingController();
   final TextEditingController _needController = TextEditingController();
   String selectedCategory = 'Business';
@@ -113,8 +137,8 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
           children: [
             _InfoCard(
               expertName: widget.expertName,
-              date: widget.selectedDate,
-              time: widget.selectedTime,
+              date: _displayDate,
+              time: _bookingTime,
             ),
             const SizedBox(height: 16),
 
@@ -393,8 +417,8 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
           .create(
             expertId: widget.expertId,
             expertName: widget.expertName,
-            bookingDate: widget.selectedDate,
-            bookingTime: widget.selectedTime,
+            bookingDate: _bookingDate,
+            bookingTime: _bookingTime,
             clientNeed: needController.text.trim(),
             aiSummary: aiBrief?.summary ?? '',
             offer: widget.offer,
@@ -405,8 +429,8 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
         context: context,
         bookingId: bookingId,
         expertName: widget.expertName,
-        selectedDate: widget.selectedDate,
-        selectedTime: widget.selectedTime,
+        selectedDate: _displayDate,
+        selectedTime: _bookingTime,
         aiSummary: aiBrief?.summary ?? needController.text.trim(),
         amountMinor: widget.offer.amountMinor,
         currency: widget.offer.currency,

@@ -5,6 +5,7 @@ import '../application/expert_availability/expert_availability_application_servi
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/profile/profile_application_service.dart';
+import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
 import '../application/workspace/workspace_state.dart';
 
@@ -21,6 +22,7 @@ final class MentoraDependencies {
     required this.expertCatalog,
     required this.favoriteExperts,
     required this.profile,
+    required this.selectableOccurrences,
     required this.startup,
     required this.timezoneResolver,
     required this.workspaceState,
@@ -35,6 +37,11 @@ final class MentoraDependencies {
   final ExpertCatalogApplicationService expertCatalog;
   final FavoriteExpertsApplicationService favoriteExperts;
   final ProfileApplicationService profile;
+
+  /// AD-022 Clarification C: Application-owned selectable occurrence
+  /// materialization and revalidation.
+  final SelectableOccurrenceApplicationService selectableOccurrences;
+
   final MentoraStartup startup;
 
   /// Scheduling-owned timezone interpretation port (AD-020 Clarification).

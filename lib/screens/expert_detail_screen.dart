@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
+import '../application/expert_catalog/expert_catalog_failure.dart';
+import '../application/scheduling/civil_selection.dart';
+import '../application/scheduling/selectable_occurrence_application_service.dart';
+import '../application/scheduling/selectable_occurrence_failure.dart';
 import '../domain/booking/expert_booking_occupancy.dart';
 import '../theme/mentora_theme.dart';
 import 'pre_consultation_screen.dart';
@@ -21,9 +25,78 @@ class ExpertDetailScreen extends StatefulWidget {
 
 enum _OccupancyLoadState { loading, loaded, failed }
 
+enum _MaterializationState { awaitingOffer, loading, loaded, failed }
+
+/// Display-only French weekday labels for structured civil dates, and the
+/// legacy weekday token used by historical occupancy identities. Rendered to
+/// the user and compared against legacy read-model keys; never parsed back
+/// into temporal truth (AD-022 Clarification C decision 5). Keys follow the
+/// `DateTime.monday..sunday` numbering (1..7).
+const Map<int, String> _weekdayLabels = {
+  DateTime.monday: 'Lundi',
+  DateTime.tuesday: 'Mardi',
+  DateTime.wednesday: 'Mercredi',
+  DateTime.thursday: 'Jeudi',
+  DateTime.friday: 'Vendredi',
+  DateTime.saturday: 'Samedi',
+  DateTime.sunday: 'Dimanche',
+};
+
+/// Display-only French month labels, indexed by month number (1..12).
+const List<String> _monthLabels = [
+  '',
+  'janvier',
+  'février',
+  'mars',
+  'avril',
+  'mai',
+  'juin',
+  'juillet',
+  'août',
+  'septembre',
+  'octobre',
+  'novembre',
+  'décembre',
+];
+
+String _two(int value) => value.toString().padLeft(2, '0');
+
+String _timeLabel(CivilSelection start) {
+  return '${_two(start.hour)}:${_two(start.minute)}';
+}
+
+String _dateKey(CivilSelection start) {
+  return '${start.year}-${_two(start.month)}-${_two(start.day)}';
+}
+
+/// Display-only weekday of a structured civil date, computed from the
+/// explicit components (proleptic Gregorian arithmetic, no clock involved).
+String _weekdayLabelOf(CivilSelection start) {
+  return _weekdayLabels[DateTime.utc(
+    start.year,
+    start.month,
+    start.day,
+  ).weekday]!;
+}
+
+String _dateLabel(CivilSelection start) {
+  return '${_weekdayLabelOf(start)} ${start.day} ${_monthLabels[start.month]}';
+}
+
 class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
-  String? selectedDate;
-  String? selectedTime;
+  /// The structured civil occurrence the client selected. Selection is only
+  /// an intent; Application revalidates it before the funnel continues.
+  CivilSelection? _selectedOccurrence;
+
+  List<CivilSelection> _occurrences = const [];
+  _MaterializationState _materializationState =
+      _MaterializationState.awaitingOffer;
+
+  /// The calendar month page currently displayed. Initialized from device
+  /// time for DISPLAY NAVIGATION ONLY (AD-022 Clarification C decision 8):
+  /// device time never determines whether a selection is valid.
+  late int _visibleYear;
+  late int _visibleMonth;
 
   /// Client-selectable offers exposed by the Expert Catalog (AD-021). The
   /// list is empty when the expert publishes no valid rate; Presentation must
@@ -40,11 +113,94 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
   bool _occupancyLoadStarted = false;
 
   @override
+  void initState() {
+    super.initState();
+    final deviceToday = DateTime.now();
+    _visibleYear = deviceToday.year;
+    _visibleMonth = deviceToday.month;
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_occupancyLoadStarted) return;
     _occupancyLoadStarted = true;
     loadBookedSlots();
+  }
+
+  void _selectOffer(ConsultationOffer offer) {
+    setState(() => _selectedOffer = offer);
+    _materializeVisibleMonth();
+  }
+
+  void _showPreviousMonth() {
+    setState(() {
+      if (_visibleMonth == 1) {
+        _visibleMonth = 12;
+        _visibleYear -= 1;
+      } else {
+        _visibleMonth -= 1;
+      }
+    });
+    _materializeVisibleMonth();
+  }
+
+  void _showNextMonth() {
+    setState(() {
+      if (_visibleMonth == 12) {
+        _visibleMonth = 1;
+        _visibleYear += 1;
+      } else {
+        _visibleMonth += 1;
+      }
+    });
+    _materializeVisibleMonth();
+  }
+
+  /// Asks Application to materialize the visible month's selectable
+  /// occurrences. Presentation computes nothing itself: it displays what the
+  /// authoritative path offers, and any failure closes the calendar.
+  Future<void> _materializeVisibleMonth() async {
+    final offer = _selectedOffer;
+    if (offer == null) {
+      setState(() {
+        _occurrences = const [];
+        _selectedOccurrence = null;
+        _materializationState = _MaterializationState.awaitingOffer;
+      });
+      return;
+    }
+
+    setState(() {
+      _occurrences = const [];
+      _selectedOccurrence = null;
+      _materializationState = _MaterializationState.loading;
+    });
+
+    try {
+      final occurrences = await context
+          .read<SelectableOccurrenceApplicationService>()
+          .materializeMonth(
+            expertId: widget.expert.id,
+            offer: offer,
+            year: _visibleYear,
+            month: _visibleMonth,
+          );
+      if (!mounted) return;
+      setState(() {
+        _occurrences = occurrences;
+        _materializationState = _MaterializationState.loaded;
+      });
+    } catch (_) {
+      // Fail closed: unknown availability never becomes selectable
+      // availability.
+      if (!mounted) return;
+      setState(() {
+        _occurrences = const [];
+        _selectedOccurrence = null;
+        _materializationState = _MaterializationState.failed;
+      });
+    }
   }
 
   Future<void> loadBookedSlots() async {
@@ -61,8 +217,7 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
       if (!mounted) return;
       setState(() {
         bookedSlots = const [];
-        selectedDate = null;
-        selectedTime = null;
+        _selectedOccurrence = null;
         _occupancyLoadState = _OccupancyLoadState.failed;
       });
     }
@@ -92,23 +247,21 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
             _PricingSection(
               offers: _offers,
               selectedOffer: _selectedOffer,
-              onOfferSelected: (offer) {
-                setState(() => _selectedOffer = offer);
-              },
+              onOfferSelected: _selectOffer,
             ),
             const SizedBox(height: 16),
 
-            _AvailabilitySection(
-              expert: expert,
-              selectedDate: selectedDate,
-              selectedTime: selectedTime,
+            _CalendarSection(
+              materializationState: _materializationState,
+              occurrences: _occurrences,
+              selectedOccurrence: _selectedOccurrence,
               bookedSlots: bookedSlots,
               occupancyLoadState: _occupancyLoadState,
-              onSlotSelected: (day, hour) {
-                setState(() {
-                  selectedDate = day;
-                  selectedTime = hour;
-                });
+              monthLabel: '${_monthLabels[_visibleMonth]} $_visibleYear',
+              onPreviousMonth: _showPreviousMonth,
+              onNextMonth: _showNextMonth,
+              onOccurrenceSelected: (occurrence) {
+                setState(() => _selectedOccurrence = occurrence);
               },
             ),
             const SizedBox(height: 16),
@@ -139,8 +292,9 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
           child: SizedBox(
             height: 56,
             child: ElevatedButton.icon(
-              onPressed: () {
-                if (selectedDate == null || selectedTime == null) {
+              onPressed: () async {
+                final occurrence = _selectedOccurrence;
+                if (occurrence == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text(
@@ -166,14 +320,43 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
                   return;
                 }
 
-                AppRouter.openPreConsultation(
-                  context: context,
-                  expertName: expert.name,
-                  selectedDate: selectedDate!,
-                  selectedTime: selectedTime!,
-                  expertId: expert.id,
-                  offer: offer,
-                );
+                // AD-022 Clarification C decision 7: a displayed slot is not
+                // thereby offered. Application revalidates the structured
+                // selection against authoritative inputs before continuing.
+                try {
+                  final validated = await context
+                      .read<SelectableOccurrenceApplicationService>()
+                      .revalidate(
+                        expertId: expert.id,
+                        offer: offer,
+                        year: occurrence.year,
+                        month: occurrence.month,
+                        day: occurrence.day,
+                        hour: occurrence.hour,
+                        minute: occurrence.minute,
+                      );
+                  if (!mounted || !context.mounted) return;
+                  AppRouter.openPreConsultation(
+                    context: context,
+                    expertName: expert.name,
+                    expertId: expert.id,
+                    offer: offer,
+                    occurrence: validated,
+                  );
+                } on SelectableOccurrenceFailure {
+                  _showContinueFailure(
+                    'Ce créneau n’est plus proposé. Choisissez un autre '
+                    'créneau.',
+                  );
+                } on ExpertCatalogFailure {
+                  _showContinueFailure(
+                    'Vérification du créneau impossible. Réessayez plus tard.',
+                  );
+                } catch (_) {
+                  _showContinueFailure(
+                    'Vérification du créneau impossible. Réessayez plus tard.',
+                  );
+                }
               },
               icon: const Icon(Icons.calendar_month),
               label: const Text('Préparer votre consultation'),
@@ -184,171 +367,11 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
     );
   }
 
-  Future<Map<String, String>?> _showAvailabilityCalendar(BuildContext context) {
-    final availableDays = [3, 5, 10, 14, 22, 25, 29];
-    int? selectedDay;
-
-    return showModalBottomSheet<Map<String, String>>(
-      context: context,
-      backgroundColor: Theme.of(context).cardColor,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(22),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 45,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(.4),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_month,
-                        color: MentoraColors.gold,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Choisir une date',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Juillet 2026',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      _WeekDay('L'),
-                      _WeekDay('M'),
-                      _WeekDay('M'),
-                      _WeekDay('J'),
-                      _WeekDay('V'),
-                      _WeekDay('S'),
-                      _WeekDay('D'),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 31,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 7,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                        ),
-                    itemBuilder: (context, index) {
-                      final day = index + 1;
-                      final isAvailable = availableDays.contains(day);
-                      final isSelected = selectedDay == day;
-
-                      return GestureDetector(
-                        onTap: isAvailable
-                            ? () {
-                                setModalState(() {
-                                  selectedDay = day;
-                                });
-                              }
-                            : null,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? MentoraColors.gold
-                                : isAvailable
-                                ? MentoraColors.gold.withOpacity(0.12)
-                                : Colors.grey.withOpacity(0.08),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '$day',
-                              style: TextStyle(
-                                color: isSelected
-                                    ? MentoraColors.navy
-                                    : isAvailable
-                                    ? Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.color
-                                    : Colors.grey,
-                                fontWeight: isAvailable
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  if (selectedDay != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Créneaux disponibles le $selectedDay juillet',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 14),
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            _TimeSlot(
-                              date: '$selectedDay juillet',
-                              time: '09:00',
-                            ),
-                            _TimeSlot(
-                              date: '$selectedDay juillet',
-                              time: '10:30',
-                            ),
-                            _TimeSlot(
-                              date: '$selectedDay juillet',
-                              time: '14:00',
-                            ),
-                            _TimeSlot(
-                              date: '$selectedDay juillet',
-                              time: '16:30',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+  void _showContinueFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -615,33 +638,65 @@ class _PricingSection extends StatelessWidget {
   }
 }
 
-class _AvailabilitySection extends StatelessWidget {
-  final ExpertCatalogEntry expert;
-  final String? selectedDate;
-  final String? selectedTime;
-  final void Function(String day, String hour) onSlotSelected;
+/// Structured calendar of selectable civil occurrences.
+///
+/// Displays what the Application materialization path legitimately offers for
+/// the visible month. Presentation renders and reports selection intent only:
+/// it computes no availability, interprets no timezone and manufactures no
+/// temporal truth. Occupancy display preserves the Wave 2C fail-safe closure:
+/// while occupancy is loading or failed, nothing is selectable.
+class _CalendarSection extends StatelessWidget {
+  final _MaterializationState materializationState;
+  final List<CivilSelection> occurrences;
+  final CivilSelection? selectedOccurrence;
   final List<ExpertBookingOccupancy> bookedSlots;
   final _OccupancyLoadState occupancyLoadState;
+  final String monthLabel;
+  final VoidCallback onPreviousMonth;
+  final VoidCallback onNextMonth;
+  final ValueChanged<CivilSelection> onOccurrenceSelected;
 
-  const _AvailabilitySection({
-    required this.expert,
-    required this.selectedDate,
-    required this.selectedTime,
-    required this.onSlotSelected,
+  const _CalendarSection({
+    required this.materializationState,
+    required this.occurrences,
+    required this.selectedOccurrence,
     required this.bookedSlots,
     required this.occupancyLoadState,
+    required this.monthLabel,
+    required this.onPreviousMonth,
+    required this.onNextMonth,
+    required this.onOccurrenceSelected,
   });
+
+  /// Whether a legacy or modern occupancy fact claims this occurrence.
+  ///
+  /// Legacy Booking records identify slots as `Lundi|09:00`; modern records
+  /// carry a full civil date. Both remain visible as occupied: legacy display
+  /// coexistence per AD-022 Clarification C decision 12.
+  bool _isBooked(CivilSelection occurrence) {
+    final time = _timeLabel(occurrence);
+    final legacyIdentity = '${_weekdayLabelOf(occurrence)}|$time';
+    final modernIdentity = '${_dateKey(occurrence)}|$time';
+    return bookedSlots.any(
+      (occupancy) =>
+          occupancy.slotIdentity == legacyIdentity ||
+          occupancy.slotIdentity == modernIdentity,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final availability = expert.availability;
+    final byDate = <String, List<CivilSelection>>{};
+    for (final occurrence in occurrences) {
+      byDate.putIfAbsent(_dateKey(occurrence), () => []).add(occurrence);
+    }
 
     return _SectionCard(
-      title: 'Disponibilités',
+      title: 'Disponibilit\u00e9s',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (selectedDate != null && selectedTime != null) ...[
+          if (selectedOccurrence != null) ...[
             Row(
               children: [
                 const Icon(
@@ -652,7 +707,8 @@ class _AvailabilitySection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '$selectedDate à $selectedTime',
+                    '${_dateLabel(selectedOccurrence!)} \u00e0 '
+                    '${_timeLabel(selectedOccurrence!)}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: MentoraColors.gold,
@@ -668,85 +724,125 @@ class _AvailabilitySection extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(bottom: 14),
               child: Text(
-                'Impossible de vérifier les créneaux réservés. '
-                'La réservation est temporairement indisponible.',
+                'Impossible de v\u00e9rifier les cr\u00e9neaux r\u00e9serv\u00e9s. '
+                'La r\u00e9servation est temporairement indisponible.',
                 style: TextStyle(color: Colors.redAccent),
               ),
             ),
 
-          if (availability.isEmpty)
-            const Text(
-              'Aucune disponibilité définie pour le moment.',
+          Row(
+            children: [
+              IconButton(
+                onPressed: onPreviousMonth,
+                icon: const Icon(Icons.chevron_left, color: MentoraColors.gold),
+              ),
+              Expanded(
+                child: Text(
+                  monthLabel,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              IconButton(
+                onPressed: onNextMonth,
+                icon: const Icon(
+                  Icons.chevron_right,
+                  color: MentoraColors.gold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          switch (materializationState) {
+            _MaterializationState.awaitingOffer => const Text(
+              'Choisissez d\u2019abord une offre pour voir les '
+              'disponibilit\u00e9s.',
               style: TextStyle(color: Colors.white70),
-            )
-          else
-            ...availability.entries.map((entry) {
-              final day = entry.key;
-              final hours = entry.value;
-
-              if (hours.isEmpty) return const SizedBox.shrink();
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      day,
-                      style: const TextStyle(
-                        color: MentoraColors.gold,
-                        fontWeight: FontWeight.bold,
+            ),
+            _MaterializationState.loading => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: LinearProgressIndicator(
+                color: MentoraColors.gold,
+                backgroundColor: Colors.white12,
+              ),
+            ),
+            _MaterializationState.failed => const Text(
+              'Impossible de charger les disponibilit\u00e9s. '
+              'La r\u00e9servation est temporairement indisponible.',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            _MaterializationState.loaded when occurrences.isEmpty => const Text(
+              'Aucune disponibilit\u00e9 pour ce mois.',
+              style: TextStyle(color: Colors.white70),
+            ),
+            _MaterializationState.loaded => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: byDate.values.map((dayOccurrences) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _dateLabel(dayOccurrences.first),
+                        style: const TextStyle(
+                          color: MentoraColors.gold,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: hours.map((hour) {
-                        final selected =
-                            selectedDate == day && selectedTime == hour;
-                        final isBooked = bookedSlots.any(
-                          (occupancy) => occupancy.slotIdentity == '$day|$hour',
-                        );
-                        final canSelect =
-                            occupancyLoadState == _OccupancyLoadState.loaded &&
-                            !isBooked;
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: dayOccurrences.map((occurrence) {
+                          final selected = selectedOccurrence == occurrence;
+                          final isBooked = _isBooked(occurrence);
+                          final canSelect =
+                              occupancyLoadState ==
+                                  _OccupancyLoadState.loaded &&
+                              !isBooked;
+                          final time = _timeLabel(occurrence);
 
-                        return GestureDetector(
-                          onTap: canSelect
-                              ? () => onSlotSelected(day, hour)
-                              : null,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: selected
-                                  ? MentoraColors.gold
-                                  : Colors.white.withOpacity(.08),
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(color: MentoraColors.gold),
-                            ),
-                            child: Text(
-                              isBooked ? '$hour • Réservé' : hour,
-                              style: TextStyle(
-                                color: isBooked
-                                    ? Colors.white38
-                                    : selected
-                                    ? MentoraColors.navy
-                                    : MentoraColors.gold,
-                                fontWeight: FontWeight.bold,
+                          return GestureDetector(
+                            onTap: canSelect
+                                ? () => onOccurrenceSelected(occurrence)
+                                : null,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? MentoraColors.gold
+                                    : Colors.white.withOpacity(.08),
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: MentoraColors.gold),
+                              ),
+                              child: Text(
+                                isBooked
+                                    ? '$time \u2022 R\u00e9serv\u00e9'
+                                    : time,
+                                style: TextStyle(
+                                  color: isBooked
+                                      ? Colors.white38
+                                      : selected
+                                      ? MentoraColors.navy
+                                      : MentoraColors.gold,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              );
-            }),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          },
         ],
       ),
     );
@@ -999,53 +1095,6 @@ class _ReviewItem extends StatelessWidget {
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _WeekDay extends StatelessWidget {
-  final String day;
-
-  const _WeekDay(this.day);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      day,
-      style: Theme.of(
-        context,
-      ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-    );
-  }
-}
-
-class _TimeSlot extends StatelessWidget {
-  final String date;
-  final String time;
-
-  const _TimeSlot({required this.date, required this.time});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.pop(context, {'date': date, 'time': time});
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        decoration: BoxDecoration(
-          color: MentoraColors.gold.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: MentoraColors.gold.withOpacity(0.4)),
-        ),
-        child: Text(
-          time,
-          style: const TextStyle(
-            color: MentoraColors.gold,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/booking/booking_creation_application_service.dart';
+import 'package:mentora/application/scheduling/civil_selection.dart';
 import 'package:mentora/domain/booking/booking_creation.dart';
 import 'package:mentora/domain/booking/booking_creation_repository.dart';
 import 'package:mentora/domain/expert_catalog/consultation_offer.dart';
@@ -98,10 +99,18 @@ Widget _app(_Repository repository) {
     child: MaterialApp(
       home: PreConsultationScreen(
         expertName: 'Expert',
-        selectedDate: 'Lundi',
-        selectedTime: '09:00',
         expertId: 'expert_1',
         offer: _offer(),
+        // AD-022 C2: the revalidated structured selection replaces the
+        // legacy 'Lundi'/'09:00' transport. Monday 3 August 2026, 09:00.
+        occurrence: CivilSelection(
+          year: 2026,
+          month: 8,
+          day: 3,
+          hour: 9,
+          minute: 0,
+          durationMinutes: 60,
+        ),
       ),
     ),
   );

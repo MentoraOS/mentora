@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../application/scheduling/civil_selection.dart';
 import '../../domain/expert_catalog/consultation_offer.dart';
 import '../../domain/expert_catalog/expert_catalog_entry.dart';
 import 'package:provider/provider.dart';
@@ -364,22 +365,22 @@ class AppRouter {
     );
   }
 
+  /// AD-022 Clarification C: the selected slot travels as a structured
+  /// selectable civil occurrence, never as localized display strings.
   static Future<void> openPreConsultation({
     required BuildContext context,
     required String expertName,
-    required String selectedDate,
-    required String selectedTime,
     required String expertId,
     required ConsultationOffer offer,
+    required CivilSelection occurrence,
   }) {
     return push(
       context,
       PreConsultationScreen(
         expertName: expertName,
-        selectedDate: selectedDate,
-        selectedTime: selectedTime,
         expertId: expertId,
         offer: offer,
+        occurrence: occurrence,
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'application/expert_availability/expert_availability_application_service.
 import 'application/expert_catalog/expert_catalog_application_service.dart';
 import 'application/favorites/favorite_experts_application_service.dart';
 import 'application/profile/profile_application_service.dart';
+import 'application/scheduling/selectable_occurrence_application_service.dart';
 import 'application/startup/mentora_startup.dart';
 import 'application/workspace/workspace_state.dart';
 import 'core/bootstrap/mentora_os.dart';
@@ -60,6 +61,9 @@ void main() async {
           value: dependencies.favoriteExperts,
         ),
         Provider<ProfileApplicationService>.value(value: dependencies.profile),
+        Provider<SelectableOccurrenceApplicationService>.value(
+          value: dependencies.selectableOccurrences,
+        ),
         Provider<WorkspaceState>.value(value: dependencies.workspaceState),
         ChangeNotifierProvider(create: (_) => MentoraThemeProvider()),
       ],
