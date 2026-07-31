@@ -4,6 +4,18 @@ import '../models/blocked_period.dart';
 import '../models/calendar_slot.dart';
 import '../models/working_hours.dart';
 
+/// Pure generation of candidate consultation slots (AD-020).
+///
+/// Temporal reasoning is half-open `[start, end)`. Candidate starts advance by
+/// [AvailabilityRule.slotGranularity] — never by the consultation duration and
+/// never by the break buffer. A candidate whose interval would exceed its
+/// availability range is not produced.
+///
+/// Scope limit (AD-020): [generateSlots] interprets the supplied date and
+/// [WorkingHours] as civil time in the ambient calendar. Resolving
+/// expert-local civil time to concrete instants requires a `TimezoneResolver`
+/// implementation, which is not authorized in this wave. This function
+/// therefore makes no IANA or DST correctness claim.
 class AvailabilityDomain {
   const AvailabilityDomain();
 
@@ -29,31 +41,28 @@ class AvailabilityDomain {
 
     final slots = <CalendarSlot>[];
 
+    final startOfDay = DateTime(date.year, date.month, date.day);
+
     for (final period in hours) {
-      var cursor = DateTime(date.year, date.month, date.day).add(period.start);
+      final rangeEnd = startOfDay.add(period.end);
 
-      final end = DateTime(date.year, date.month, date.day).add(period.end);
+      var cursor = startOfDay.add(period.start);
 
-      while (cursor.add(rule.consultationDuration).isBefore(end) ||
-          cursor.add(rule.consultationDuration).isAtSameMomentAs(end)) {
+      while (!cursor.add(rule.consultationDuration).isAfter(rangeEnd)) {
         final slot = CalendarSlot(
           start: cursor,
           end: cursor.add(rule.consultationDuration),
         );
 
         final blocked = blockedPeriods.any(
-          (blockedPeriod) =>
-              slot.start.isBefore(blockedPeriod.end) &&
-              slot.end.isAfter(blockedPeriod.start),
+          (blockedPeriod) => blockedPeriod.overlaps(slot.start, slot.end),
         );
 
         if (!blocked) {
           slots.add(slot);
         }
 
-        cursor = cursor
-            .add(rule.consultationDuration)
-            .add(rule.breakBetweenMeetings);
+        cursor = cursor.add(rule.slotGranularity);
       }
     }
 

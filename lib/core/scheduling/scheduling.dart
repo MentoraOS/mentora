@@ -15,3 +15,4 @@ export 'models/blocked_period.dart';
 export 'models/calendar_slot.dart';
 export 'models/timezone_info.dart';
 export 'models/working_hours.dart';
+export 'ports/timezone_resolver.dart';

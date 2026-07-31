@@ -10,7 +10,7 @@ void main() {
     test('should generate available slots', () {
       final result = AvailabilityEngine.instance.generateSlots(
         date: DateTime(2026, 7, 6), // Monday
-        workingHours: const [
+        workingHours: [
           WorkingHours(
             day: WeekDay.monday,
             start: Duration(hours: 9),
@@ -18,12 +18,13 @@ void main() {
           ),
         ],
         blockedPeriods: const [],
-        rule: const AvailabilityRule(
-          consultationDuration: Duration(minutes: 30),
-          breakBetweenMeetings: Duration(minutes: 0),
+        rule: AvailabilityRule(
+          consultationDuration: const Duration(minutes: 30),
+          slotGranularity: const Duration(minutes: 30),
+          breakBetweenMeetings: Duration.zero,
           maximumBookingsPerDay: 10,
-          minimumNotice: Duration(hours: 1),
-          maximumAdvanceBooking: Duration(days: 30),
+          minimumNotice: const Duration(hours: 1),
+          maximumAdvanceBooking: const Duration(days: 30),
         ),
       );
 
@@ -34,7 +35,7 @@ void main() {
     test('should exclude blocked periods', () {
       final result = AvailabilityEngine.instance.generateSlots(
         date: DateTime(2026, 7, 6), // Monday
-        workingHours: const [
+        workingHours: [
           WorkingHours(
             day: WeekDay.monday,
             start: Duration(hours: 9),
@@ -48,12 +49,13 @@ void main() {
             reason: 'Internal meeting',
           ),
         ],
-        rule: const AvailabilityRule(
-          consultationDuration: Duration(minutes: 30),
-          breakBetweenMeetings: Duration(minutes: 0),
+        rule: AvailabilityRule(
+          consultationDuration: const Duration(minutes: 30),
+          slotGranularity: const Duration(minutes: 30),
+          breakBetweenMeetings: Duration.zero,
           maximumBookingsPerDay: 10,
-          minimumNotice: Duration(hours: 1),
-          maximumAdvanceBooking: Duration(days: 30),
+          minimumNotice: const Duration(hours: 1),
+          maximumAdvanceBooking: const Duration(days: 30),
         ),
       );
 
