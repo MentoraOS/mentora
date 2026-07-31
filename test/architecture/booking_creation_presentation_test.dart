@@ -6,6 +6,7 @@ import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/booking/booking_creation_application_service.dart';
 import 'package:mentora/domain/booking/booking_creation.dart';
 import 'package:mentora/domain/booking/booking_creation_repository.dart';
+import 'package:mentora/domain/expert_catalog/consultation_offer.dart';
 import 'package:mentora/screens/payment_screen.dart';
 import 'package:mentora/screens/pre_consultation_screen.dart';
 import 'package:provider/provider.dart';
@@ -94,14 +95,26 @@ Widget _app(_Repository repository) {
   );
   return Provider<BookingCreationApplicationService>.value(
     value: service,
-    child: const MaterialApp(
+    child: MaterialApp(
       home: PreConsultationScreen(
         expertName: 'Expert',
         selectedDate: 'Lundi',
         selectedTime: '09:00',
         expertId: 'expert_1',
+        offer: _offer(),
       ),
     ),
+  );
+}
+
+ConsultationOffer _offer() {
+  return ConsultationOffer(
+    offerId: 'expert:expert_1:consultation:60m',
+    expertId: 'expert_1',
+    durationMinutes: 60,
+    amountMinor: 50000,
+    currency: 'XOF',
+    clientSelectable: true,
   );
 }
 

@@ -46,6 +46,15 @@ void main() {
       ),
       findsNothing,
     );
+    // AD-021: the client selects the expert's Consultation Offer before the
+    // funnel can continue.
+    await tester.ensureVisible(find.text('1 heure'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('1 heure'));
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Préparer votre consultation'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Préparer votre consultation'));
     await tester.pumpAndSettle();
     expect(find.text('Préparer la consultation'), findsOneWidget);
@@ -119,6 +128,9 @@ Widget _app(_Repository repository) {
           availability: const {
             'Lundi': ['09:00', '10:00'],
           },
+          // ARCH-009B: the expert must publish a rate for a Consultation
+          // Offer to exist. Occupancy expectations below are unchanged.
+          rate60: 50000,
         ),
       ),
     ),

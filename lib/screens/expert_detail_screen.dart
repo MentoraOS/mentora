@@ -6,7 +6,9 @@ import '../theme/mentora_theme.dart';
 import 'pre_consultation_screen.dart';
 import 'package:intl/intl.dart';
 import '../core/routing/app_router.dart';
+import '../domain/expert_catalog/consultation_offer.dart';
 import '../domain/expert_catalog/expert_catalog_entry.dart';
+import '../domain/expert_catalog/legacy_rate_offer_adapter.dart';
 
 class ExpertDetailScreen extends StatefulWidget {
   final ExpertCatalogEntry expert;
@@ -22,6 +24,16 @@ enum _OccupancyLoadState { loading, loaded, failed }
 class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
   String? selectedDate;
   String? selectedTime;
+
+  /// Client-selectable offers exposed by the Expert Catalog (AD-021). The
+  /// list is empty when the expert publishes no valid rate; Presentation must
+  /// not fabricate one.
+  late final List<ConsultationOffer> _offers = const LegacyRateOfferAdapter()
+      .offersFor(widget.expert);
+
+  /// The offer the client selected. It is transported to the booking funnel
+  /// unchanged; no display index is used as commercial truth.
+  ConsultationOffer? _selectedOffer;
 
   List<ExpertBookingOccupancy> bookedSlots = const [];
   _OccupancyLoadState _occupancyLoadState = _OccupancyLoadState.loading;
@@ -77,7 +89,13 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
             _StatsSection(expert: expert),
             const SizedBox(height: 16),
 
-            _PricingSection(expert: expert),
+            _PricingSection(
+              offers: _offers,
+              selectedOffer: _selectedOffer,
+              onOfferSelected: (offer) {
+                setState(() => _selectedOffer = offer);
+              },
+            ),
             const SizedBox(height: 16),
 
             _AvailabilitySection(
@@ -133,12 +151,28 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
                   return;
                 }
 
+                // AD-021: without an authoritative selected offer there is no
+                // commercial truth to carry, so the funnel fails closed.
+                final offer = _selectedOffer;
+                if (offer == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Choisissez une offre de consultation avant de '
+                        'continuer',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 AppRouter.openPreConsultation(
                   context: context,
                   expertName: expert.name,
                   selectedDate: selectedDate!,
                   selectedTime: selectedTime!,
                   expertId: expert.id,
+                  offer: offer,
                 );
               },
               icon: const Icon(Icons.calendar_month),
@@ -435,41 +469,50 @@ class _StatsSection extends StatelessWidget {
   }
 }
 
-class _PricingSection extends StatefulWidget {
-  final ExpertCatalogEntry expert;
+/// Renders the expert's Consultation Offers and reports the selected one.
+///
+/// AD-021 decision 15: Presentation displays and transports offer data. It
+/// owns no pricing, duration or fallback rule, and never fabricates an offer
+/// when the Expert Catalog exposes none.
+class _PricingSection extends StatelessWidget {
+  final List<ConsultationOffer> offers;
+  final ConsultationOffer? selectedOffer;
+  final ValueChanged<ConsultationOffer> onOfferSelected;
 
-  const _PricingSection({super.key, required this.expert});
+  const _PricingSection({
+    required this.offers,
+    required this.selectedOffer,
+    required this.onOfferSelected,
+  });
 
-  @override
-  State<_PricingSection> createState() => _PricingSectionState();
-}
+  static final NumberFormat _formatter = NumberFormat('#,##0', 'fr_FR');
 
-class _PricingSectionState extends State<_PricingSection> {
-  int selectedIndex = 1;
-  final formatter = NumberFormat('#,##0', 'fr_FR');
+  static String _title(int durationMinutes) {
+    switch (durationMinutes) {
+      case 60:
+        return '1 heure';
+      case 120:
+        return '2 heures';
+      default:
+        return '$durationMinutes minutes';
+    }
+  }
+
+  static String _subtitle(int durationMinutes) {
+    switch (durationMinutes) {
+      case 30:
+        return 'Conseil rapide';
+      case 60:
+        return 'Consultation standard';
+      case 120:
+        return 'Session approfondie';
+      default:
+        return 'Consultation';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final expert = widget.expert;
-
-    final options = [
-      {
-        "title": "30 minutes",
-        "subtitle": "Conseil rapide",
-        "price": "${formatter.format(expert.rate30 ?? 25000)} FCFA",
-      },
-      {
-        "title": "1 heure",
-        "subtitle": "Consultation standard",
-        "price": "${formatter.format(expert.rate60 ?? 50000)} FCFA",
-      },
-      {
-        "title": "2 heures",
-        "subtitle": "Session approfondie",
-        "price": "${formatter.format(expert.rate120 ?? 100000)} FCFA",
-      },
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -479,12 +522,17 @@ class _PricingSectionState extends State<_PricingSection> {
         ),
         const SizedBox(height: 12),
 
-        ...List.generate(options.length, (index) {
-          final item = options[index];
-          final selected = selectedIndex == index;
+        if (offers.isEmpty)
+          Text(
+            'Aucune offre de consultation disponible pour cet expert.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+
+        ...offers.map((offer) {
+          final selected = selectedOffer?.offerId == offer.offerId;
 
           return GestureDetector(
-            onTap: () => setState(() => selectedIndex = index),
+            onTap: () => onOfferSelected(offer),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               margin: const EdgeInsets.only(bottom: 10),
@@ -501,14 +549,14 @@ class _PricingSectionState extends State<_PricingSection> {
               ),
               child: Row(
                 children: [
-                  Radio<int>(
-                    value: index,
-                    groupValue: selectedIndex,
+                  Radio<String>(
+                    value: offer.offerId,
+                    groupValue: selectedOffer?.offerId,
                     activeColor: MentoraColors.gold,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     onChanged: (value) {
                       if (value == null) return;
-                      setState(() => selectedIndex = value);
+                      onOfferSelected(offer);
                     },
                   ),
 
@@ -522,7 +570,7 @@ class _PricingSectionState extends State<_PricingSection> {
                           children: [
                             Expanded(
                               child: Text(
-                                item["title"] as String,
+                                _title(offer.durationMinutes),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.titleMedium
@@ -533,7 +581,8 @@ class _PricingSectionState extends State<_PricingSection> {
                               ),
                             ),
                             Text(
-                              item["price"] as String,
+                              '${_formatter.format(offer.amountMinor)} '
+                              '${offer.currency}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
@@ -550,7 +599,7 @@ class _PricingSectionState extends State<_PricingSection> {
                         const SizedBox(height: 3),
 
                         Text(
-                          item["subtitle"] as String,
+                          _subtitle(offer.durationMinutes),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],

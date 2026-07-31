@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_creation_failure.dart';
+import '../domain/expert_catalog/consultation_offer.dart';
 import '../widgets/session_progress.dart';
 import '../ai/mentora_ai_service.dart';
 import 'payment_screen.dart';
@@ -13,12 +14,17 @@ class PreConsultationScreen extends StatefulWidget {
   final String selectedTime;
   final String expertId;
 
+  /// The Consultation Offer the client selected, carried unchanged from the
+  /// expert profile (AD-021 decision 15).
+  final ConsultationOffer offer;
+
   const PreConsultationScreen({
     super.key,
     required this.expertName,
     required this.selectedDate,
     required this.selectedTime,
     required this.expertId,
+    required this.offer,
   });
 
   @override
@@ -391,6 +397,7 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
             bookingTime: widget.selectedTime,
             clientNeed: needController.text.trim(),
             aiSummary: aiBrief?.summary ?? '',
+            offer: widget.offer,
           );
 
       if (!mounted) return;
@@ -401,6 +408,8 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
         selectedDate: widget.selectedDate,
         selectedTime: widget.selectedTime,
         aiSummary: aiBrief?.summary ?? needController.text.trim(),
+        amountMinor: widget.offer.amountMinor,
+        currency: widget.offer.currency,
       );
     } on BookingCreationSlotConflictFailure {
       _showCreationFailure(
@@ -408,6 +417,14 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
       );
     } on BookingCreationUnauthenticatedFailure {
       _showCreationFailure('Utilisateur non connecté');
+    } on BookingCreationOfferUnavailableFailure {
+      _showCreationFailure(
+        'Cette offre n’est plus disponible. Choisissez une autre offre.',
+      );
+    } on BookingCreationExpertMismatchFailure {
+      _showCreationFailure(
+        'L’offre sélectionnée ne correspond pas à cet expert.',
+      );
     } on BookingCreationInvalidRequestFailure {
       _showCreationFailure('La demande de réservation est invalide.');
     } on BookingCreationMalformedDataFailure {

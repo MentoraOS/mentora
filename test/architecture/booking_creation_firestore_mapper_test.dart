@@ -7,7 +7,7 @@ void main() {
   group('BookingCreationFirestoreMapper', () {
     const mapper = BookingCreationFirestoreMapper();
 
-    test('creates only the authorized exact Genesis payload plus expertId', () {
+    test('creates the authorized payload plus the commercial snapshot', () {
       final data = mapper.toMap(
         BookingCreation(
           clientId: 'client_1',
@@ -18,6 +18,10 @@ void main() {
           agoraChannel: 'mentora_1',
           clientNeed: 'Need',
           aiSummary: 'Summary',
+          offerId: 'expert:expert_1:consultation:120m',
+          durationMinutes: 120,
+          amountMinor: 100000,
+          currency: 'XOF',
         ),
       );
 
@@ -27,8 +31,10 @@ void main() {
         'expertName',
         'bookingDate',
         'bookingTime',
+        'offerId',
         'duration',
         'amount',
+        'currency',
         'paymentStatus',
         'status',
         'agoraChannel',
@@ -39,8 +45,11 @@ void main() {
       expect(data['expertId'], 'expert_1');
       expect(data['status'], 'pending_payment');
       expect(data['paymentStatus'], 'pending');
-      expect(data['amount'], 15000);
-      expect(data['duration'], 30);
+      // AD-021: persisted commercial values come from the selected offer.
+      expect(data['offerId'], 'expert:expert_1:consultation:120m');
+      expect(data['amount'], 100000);
+      expect(data['duration'], 120);
+      expect(data['currency'], 'XOF');
       expect(data['createdAt'], isA<FieldValue>());
       expect(data, isNot(contains('ledger')));
       expect(data, isNot(contains('escrow')));

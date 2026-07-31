@@ -1,5 +1,6 @@
 import '../../domain/booking/booking_creation.dart';
 import '../../domain/booking/booking_creation_repository.dart';
+import '../../domain/expert_catalog/consultation_offer.dart';
 import '../authentication/authentication_session.dart';
 import 'booking_creation_failure.dart';
 
@@ -18,6 +19,11 @@ final class BookingCreationApplicationService {
   final BookingCreationRepository _repository;
   final BookingChannelFactory _channelFactory;
 
+  /// Creates the initial Booking from the authoritative selected offer.
+  ///
+  /// [offer] is the single commercial source (AD-021). Its duration, amount
+  /// and currency are copied into the reservation snapshot; no value is
+  /// recomputed or defaulted here.
   Future<String> create({
     required String expertId,
     required String expertName,
@@ -25,12 +31,22 @@ final class BookingCreationApplicationService {
     required String bookingTime,
     required String clientNeed,
     required String aiSummary,
+    required ConsultationOffer offer,
   }) async {
     final clientId = _session.currentUserId;
     if (!_session.isAuthenticated ||
         clientId == null ||
         clientId.trim().isEmpty) {
       throw const BookingCreationUnauthenticatedFailure();
+    }
+
+    if (!offer.clientSelectable) {
+      throw const BookingCreationOfferUnavailableFailure();
+    }
+    // A blank expert identity is an invalid request, not a mismatch; it is
+    // reported by BookingCreation's own validation below.
+    if (expertId.trim().isNotEmpty && offer.expertId != expertId) {
+      throw const BookingCreationExpertMismatchFailure();
     }
 
     late final BookingCreation booking;
@@ -44,6 +60,10 @@ final class BookingCreationApplicationService {
         agoraChannel: _channelFactory(),
         clientNeed: clientNeed,
         aiSummary: aiSummary,
+        offerId: offer.offerId,
+        durationMinutes: offer.durationMinutes,
+        amountMinor: offer.amountMinor,
+        currency: offer.currency,
       );
     } on ArgumentError catch (error) {
       throw BookingCreationInvalidRequestFailure(cause: error);

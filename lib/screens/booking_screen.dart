@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'payment_screen.dart';
 import 'pre_consultation_screen.dart';
-import '../core/routing/app_router.dart';
 
 class BookingScreen extends StatefulWidget {
   final String expertName;
@@ -143,12 +142,16 @@ class _BookingScreenState extends State<BookingScreen> {
           height: 60,
           child: ElevatedButton(
             onPressed: () {
-              AppRouter.openPreConsultation(
-                context: context,
-                expertName: widget.expertName,
-                selectedDate: "25 juillet",
-                selectedTime: selectedTime,
-                expertId: widget.expertId,
+              // AD-021: this legacy screen carries no authoritative
+              // Consultation Offer, and an offer must never be synthesised.
+              // The client selects one on the expert profile instead.
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Choisissez une offre de consultation sur le profil de '
+                    'l’expert pour continuer.',
+                  ),
+                ),
               );
             },
             style: ElevatedButton.styleFrom(

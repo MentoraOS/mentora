@@ -136,8 +136,10 @@ void main() {
           'expertName',
           'bookingDate',
           'bookingTime',
+          'offerId',
           'duration',
           'amount',
+          'currency',
           'paymentStatus',
           'status',
           'agoraChannel',
@@ -148,8 +150,12 @@ void main() {
         expect(data['expertId'], expertId);
         expect(data['status'], 'pending_payment');
         expect(data['paymentStatus'], 'pending');
-        expect(data['amount'], 15000);
-        expect(data['duration'], 30);
+        // AD-021: the commercial snapshot is persisted through the existing
+        // transaction, exactly as supplied by the selected offer.
+        expect(data['offerId'], 'expert:$expertId:consultation:120m');
+        expect(data['amount'], 100000);
+        expect(data['duration'], 120);
+        expect(data['currency'], 'XOF');
         expect(data['createdAt'], isA<Timestamp>());
 
         final unrelatedAfter = await unrelated.get(
@@ -210,5 +216,9 @@ BookingCreation _booking({
     agoraChannel: 'mentora_arch008',
     clientNeed: 'Need',
     aiSummary: 'Summary',
+    offerId: 'expert:$expertId:consultation:120m',
+    durationMinutes: 120,
+    amountMinor: 100000,
+    currency: 'XOF',
   );
 }

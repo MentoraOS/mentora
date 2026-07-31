@@ -12,6 +12,13 @@ class PaymentScreen extends StatefulWidget {
   final String selectedTime;
   final String aiSummary;
 
+  /// Authoritative commercial amount, copied from the Booking commercial
+  /// snapshot (AD-021 decision 12). Payment consumes it and never computes it.
+  final int amountMinor;
+
+  /// Authoritative ISO 4217 currency of [amountMinor].
+  final String currency;
+
   const PaymentScreen({
     super.key,
     required this.bookingId,
@@ -19,6 +26,8 @@ class PaymentScreen extends StatefulWidget {
     required this.selectedDate,
     required this.selectedTime,
     required this.aiSummary,
+    required this.amountMinor,
+    required this.currency,
   });
 
   @override
@@ -31,15 +40,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
   bool isProcessing = false;
   String paymentMethod = "wave";
   bool acceptedTerms = false;
-  final int consultationPrice = 50000;
-  late final int total = consultationPrice;
+  late final int total = widget.amountMinor;
 
   final NumberFormat money = NumberFormat('#,##0', 'fr_FR');
 
   final String countryCode = 'ML';
 
   late final countryConfig = CountryEngine.getByCode(countryCode);
-  late final String currency = countryConfig.currency;
   late final List<String> availablePaymentProviders =
       countryConfig.paymentProviders;
 
@@ -300,7 +307,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
                   _SummaryRow(
                     title: "TOTAL",
-                    value: "${money.format(total)} FCFA",
+                    value: "${money.format(total)} ${widget.currency}",
                     highlight: true,
                   ),
                 ],
@@ -377,7 +384,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       }
                     : null,
                 label: Text(
-                  "Payer ${money.format(total)} FCFA",
+                  "Payer ${money.format(total)} ${widget.currency}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../domain/expert_catalog/consultation_offer.dart';
 import '../../domain/expert_catalog/expert_catalog_entry.dart';
 import 'package:provider/provider.dart';
 import '../../application/authentication/authentication_session.dart';
@@ -302,6 +303,8 @@ class AppRouter {
     required String selectedDate,
     required String selectedTime,
     required String aiSummary,
+    required int amountMinor,
+    required String currency,
   }) {
     return push(
       context,
@@ -311,6 +314,8 @@ class AppRouter {
         selectedDate: selectedDate,
         selectedTime: selectedTime,
         aiSummary: aiSummary,
+        amountMinor: amountMinor,
+        currency: currency,
       ),
     );
   }
@@ -365,6 +370,7 @@ class AppRouter {
     required String selectedDate,
     required String selectedTime,
     required String expertId,
+    required ConsultationOffer offer,
   }) {
     return push(
       context,
@@ -373,6 +379,7 @@ class AppRouter {
         selectedDate: selectedDate,
         selectedTime: selectedTime,
         expertId: expertId,
+        offer: offer,
       ),
     );
   }

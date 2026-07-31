@@ -1,8 +1,14 @@
 /// The immutable facts required to persist an initial Booking.
 ///
-/// ARCH-008 deliberately preserves the legacy date, time, amount, duration,
-/// status, and payment-status representations. It does not interpret them as
-/// Scheduling, Payment, or lifecycle policy.
+/// ARCH-008 deliberately preserves the legacy date, time, status and
+/// payment-status representations. It does not interpret them as Scheduling,
+/// Payment, or lifecycle policy.
+///
+/// ARCH-009B adds the reservation-level commercial snapshot required by
+/// AD-021 decision 7. The snapshot is copied by value from the selected
+/// Consultation Offer, so a later Expert Catalog edit cannot mutate an
+/// existing Booking's commercial truth. There is no hardcoded duration or
+/// amount default: missing commercial truth is an explicit failure.
 final class BookingCreation {
   factory BookingCreation({
     required String clientId,
@@ -13,6 +19,10 @@ final class BookingCreation {
     required String agoraChannel,
     required String clientNeed,
     required String aiSummary,
+    required String offerId,
+    required int durationMinutes,
+    required int amountMinor,
+    required String currency,
   }) {
     _requireNonBlank(clientId, 'clientId');
     _requireNonBlank(expertId, 'expertId');
@@ -20,6 +30,23 @@ final class BookingCreation {
     _requireNonBlank(bookingDate, 'bookingDate');
     _requireNonBlank(bookingTime, 'bookingTime');
     _requireNonBlank(agoraChannel, 'agoraChannel');
+    _requireNonBlank(offerId, 'offerId');
+    _requireNonBlank(currency, 'currency');
+
+    if (durationMinutes <= 0) {
+      throw ArgumentError.value(
+        durationMinutes,
+        'durationMinutes',
+        'must be strictly positive',
+      );
+    }
+    if (amountMinor < 0) {
+      throw ArgumentError.value(
+        amountMinor,
+        'amountMinor',
+        'must not be negative',
+      );
+    }
 
     return BookingCreation._(
       clientId: clientId,
@@ -30,6 +57,10 @@ final class BookingCreation {
       agoraChannel: agoraChannel,
       clientNeed: clientNeed,
       aiSummary: aiSummary,
+      offerId: offerId,
+      durationMinutes: durationMinutes,
+      amountMinor: amountMinor,
+      currency: currency,
     );
   }
 
@@ -42,10 +73,12 @@ final class BookingCreation {
     required this.agoraChannel,
     required this.clientNeed,
     required this.aiSummary,
+    required this.offerId,
+    required this.durationMinutes,
+    required this.amountMinor,
+    required this.currency,
   });
 
-  static const int durationMinutes = 30;
-  static const int amount = 15000;
   static const String paymentStatus = 'pending';
   static const String initialStatus = 'pending_payment';
 
@@ -57,6 +90,12 @@ final class BookingCreation {
   final String agoraChannel;
   final String clientNeed;
   final String aiSummary;
+
+  /// Commercial snapshot copied from the selected Consultation Offer.
+  final String offerId;
+  final int durationMinutes;
+  final int amountMinor;
+  final String currency;
 
   String get slotIdentity => '$expertId|$bookingDate|$bookingTime';
 
@@ -71,7 +110,11 @@ final class BookingCreation {
             other.bookingTime == bookingTime &&
             other.agoraChannel == agoraChannel &&
             other.clientNeed == clientNeed &&
-            other.aiSummary == aiSummary;
+            other.aiSummary == aiSummary &&
+            other.offerId == offerId &&
+            other.durationMinutes == durationMinutes &&
+            other.amountMinor == amountMinor &&
+            other.currency == currency;
   }
 
   @override
@@ -84,6 +127,10 @@ final class BookingCreation {
     agoraChannel,
     clientNeed,
     aiSummary,
+    offerId,
+    durationMinutes,
+    amountMinor,
+    currency,
   );
 }
 

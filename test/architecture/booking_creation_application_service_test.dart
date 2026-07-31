@@ -4,6 +4,7 @@ import 'package:mentora/application/booking/booking_creation_application_service
 import 'package:mentora/application/booking/booking_creation_failure.dart';
 import 'package:mentora/domain/booking/booking_creation.dart';
 import 'package:mentora/domain/booking/booking_creation_repository.dart';
+import 'package:mentora/domain/expert_catalog/consultation_offer.dart';
 
 void main() {
   group('BookingCreationApplicationService', () {
@@ -119,6 +120,7 @@ BookingCreationApplicationService _service(
 Future<String> _create(
   BookingCreationApplicationService service, {
   String expertId = 'expert_1',
+  ConsultationOffer? offer,
 }) {
   return service.create(
     expertId: expertId,
@@ -127,6 +129,21 @@ Future<String> _create(
     bookingTime: ' 09:00 ',
     clientNeed: 'Need',
     aiSummary: 'Summary',
+    offer: offer ?? _offer(),
+  );
+}
+
+ConsultationOffer _offer({
+  String expertId = 'expert_1',
+  bool clientSelectable = true,
+}) {
+  return ConsultationOffer(
+    offerId: 'expert:$expertId:consultation:60m',
+    expertId: expertId,
+    durationMinutes: 60,
+    amountMinor: 50000,
+    currency: 'XOF',
+    clientSelectable: clientSelectable,
   );
 }
 
