@@ -23,6 +23,7 @@ final class ExpertCatalogFirestoreMapper {
       rate30: _optionalNumber(data['rate30']),
       rate60: _optionalNumber(data['rate60']),
       rate120: _optionalNumber(data['rate120']),
+      expertTimezone: _optionalTimezoneIdentity(data['expertTimezone']),
       specialities: _firstStringList(data['specialities'], data['skills']),
       languages: _optionalStringList(data['languages']),
       bio: _firstOptionalString(data['bio'], data['about']),
@@ -70,6 +71,22 @@ final class ExpertCatalogFirestoreMapper {
 
   String? _optionalString(Object? value) {
     return value is String ? value : null;
+  }
+
+  /// Reads the expert's declared timezone identity (AD-022 Clarification A).
+  ///
+  /// A missing or non-string value stays absent. A blank value is absence, not
+  /// an identity. No replacement is inferred: never `UTC`, never a
+  /// country-derived zone, never a device or launch-market default. The value
+  /// is carried through as an opaque identity and validated where Scheduling
+  /// interprets it, consistent with this mapper's tolerant read contract.
+  String? _optionalTimezoneIdentity(Object? value) {
+    final identity = _optionalString(value)?.trim();
+    if (identity == null || identity.isEmpty) {
+      return null;
+    }
+
+    return identity;
   }
 
   num? _optionalNumber(Object? value) {

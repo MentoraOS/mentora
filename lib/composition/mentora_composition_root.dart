@@ -13,6 +13,7 @@ import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
+import '../infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
@@ -118,6 +119,10 @@ final class MentoraCompositionRoot {
 
     final startup = MentoraStartup(session: authenticationSession);
 
+    // Scheduling-owned timezone interpretation. The concrete resolver is
+    // constructed here and exposed only through its port.
+    const timezoneResolver = LaunchMarketTimezoneResolver();
+
     return MentoraDependencies(
       authenticationSession: authenticationSession,
       bookingCreation: bookingCreation,
@@ -127,6 +132,7 @@ final class MentoraCompositionRoot {
       favoriteExperts: favoriteExperts,
       profile: profile,
       startup: startup,
+      timezoneResolver: timezoneResolver,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,

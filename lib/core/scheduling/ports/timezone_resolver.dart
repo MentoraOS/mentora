@@ -57,15 +57,36 @@ final class TimezoneId {
   String toString() => value;
 }
 
+/// Raised when a resolver cannot interpret the requested timezone identity.
+///
+/// A resolver MUST fail closed rather than approximate an unsupported zone.
+/// It MUST NOT substitute `UTC`, a device timezone, a country-derived zone or
+/// any other identity.
+final class UnsupportedTimezoneException implements Exception {
+  const UnsupportedTimezoneException(this.zone);
+
+  final TimezoneId zone;
+
+  @override
+  String toString() {
+    return 'UnsupportedTimezoneException: $zone is not supported by this '
+        'resolver.';
+  }
+}
+
 /// Scheduling-owned port resolving expert-local civil time to instants.
 ///
 /// AD-020: Scheduling owns this abstraction; the Domain depends on the port
-/// and never on an implementation. Implementations belong to Infrastructure
-/// and are not authorized in ARCH-009A, so no concrete resolver exists yet and
-/// no IANA or DST correctness is claimed by this wave.
+/// and never on an implementation. Implementations belong to Infrastructure.
+///
+/// The AD-020 Clarification (Production TimezoneResolver Authorization)
+/// authorizes a production implementation of this port for the purpose of
+/// satisfying AD-022. An implementation states its own supported identities;
+/// this port claims no IANA or DST coverage on their behalf.
 ///
 /// Implementations must reason from [TimezoneId] identity rather than from a
-/// fixed offset.
+/// fixed offset, and must throw [UnsupportedTimezoneException] for any
+/// identity they cannot interpret.
 abstract interface class TimezoneResolver {
   /// Resolves a civil (wall-clock) date-time in [zone] to a UTC instant.
   DateTime toUtc({required DateTime localDateTime, required TimezoneId zone});

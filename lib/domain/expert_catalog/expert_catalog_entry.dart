@@ -16,6 +16,7 @@ final class ExpertCatalogEntry {
     this.rate30,
     this.rate60,
     this.rate120,
+    this.expertTimezone,
     List<String>? specialities,
     List<String>? languages,
     this.bio,
@@ -38,6 +39,23 @@ final class ExpertCatalogEntry {
   final num? rate30;
   final num? rate60;
   final num? rate120;
+
+  /// The expert's declared timezone identity, as a named IANA identifier
+  /// (AD-022 Clarification A).
+  ///
+  /// Expert Catalog OWNS this identity; Scheduling INTERPRETS it; Booking
+  /// snapshots it. Expert Catalog performs no timezone conversion.
+  ///
+  /// Nullable at the persistence/read boundary so legacy expert records
+  /// remain readable. Absence stays absence: it is never defaulted to `UTC`,
+  /// never derived from [country], never taken from the device, and never
+  /// taken from a launch-market default. Modern reservation eligibility fails
+  /// closed on absence in a later wave.
+  ///
+  /// The value is an opaque identity here. Validity is established where the
+  /// identity is interpreted, so one malformed expert document cannot poison
+  /// catalog reads for every other expert.
+  final String? expertTimezone;
   final List<String>? specialities;
   final List<String>? languages;
   final String? bio;
