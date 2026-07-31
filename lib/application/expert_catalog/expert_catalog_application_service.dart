@@ -9,6 +9,24 @@ final class ExpertCatalogApplicationService {
 
   final ExpertCatalogRepository _repository;
 
+  /// The authoritative Catalog entry for [expertId], or `null` when absent.
+  ///
+  /// This is a Catalog lookup only: it does not validate reservation
+  /// eligibility, interpret timezones, determine availability or evaluate
+  /// conflict. Callers that need temporal truth pass the returned identity to
+  /// Scheduling.
+  Future<ExpertCatalogEntry?> findById(String expertId) async {
+    try {
+      return await _repository.findById(expertId);
+    } on ExpertCatalogFailure {
+      rethrow;
+    } on ExpertCatalogRepositoryException catch (error) {
+      throw ExpertCatalogInfrastructureFailure(cause: error.cause);
+    } catch (error) {
+      throw ExpertCatalogInfrastructureFailure(cause: error);
+    }
+  }
+
   Stream<List<ExpertCatalogEntry>> watchExperts() {
     return _repository.watchExperts().handleError((
       Object error,

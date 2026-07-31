@@ -59,6 +59,17 @@ final class _FakeExpertCatalogRepository implements ExpertCatalogRepository {
     }
     return Stream.value(experts);
   }
+
+  @override
+  Future<ExpertCatalogEntry?> findById(String expertId) async {
+    if (error case final error?) {
+      throw ExpertCatalogRepositoryException(cause: error);
+    }
+    for (final expert in experts) {
+      if (expert.id == expertId) return expert;
+    }
+    return null;
+  }
 }
 
 ExpertCatalogEntry _expert(String id) {

@@ -59,6 +59,14 @@ final class _FakeExpertCatalogRepository implements ExpertCatalogRepository {
   Stream<List<ExpertCatalogEntry>> watchExperts() {
     return Stream.value(experts);
   }
+
+  @override
+  Future<ExpertCatalogEntry?> findById(String expertId) async {
+    for (final expert in experts) {
+      if (expert.id == expertId) return expert;
+    }
+    return null;
+  }
 }
 
 ExpertCatalogEntry _expert({required String id, required String name}) {
