@@ -4,6 +4,8 @@ import 'booking_success_screen.dart';
 import 'package:intl/intl.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
 import '../application/booking/booking_confirmation_failure.dart';
+import '../application/payment/payment_collection_application_service.dart';
+import '../domain/payment/payment_collection_provider.dart';
 import 'payment_success_animation.dart';
 import '../core/engines/country/country_engine.dart';
 import '../core/routing/app_router.dart';
@@ -366,23 +368,52 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           builder: (_) => const _PaymentLoadingDialog(),
                         );
 
-                        // Simulated provider outcome. Only this confirmed
-                        // outcome may reach the Booking boundary below.
-                        await Future.delayed(const Duration(seconds: 3));
-
-                        // AD-022 decisions 11/12: the reservation is
-                        // confirmed by Booking, never by this screen. A
-                        // failed confirmation never becomes a success page.
+                        // AD-022 decisions 11/12: the provider boundary
+                        // returns confirmed or definitively rejected;
+                        // ambiguity throws and is never success. Only a
+                        // confirmed collection reaches the Booking-owned
+                        // confirmation, and a failed confirmation never
+                        // becomes a success page.
                         var confirmed = false;
+                        var failureText =
+                            'Le paiement n’a pas abouti. '
+                            'Réessayez.';
                         try {
-                          if (context.mounted) {
-                            await context
-                                .read<BookingConfirmationApplicationService>()
-                                .confirmPaid(widget.bookingId);
-                            confirmed = true;
+                          final outcome = await context
+                              .read<PaymentCollectionApplicationService>()
+                              .collect(
+                                bookingId: widget.bookingId,
+                                amountMinor: widget.amountMinor,
+                                currency: widget.currency,
+                                method: paymentMethod,
+                              );
+
+                          switch (outcome) {
+                            case PaymentCollectionConfirmed():
+                              if (context.mounted) {
+                                await context
+                                    .read<
+                                      BookingConfirmationApplicationService
+                                    >()
+                                    .confirmPaid(widget.bookingId);
+                                confirmed = true;
+                              }
+                            case PaymentCollectionRejected():
+                              failureText =
+                                  'Paiement refusé par le prestataire. '
+                                  'Choisissez un autre moyen de paiement.';
                           }
+                        } on PaymentCollectionProviderFailure {
+                          failureText =
+                              'Le paiement n’a pas pu être '
+                              'vérifié. Réessayez ou '
+                              'contactez le support.';
                         } on BookingConfirmationFailure {
-                          confirmed = false;
+                          failureText =
+                              'La confirmation de la réservation a '
+                              'échoué. Le paiement sera '
+                              'vérifié ; réessayez ou '
+                              'contactez le support.';
                         } catch (_) {
                           confirmed = false;
                         }
@@ -401,14 +432,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'La confirmation de la réservation a '
-                                  'échoué. Le paiement sera '
-                                  'vérifié ; réessayez ou '
-                                  'contactez le support.',
-                                ),
-                              ),
+                              SnackBar(content: Text(failureText)),
                             );
                           }
                         }

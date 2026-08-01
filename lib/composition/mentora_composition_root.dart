@@ -8,6 +8,7 @@ import '../application/expert_availability/expert_availability_application_servi
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
+import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
@@ -25,6 +26,7 @@ import '../infrastructure/expert_availability/firestore_expert_availability_repo
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
 import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.dart';
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
+import '../infrastructure/payment/simulated_payment_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
 import 'mentora_dependencies.dart';
 
@@ -154,6 +156,13 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Product-facing Payment Provider boundary (AD-021 decision 12). The
+    // simulated adapter is replaced by a real PSP adapter later; nothing
+    // upstream changes.
+    const paymentCollection = PaymentCollectionApplicationService(
+      provider: SimulatedPaymentProvider(),
+    );
+
     // AD-022 decision 12: Booking consumes the confirmed payment outcome
     // through its own boundary; Payment owns no reservation state.
     final bookingConfirmation = BookingConfirmationApplicationService(
@@ -172,6 +181,7 @@ final class MentoraCompositionRoot {
       expertCatalog: expertCatalog,
       expertTimezone: expertTimezone,
       favoriteExperts: favoriteExperts,
+      paymentCollection: paymentCollection,
       profile: profile,
       selectableOccurrences: selectableOccurrences,
       startup: startup,

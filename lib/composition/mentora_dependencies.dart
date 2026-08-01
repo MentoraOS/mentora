@@ -6,6 +6,7 @@ import '../application/expert_availability/expert_availability_application_servi
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
+import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
@@ -25,6 +26,7 @@ final class MentoraDependencies {
     required this.expertCatalog,
     required this.expertTimezone,
     required this.favoriteExperts,
+    required this.paymentCollection,
     required this.profile,
     required this.selectableOccurrences,
     required this.startup,
@@ -48,6 +50,10 @@ final class MentoraDependencies {
   final ExpertTimezoneApplicationService expertTimezone;
 
   final FavoriteExpertsApplicationService favoriteExperts;
+
+  /// Product-facing Payment Provider boundary (AD-021 decision 12).
+  final PaymentCollectionApplicationService paymentCollection;
+
   final ProfileApplicationService profile;
 
   /// AD-022 Clarification C: Application-owned selectable occurrence
