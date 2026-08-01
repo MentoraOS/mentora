@@ -230,6 +230,10 @@ void main() {
         'lib/composition/mentora_dependencies.dart',
         // The consent UI follows the RecordingSession contract only.
         'lib/widgets/recording_consent_controller.dart',
+        // The coordinator and its indicator relay the session lifecycle.
+        'lib/application/recording/recording_orchestrator.dart',
+        'lib/widgets/recording_indicator.dart',
+        'lib/screens/live_consultation_screen.dart',
       ];
 
       final offenders = <String>[];

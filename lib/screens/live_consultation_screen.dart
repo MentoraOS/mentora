@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
+import '../application/recording/recording_orchestrator.dart';
 import '../domain/action_items/action_items_provider.dart';
 import '../domain/assistant/assistant_provider.dart';
 import '../domain/translation/translation_provider.dart';
@@ -17,6 +18,7 @@ import '../widgets/assistant_overlay.dart';
 import '../widgets/live_subtitle_overlay.dart';
 import '../widgets/recording_consent_controller.dart';
 import '../widgets/recording_consent_overlay.dart';
+import '../widgets/recording_indicator.dart';
 import '../widgets/subtitle_controller.dart';
 import '../widgets/video_track_view.dart';
 
@@ -31,6 +33,7 @@ class LiveConsultationScreen extends StatefulWidget {
     this.assistant,
     this.actionItems,
     this.recordingConsent = false,
+    this.recordingOrchestrator,
   });
 
   final VideoSessionInfo session;
@@ -56,6 +59,11 @@ class LiveConsultationScreen extends StatefulWidget {
   /// cross-device synchronization arrive with their own waves.
   final bool recordingConsent;
 
+  /// The per-consultation recording coordinator; null records nothing.
+  /// The screen only CONNECTS the consent controller to it — every
+  /// business rule stays in the recording service behind it.
+  final RecordingOrchestrator? recordingOrchestrator;
+
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
 }
@@ -69,6 +77,18 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   RecordingConsentController? _recordingConsent;
   String? _failureMessage;
 
+  void _pushConsents() {
+    final consent = _recordingConsent;
+    final orchestrator = widget.recordingOrchestrator;
+    if (consent == null || orchestrator == null) return;
+    unawaited(
+      orchestrator.onConsents(
+        clientConsent: consent.clientDecision == ConsentDecision.accepted,
+        expertConsent: consent.expertDecision == ConsentDecision.accepted,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -76,7 +96,13 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
       _subtitles = SubtitleController(translation: translation);
     }
     if (widget.recordingConsent) {
-      _recordingConsent = RecordingConsentController();
+      final consent = RecordingConsentController();
+      _recordingConsent = consent;
+      // Pure connection: the consents flow to the coordinator, which
+      // waits for the double agreement and lets the service enforce it.
+      if (widget.recordingOrchestrator != null) {
+        consent.addListener(_pushConsents);
+      }
     }
     // Fail closed: no expert session means NO expert-only surface — the
     // client never sees the copilot nor the action review.
@@ -147,6 +173,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     _subtitles?.dispose();
     _assistant?.dispose();
     _actionItems?.dispose();
+    _recordingConsent?.removeListener(_pushConsents);
     _recordingConsent?.dispose();
     final room = _room;
     if (room != null) unawaited(room.dispose());
@@ -248,6 +275,17 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                 if (_recordingConsent case final consent?)
                   Positioned.fill(
                     child: RecordingConsentOverlay(controller: consent),
+                  ),
+                // The REC indicator: extremely discreet, top center,
+                // following only the relayed recording lifecycle.
+                if (widget.recordingOrchestrator case final orchestrator?)
+                  Positioned(
+                    top: 8,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: RecordingIndicator(orchestrator: orchestrator),
+                    ),
                   ),
               ],
             ),
