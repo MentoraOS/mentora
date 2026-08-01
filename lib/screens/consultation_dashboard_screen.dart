@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../application/authentication/authentication_session.dart';
 import '../domain/booking/booking_overview.dart';
 import '../theme/mentora_theme.dart';
+import '../widgets/consultation_timeline.dart';
 
 /// Consultation Dashboard: the dedicated space for a confirmed reservation.
 ///
@@ -79,6 +80,13 @@ class ConsultationDashboardScreen extends StatelessWidget {
                   _StatusBadge(status: booking.status),
                 ],
               ),
+            ),
+            const SizedBox(height: 16),
+
+            _DashboardCard(
+              title: 'Progression',
+              icon: Icons.timeline,
+              child: ConsultationTimeline(booking: booking),
             ),
             const SizedBox(height: 16),
 
