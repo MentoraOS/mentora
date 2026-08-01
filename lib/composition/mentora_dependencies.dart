@@ -17,6 +17,7 @@ import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
+import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
 import '../application/video_session/video_session_application_service.dart';
@@ -47,6 +48,7 @@ final class MentoraDependencies {
     required this.favoriteExperts,
     required this.paymentCollection,
     required this.profile,
+    required this.reviews,
     required this.selectableOccurrences,
     required this.startup,
     required this.timezoneResolver,
@@ -104,6 +106,9 @@ final class MentoraDependencies {
   final PaymentCollectionApplicationService paymentCollection;
 
   final ProfileApplicationService profile;
+
+  /// Consultation reviews: one per completed reservation, plain reads.
+  final ReviewApplicationService reviews;
 
   /// AD-022 Clarification C: Application-owned selectable occurrence
   /// materialization and revalidation.

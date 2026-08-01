@@ -7,6 +7,7 @@ import '../application/scheduling/selectable_occurrence_application_service.dart
 import '../application/scheduling/selectable_occurrence_failure.dart';
 import '../domain/booking/expert_booking_occupancy.dart';
 import '../theme/mentora_theme.dart';
+import '../widgets/expert_reviews_list.dart';
 import 'pre_consultation_screen.dart';
 import 'package:intl/intl.dart';
 import '../core/routing/app_router.dart';
@@ -282,7 +283,10 @@ class _ExpertDetailScreenState extends State<ExpertDetailScreen> {
             ),
             const SizedBox(height: 16),
 
-            const _ReviewsSection(),
+            _SectionCard(
+              title: 'Avis clients',
+              child: ExpertReviewsList(expertId: expert.id),
+            ),
           ],
         ),
       ),
@@ -886,36 +890,6 @@ class _ChipsSection extends StatelessWidget {
   }
 }
 
-class _ReviewsSection extends StatelessWidget {
-  const _ReviewsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _SectionCard(
-      title: 'Avis clients',
-      child: Column(
-        children: [
-          _ReviewItem(
-            rating: '5.0',
-            comment:
-                'Excellent mentor. Ses conseils sont clairs, précis et directement applicables.',
-            author: 'Fatou B.',
-            country: 'Sénégal',
-          ),
-          Divider(),
-          _ReviewItem(
-            rating: '5.0',
-            comment:
-                'Grâce à cette consultation, j’ai mieux structuré ma stratégie de croissance.',
-            author: 'Mohamed D.',
-            country: 'Mali',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
@@ -1047,54 +1021,6 @@ class _ChipText extends StatelessWidget {
           fontWeight: FontWeight.w700,
           letterSpacing: .2,
         ),
-      ),
-    );
-  }
-}
-
-class _ReviewItem extends StatelessWidget {
-  final String rating;
-  final String comment;
-  final String author;
-  final String country;
-
-  const _ReviewItem({
-    required this.rating,
-    required this.comment,
-    required this.author,
-    required this.country,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.star, color: MentoraColors.gold, size: 16),
-              const SizedBox(width: 4),
-              Text(
-                rating,
-                style: const TextStyle(
-                  color: MentoraColors.gold,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(comment, style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 8),
-          Text(
-            '— $author, $country',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }

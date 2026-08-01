@@ -22,6 +22,7 @@ import 'application/favorites/favorite_experts_application_service.dart';
 import 'application/notification/booking_notification_application_service.dart';
 import 'application/payment/payment_collection_application_service.dart';
 import 'application/profile/profile_application_service.dart';
+import 'application/review/review_application_service.dart';
 import 'application/scheduling/selectable_occurrence_application_service.dart';
 import 'application/startup/mentora_startup.dart';
 import 'application/video_session/video_session_application_service.dart';
@@ -84,6 +85,9 @@ void main() async {
         ),
         Provider<ConsultationCompletionApplicationService>.value(
           value: dependencies.consultationCompletion,
+        ),
+        Provider<ReviewApplicationService>.value(
+          value: dependencies.reviews,
         ),
         Provider<ConsultationDocumentApplicationService>.value(
           value: dependencies.consultationDocuments,

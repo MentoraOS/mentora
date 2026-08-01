@@ -20,6 +20,7 @@ import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
+import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
 import '../application/video_session/video_session_application_service.dart';
@@ -49,6 +50,7 @@ import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/notification/simulated_notification_provider.dart';
 import '../infrastructure/payment/simulated_payment_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
+import '../infrastructure/review/firestore_consultation_review_repository.dart';
 import 'mentora_dependencies.dart';
 
 import '../infrastructure/session/firebase_session_repository.dart';
@@ -280,6 +282,15 @@ final class MentoraCompositionRoot {
       provider: const LiveKitCloudAdapter(),
     );
 
+    // Consultation reviews: one review per completed reservation, plain
+    // chronological reads — no ranking, no averages.
+    final reviews = ReviewApplicationService(
+      session: authenticationSession,
+      repository: FirestoreConsultationReviewRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     // Dashboard read projection: live stream of the user's reservations.
     final bookingDashboard = BookingDashboardApplicationService(
       session: authenticationSession,
@@ -308,6 +319,7 @@ final class MentoraCompositionRoot {
       favoriteExperts: favoriteExperts,
       paymentCollection: paymentCollection,
       profile: profile,
+      reviews: reviews,
       selectableOccurrences: selectableOccurrences,
       startup: startup,
       timezoneResolver: timezoneResolver,

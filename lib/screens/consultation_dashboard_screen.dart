@@ -14,7 +14,9 @@ import '../theme/mentora_theme.dart';
 import '../widgets/consultation_brief_card.dart';
 import '../widgets/consultation_documents_card.dart';
 import '../widgets/consultation_private_notes_card.dart';
+import '../widgets/consultation_review_card.dart';
 import '../widgets/consultation_timeline.dart';
+import 'review_screen.dart';
 
 /// Consultation Dashboard: the dedicated space for a confirmed reservation.
 ///
@@ -147,6 +149,8 @@ class _ConsultationDashboardScreenState
     final canComplete =
         !_completed &&
         (booking.status == 'confirmed' || booking.status == 'paid');
+    final canReview =
+        !isExpert && (_completed || booking.status == 'completed');
 
     return Scaffold(
       backgroundColor: MentoraColors.navy,
@@ -272,6 +276,13 @@ class _ConsultationDashboardScreenState
             ),
             const SizedBox(height: 16),
 
+            _DashboardCard(
+              title: 'Avis',
+              icon: Icons.star_border,
+              child: ConsultationReviewCard(bookingId: booking.bookingId),
+            ),
+            const SizedBox(height: 16),
+
             const _DashboardCard(
               title: 'Messages',
               icon: Icons.chat_bubble_outline,
@@ -319,6 +330,34 @@ class _ConsultationDashboardScreenState
                   icon: const Icon(Icons.task_alt),
                   label: const Text(
                     'Terminer la consultation',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+            if (canReview) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => ReviewScreen(
+                          bookingId: booking.bookingId,
+                          expertName: booking.expertName,
+                        ),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: MentoraColors.gold,
+                    side: const BorderSide(color: MentoraColors.gold),
+                  ),
+                  icon: const Icon(Icons.star_border),
+                  label: const Text(
+                    'Donner un avis',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

@@ -9,6 +9,7 @@ import '../application/notification/booking_notification_application_service.dar
 import '../domain/booking/booking_overview.dart';
 import '../core/routing/app_router.dart';
 import '../theme/mentora_theme.dart';
+import 'review_screen.dart';
 
 /// Booking Dashboard: the reference screen for a user's reservations.
 ///
@@ -327,9 +328,13 @@ class _BookingCard extends StatelessWidget {
             icon: Icons.star_border,
             label: 'Donner un avis',
             onPressed: () {
-              // Review flow placeholder — its own future milestone.
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Les avis arrivent bientôt.')),
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ReviewScreen(
+                    bookingId: booking.bookingId,
+                    expertName: booking.expertName,
+                  ),
+                ),
               );
             },
           ),
