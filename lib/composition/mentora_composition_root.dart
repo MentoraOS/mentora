@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../application/ai_gateway/ai_gateway_application_service.dart';
 import '../application/authentication/default_authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
@@ -28,6 +29,7 @@ import '../application/transcript/transcript_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
+import '../infrastructure/ai_gateway/simulated_ai_provider.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_cancellation_repository.dart';
 import '../infrastructure/booking/firestore_booking_confirmation_repository.dart';
@@ -290,6 +292,14 @@ final class MentoraCompositionRoot {
 
     const liveConsultationRooms = LiveKitRoomProvider();
 
+    // AI Gateway foundation: the single doorway every future intelligence
+    // capability must pass through. One simulated provider, no selection
+    // logic, no engine, no generated content.
+    final aiGateway = AIGatewayApplicationService(
+      session: authenticationSession,
+      provider: const SimulatedAIProvider(),
+    );
+
     // Transcript foundation: opaque audio transport behind its port. The
     // simulated provider emits lifecycle events only — no transcription
     // exists anywhere yet.
@@ -326,6 +336,7 @@ final class MentoraCompositionRoot {
     );
 
     return MentoraDependencies(
+      aiGateway: aiGateway,
       authenticationSession: authenticationSession,
       bookingCancellation: bookingCancellation,
       bookingConfirmation: bookingConfirmation,

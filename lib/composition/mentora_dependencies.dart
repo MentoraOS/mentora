@@ -1,3 +1,4 @@
+import '../application/ai_gateway/ai_gateway_application_service.dart';
 import '../application/authentication/authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
@@ -32,6 +33,7 @@ import '../domain/workspace/workspace_repository.dart';
 
 final class MentoraDependencies {
   const MentoraDependencies({
+    required this.aiGateway,
     required this.authenticationSession,
     required this.bookingCancellation,
     required this.bookingConfirmation,
@@ -63,6 +65,9 @@ final class MentoraDependencies {
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
   });
+
+  /// The single doorway to every future AI capability (ARC-AI01).
+  final AIGatewayApplicationService aiGateway;
 
   final AuthenticationSession authenticationSession;
 
