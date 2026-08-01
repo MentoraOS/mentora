@@ -228,6 +228,8 @@ void main() {
         'lib/infrastructure/recording/livekit_recording_provider.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
+        // The consent UI follows the RecordingSession contract only.
+        'lib/widgets/recording_consent_controller.dart',
       ];
 
       final offenders = <String>[];

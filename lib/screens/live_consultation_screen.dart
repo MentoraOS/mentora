@@ -15,6 +15,8 @@ import '../widgets/action_items_overlay.dart';
 import '../widgets/assistant_controller.dart';
 import '../widgets/assistant_overlay.dart';
 import '../widgets/live_subtitle_overlay.dart';
+import '../widgets/recording_consent_controller.dart';
+import '../widgets/recording_consent_overlay.dart';
 import '../widgets/subtitle_controller.dart';
 import '../widgets/video_track_view.dart';
 
@@ -28,6 +30,7 @@ class LiveConsultationScreen extends StatefulWidget {
     this.subtitles,
     this.assistant,
     this.actionItems,
+    this.recordingConsent = false,
   });
 
   final VideoSessionInfo session;
@@ -48,6 +51,11 @@ class LiveConsultationScreen extends StatefulWidget {
   /// review surface.
   final ActionItemsStream? actionItems;
 
+  /// Whether the recording consent surface is offered. Consent stays a
+  /// free, local choice in this wave; the real recording start and the
+  /// cross-device synchronization arrive with their own waves.
+  final bool recordingConsent;
+
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
 }
@@ -58,6 +66,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   SubtitleController? _subtitles;
   AssistantController? _assistant;
   ActionItemsController? _actionItems;
+  RecordingConsentController? _recordingConsent;
   String? _failureMessage;
 
   @override
@@ -65,6 +74,9 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     super.initState();
     if (widget.subtitles case final translation?) {
       _subtitles = SubtitleController(translation: translation);
+    }
+    if (widget.recordingConsent) {
+      _recordingConsent = RecordingConsentController();
     }
     // Fail closed: no expert session means NO expert-only surface — the
     // client never sees the copilot nor the action review.
@@ -135,6 +147,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     _subtitles?.dispose();
     _assistant?.dispose();
     _actionItems?.dispose();
+    _recordingConsent?.dispose();
     final room = _room;
     if (room != null) unawaited(room.dispose());
     super.dispose();
@@ -229,6 +242,12 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                 if (_actionItems case final actionItems?)
                   Positioned.fill(
                     child: ActionItemsOverlay(controller: actionItems),
+                  ),
+                // Recording consent: a free, informed, respected choice
+                // for each participant — never a formality.
+                if (_recordingConsent case final consent?)
+                  Positioned.fill(
+                    child: RecordingConsentOverlay(controller: consent),
                   ),
               ],
             ),
