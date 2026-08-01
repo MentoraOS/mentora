@@ -1,5 +1,7 @@
 import '../../domain/consultation_documents/consultation_shared_document.dart';
 import '../authentication/authentication_session.dart';
+import '../consultation_memory/consultation_memory_application_service.dart';
+import '../../domain/consultation_memory/consultation_memory.dart';
 import 'consultation_document_failure.dart';
 
 /// Uploads and lists shared consultation documents for the session user.
@@ -11,11 +13,16 @@ final class ConsultationDocumentApplicationService {
   const ConsultationDocumentApplicationService({
     required AuthenticationSession session,
     required ConsultationSharedDocumentRepository repository,
+    ConsultationMemoryApplicationService? memory,
   }) : _session = session,
-       _repository = repository;
+       _repository = repository,
+       _memory = memory;
 
   final AuthenticationSession _session;
   final ConsultationSharedDocumentRepository _repository;
+
+  /// Optional memory producer; absent means no fact is recorded.
+  final ConsultationMemoryApplicationService? _memory;
 
   Future<void> upload({
     required String bookingId,
@@ -42,6 +49,11 @@ final class ConsultationDocumentApplicationService {
     } catch (error) {
       throw ConsultationDocumentRepositoryFailure(cause: error);
     }
+
+    await _recordFact(bookingId, MemoryEntryType.sharedDocument, {
+      'fileName': fileName.trim(),
+      'fileSize': bytes.length,
+    });
   }
 
   Future<List<ConsultationSharedDocument>> listByBookingId(
@@ -69,5 +81,20 @@ final class ConsultationDocumentApplicationService {
       throw const ConsultationDocumentUnauthenticatedFailure();
     }
     return userId;
+  }
+
+  /// Best-effort memory producer (ARC-MEM01): the business fact is recorded
+  /// through the single memory door AFTER the operation succeeded; a memory
+  /// failure never fails the business flow.
+  Future<void> _recordFact(
+    String bookingId,
+    MemoryEntryType type,
+    Map<String, Object?> payload,
+  ) async {
+    try {
+      await _memory?.record(bookingId: bookingId, type: type, payload: payload);
+    } catch (_) {
+      // Best-effort by contract.
+    }
   }
 }

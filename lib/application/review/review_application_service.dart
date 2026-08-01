@@ -1,6 +1,8 @@
 import '../../domain/review/consultation_review.dart';
 import '../../domain/review/consultation_review_repository.dart';
 import '../authentication/authentication_session.dart';
+import '../consultation_memory/consultation_memory_application_service.dart';
+import '../../domain/consultation_memory/consultation_memory.dart';
 import 'review_failure.dart';
 
 /// Consultation reviews: submit one review per completed reservation and
@@ -10,11 +12,16 @@ final class ReviewApplicationService {
   const ReviewApplicationService({
     required AuthenticationSession session,
     required ConsultationReviewRepository repository,
+    ConsultationMemoryApplicationService? memory,
   }) : _session = session,
-       _repository = repository;
+       _repository = repository,
+       _memory = memory;
 
   final AuthenticationSession _session;
   final ConsultationReviewRepository _repository;
+
+  /// Optional memory producer; absent means no fact is recorded.
+  final ConsultationMemoryApplicationService? _memory;
 
   /// Publishes the session client's single review of their completed
   /// reservation. Ownership and the completed state are verified
@@ -50,6 +57,11 @@ final class ReviewApplicationService {
     } catch (error) {
       throw ReviewRepositoryFailure(cause: error);
     }
+
+    await _recordFact(bookingId, MemoryEntryType.reviewCreated, {
+      'rating': rating,
+      'comment': comment.trim(),
+    });
   }
 
   /// Every review published for this expert, most recent first.
@@ -78,6 +90,21 @@ final class ReviewApplicationService {
       throw ReviewRepositoryFailure(cause: error.cause);
     } catch (error) {
       throw ReviewRepositoryFailure(cause: error);
+    }
+  }
+
+  /// Best-effort memory producer (ARC-MEM01): the business fact is recorded
+  /// through the single memory door AFTER the operation succeeded; a memory
+  /// failure never fails the business flow.
+  Future<void> _recordFact(
+    String bookingId,
+    MemoryEntryType type,
+    Map<String, Object?> payload,
+  ) async {
+    try {
+      await _memory?.record(bookingId: bookingId, type: type, payload: payload);
+    } catch (_) {
+      // Best-effort by contract.
     }
   }
 }

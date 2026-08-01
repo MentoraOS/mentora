@@ -202,6 +202,13 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Consultation memory foundation: one memory per reservation holding
+    // durable business facts only — never any engine output (ARC-MEM01).
+    final consultationMemory = ConsultationMemoryApplicationService(
+      session: authenticationSession,
+      repository: FirestoreMemoryRepository(firestore: firebase.firestore),
+    );
+
     // Booking lifecycle notifications: best-effort, never a workflow
     // condition. The simulated provider is replaced by a real channel later.
     final bookingNotifications = BookingNotificationApplicationService(
@@ -220,6 +227,7 @@ final class MentoraCompositionRoot {
     // through its own boundary; Payment owns no reservation state.
     final bookingConfirmation = BookingConfirmationApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreBookingConfirmationRepository(
         firestore: firebase.firestore,
       ),
@@ -229,6 +237,7 @@ final class MentoraCompositionRoot {
     // release and rescheduling remain separate future contracts.
     final bookingCancellation = BookingCancellationApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreBookingCancellationRepository(
         firestore: firebase.firestore,
       ),
@@ -238,6 +247,7 @@ final class MentoraCompositionRoot {
     // snapshotted duration; conflict exclusion stays a future contract.
     final bookingReschedule = BookingRescheduleApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreBookingRescheduleRepository(
         firestore: firebase.firestore,
       ),
@@ -253,6 +263,7 @@ final class MentoraCompositionRoot {
     // becomes completed; every other reservation fact is preserved.
     final consultationCompletion = ConsultationCompletionApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreConsultationCompletionRepository(
         firestore: firebase.firestore,
       ),
@@ -261,6 +272,7 @@ final class MentoraCompositionRoot {
     // Consultation brief: a plain persistent snapshot keyed by booking.
     final consultationBrief = ConsultationBriefApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreConsultationBriefRepository(
         firestore: firebase.firestore,
       ),
@@ -269,6 +281,7 @@ final class MentoraCompositionRoot {
     // Expert-only private consultation notes: plain write/read snapshot.
     final consultationPrivateNotes = ConsultationPrivateNotesApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreConsultationPrivateNotesRepository(
         firestore: firebase.firestore,
       ),
@@ -277,6 +290,7 @@ final class MentoraCompositionRoot {
     // Shared consultation documents: upload, list, open — participants only.
     final consultationDocuments = ConsultationDocumentApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirebaseConsultationDocumentRepository(
         firestore: firebase.firestore,
         storage: FirebaseStorage.instance,
@@ -293,13 +307,6 @@ final class MentoraCompositionRoot {
     );
 
     const liveConsultationRooms = LiveKitRoomProvider();
-
-    // Consultation memory foundation: one memory per reservation holding
-    // durable business facts only — never any engine output (ARC-MEM01).
-    final consultationMemory = ConsultationMemoryApplicationService(
-      session: authenticationSession,
-      repository: FirestoreMemoryRepository(firestore: firebase.firestore),
-    );
 
     // AI Gateway foundation: the single doorway every future intelligence
     // capability must pass through. One simulated provider, no selection
@@ -321,6 +328,7 @@ final class MentoraCompositionRoot {
     // chronological reads — no ranking, no averages.
     final reviews = ReviewApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreConsultationReviewRepository(
         firestore: firebase.firestore,
       ),
@@ -331,6 +339,7 @@ final class MentoraCompositionRoot {
     // intelligence layers.
     final conversations = ConversationApplicationService(
       session: authenticationSession,
+      memory: consultationMemory,
       repository: FirestoreConversationRepository(
         firestore: firebase.firestore,
       ),

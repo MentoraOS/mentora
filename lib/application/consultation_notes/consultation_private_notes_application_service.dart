@@ -1,5 +1,7 @@
 import '../../domain/consultation_notes/consultation_private_notes_repository.dart';
 import '../authentication/authentication_session.dart';
+import '../consultation_memory/consultation_memory_application_service.dart';
+import '../../domain/consultation_memory/consultation_memory.dart';
 import 'consultation_private_notes_failure.dart';
 
 /// Writes and reads the expert's private consultation notes.
@@ -11,11 +13,16 @@ final class ConsultationPrivateNotesApplicationService {
   const ConsultationPrivateNotesApplicationService({
     required AuthenticationSession session,
     required ConsultationPrivateNotesRepository repository,
+    ConsultationMemoryApplicationService? memory,
   }) : _session = session,
-       _repository = repository;
+       _repository = repository,
+       _memory = memory;
 
   final AuthenticationSession _session;
   final ConsultationPrivateNotesRepository _repository;
+
+  /// Optional memory producer; absent means no fact is recorded.
+  final ConsultationMemoryApplicationService? _memory;
 
   Future<void> save({required String bookingId, required String notes}) async {
     final expertId = _requireExpertId();
@@ -37,6 +44,10 @@ final class ConsultationPrivateNotesApplicationService {
     } catch (error) {
       throw ConsultationPrivateNotesRepositoryFailure(cause: error);
     }
+
+    // Fact only, NEVER the note content: the memory is participant-
+    // readable while private notes are strictly expert-only.
+    await _recordFact(bookingId, MemoryEntryType.privateNote, const {});
   }
 
   Future<String?> loadByBookingId(String bookingId) async {
@@ -63,5 +74,20 @@ final class ConsultationPrivateNotesApplicationService {
       throw const ConsultationPrivateNotesForbiddenFailure();
     }
     return userId;
+  }
+
+  /// Best-effort memory producer (ARC-MEM01): the business fact is recorded
+  /// through the single memory door AFTER the operation succeeded; a memory
+  /// failure never fails the business flow.
+  Future<void> _recordFact(
+    String bookingId,
+    MemoryEntryType type,
+    Map<String, Object?> payload,
+  ) async {
+    try {
+      await _memory?.record(bookingId: bookingId, type: type, payload: payload);
+    } catch (_) {
+      // Best-effort by contract.
+    }
   }
 }

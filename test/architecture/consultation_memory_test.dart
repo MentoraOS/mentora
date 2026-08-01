@@ -189,7 +189,9 @@ void main() {
     });
 
     test('memory writes are confined to the single application door', () {
-      const allowedSurface = [
+      // The port and the Firestore adapter stay confined to the memory
+      // layers; ONLY the composition root may construct the adapter.
+      const allowedPortSurface = [
         'lib/domain/consultation_memory/consultation_memory.dart',
         'lib/domain/consultation_memory/memory_repository.dart',
         'lib/application/consultation_memory/'
@@ -198,20 +200,53 @@ void main() {
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
       ];
+      const allowedAdapterSurface = [
+        'lib/infrastructure/consultation_memory/firestore_memory_repository.dart',
+        'lib/composition/mentora_composition_root.dart',
+      ];
+      // The authorized producers call the single application door — never
+      // the repository. No other module may join this list without a wave.
+      const allowedProducers = [
+        'lib/application/conversation/conversation_application_service.dart',
+        'lib/application/consultation_brief/'
+            'consultation_brief_application_service.dart',
+        'lib/application/consultation_notes/'
+            'consultation_private_notes_application_service.dart',
+        'lib/application/consultation_documents/'
+            'consultation_document_application_service.dart',
+        'lib/application/booking/booking_confirmation_application_service.dart',
+        'lib/application/booking/booking_cancellation_application_service.dart',
+        'lib/application/booking/booking_reschedule_application_service.dart',
+        'lib/application/booking/'
+            'consultation_completion_application_service.dart',
+        'lib/application/review/review_application_service.dart',
+      ];
 
-      final offenders = <String>[];
+      final portOffenders = <String>[];
+      final adapterOffenders = <String>[];
+      final serviceOffenders = <String>[];
       for (final entity in Directory('lib').listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         final normalized = entity.path.replaceAll('\\', '/');
         final source = entity.readAsStringSync();
-        if ((source.contains('MemoryRepository') ||
-                source.contains('ConsultationMemoryApplicationService')) &&
-            !allowedSurface.contains(normalized)) {
-          offenders.add(normalized);
+        if (source.contains('MemoryRepository') &&
+            !allowedPortSurface.contains(normalized)) {
+          portOffenders.add(normalized);
+        }
+        if (source.contains('FirestoreMemoryRepository') &&
+            !allowedAdapterSurface.contains(normalized)) {
+          adapterOffenders.add(normalized);
+        }
+        if (source.contains('ConsultationMemoryApplicationService') &&
+            !allowedPortSurface.contains(normalized) &&
+            !allowedProducers.contains(normalized)) {
+          serviceOffenders.add(normalized);
         }
       }
 
-      expect(offenders, isEmpty);
+      expect(portOffenders, isEmpty);
+      expect(adapterOffenders, isEmpty);
+      expect(serviceOffenders, isEmpty);
     });
 
     test('the memory layer holds business facts only — no engine, no '

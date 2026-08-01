@@ -1,6 +1,8 @@
 import '../../domain/conversation/conversation.dart';
 import '../../domain/conversation/conversation_repository.dart';
 import '../authentication/authentication_session.dart';
+import '../consultation_memory/consultation_memory_application_service.dart';
+import '../../domain/consultation_memory/consultation_memory.dart';
 import 'conversation_failure.dart';
 
 /// Real-time consultation messaging between the client and the expert.
@@ -13,11 +15,16 @@ final class ConversationApplicationService {
   const ConversationApplicationService({
     required AuthenticationSession session,
     required ConversationRepository repository,
+    ConsultationMemoryApplicationService? memory,
   }) : _session = session,
-       _repository = repository;
+       _repository = repository,
+       _memory = memory;
 
   final AuthenticationSession _session;
   final ConversationRepository _repository;
+
+  /// Optional memory producer; absent means no fact is recorded.
+  final ConsultationMemoryApplicationService? _memory;
 
   Future<void> sendMessage({
     required String bookingId,
@@ -46,6 +53,10 @@ final class ConversationApplicationService {
     } catch (error) {
       throw ConversationRepositoryFailure(cause: error);
     }
+
+    await _recordFact(bookingId, MemoryEntryType.chatMessage, {
+      'content': text,
+    });
   }
 
   Stream<List<Message>> watchMessages(String bookingId) async* {
@@ -78,5 +89,20 @@ final class ConversationApplicationService {
       throw const ConversationUnauthenticatedFailure();
     }
     return userId;
+  }
+
+  /// Best-effort memory producer (ARC-MEM01): the business fact is recorded
+  /// through the single memory door AFTER the operation succeeded; a memory
+  /// failure never fails the business flow.
+  Future<void> _recordFact(
+    String bookingId,
+    MemoryEntryType type,
+    Map<String, Object?> payload,
+  ) async {
+    try {
+      await _memory?.record(bookingId: bookingId, type: type, payload: payload);
+    } catch (_) {
+      // Best-effort by contract.
+    }
   }
 }
