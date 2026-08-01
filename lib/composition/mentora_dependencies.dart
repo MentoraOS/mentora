@@ -24,6 +24,7 @@ import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/workspace_state.dart';
 
 import '../core/scheduling/scheduling.dart';
+import '../domain/video_session/live_consultation_room.dart';
 import '../domain/workspace/workspace_member_repository.dart';
 import '../domain/workspace/workspace_repository.dart';
 
@@ -53,6 +54,7 @@ final class MentoraDependencies {
     required this.startup,
     required this.timezoneResolver,
     required this.videoSessions,
+    required this.liveConsultationRooms,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -124,6 +126,9 @@ final class MentoraDependencies {
 
   /// Video sessions behind the vendor-agnostic provider port.
   final VideoSessionApplicationService videoSessions;
+
+  /// Live room handles behind the vendor-neutral room contract.
+  final LiveConsultationRoomProvider liveConsultationRooms;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

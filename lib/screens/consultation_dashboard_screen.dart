@@ -16,6 +16,7 @@ import '../widgets/consultation_documents_card.dart';
 import '../widgets/consultation_private_notes_card.dart';
 import '../widgets/consultation_review_card.dart';
 import '../widgets/consultation_timeline.dart';
+import 'live_consultation_screen.dart';
 import 'review_screen.dart';
 
 /// Consultation Dashboard: the dedicated space for a confirmed reservation.
@@ -51,13 +52,9 @@ class _ConsultationDashboardScreenState
           .read<VideoSessionApplicationService>()
           .joinConsultation(booking);
       if (!context.mounted) return;
-      // Foundation wave: the session is prepared but no real room opens yet.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Salle prête : ${session.sessionId}. '
-            'La vidéo arrive dans une prochaine version.',
-          ),
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => LiveConsultationScreen(session: session),
         ),
       );
       return;
@@ -306,8 +303,8 @@ class _ConsultationDashboardScreenState
               width: double.infinity,
               height: 56,
               child: ElevatedButton.icon(
-                // The vendor-agnostic video boundary; the room itself is
-                // simulated until the LiveKit integration wave.
+                // Vendor-agnostic video boundary: joins the session then
+                // opens the live room screen.
                 onPressed: () => _joinConsultation(context),
                 icon: const Icon(Icons.videocam),
                 label: const Text(

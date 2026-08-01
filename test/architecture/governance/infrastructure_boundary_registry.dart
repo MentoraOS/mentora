@@ -14,6 +14,7 @@ enum InfrastructureTechnology {
   firebaseStorage,
   agora,
   webrtc,
+  livekit,
   psp,
 }
 
@@ -87,6 +88,12 @@ const List<InfrastructureBoundary> infrastructureBoundaryRegistry = [
     technology: InfrastructureTechnology.webrtc,
     packagePrefixes: {'package:flutter_webrtc/'},
     allowedRootPrefixes: {'infrastructure/', 'core/meeting/infrastructure/'},
+  ),
+
+  InfrastructureBoundary(
+    technology: InfrastructureTechnology.livekit,
+    packagePrefixes: {'package:livekit_client/'},
+    allowedRootPrefixes: {'infrastructure/'},
   ),
 
   InfrastructureBoundary(

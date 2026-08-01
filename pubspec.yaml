@@ -43,13 +43,19 @@ dependencies:
   permission_handler: ^12.0.3
   intl: ^0.20.2
   provider: ^6.1.2
-  file_picker: ^4.6.1
+  file_picker: ^8.3.3
   url_launcher: ^6.3.0
   pdf: ^3.11.1
   printing: ^5.13.4
   collection: ^1.19.0
+  livekit_client: ^2.4.0
 
-
+# livekit_client and file_picker >=8.3.3 need the modern ffi line while
+# the legacy agora_rtc_engine still declares ffi ^1.1.2. package:ffi 2.x
+# is source-compatible with Agora's usage; the override disappears with
+# the Agora migration wave.
+dependency_overrides:
+  ffi: ^2.1.4
 
 dev_dependencies:
   flutter_test:

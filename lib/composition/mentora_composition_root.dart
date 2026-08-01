@@ -41,6 +41,7 @@ import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dar
 import '../infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
 import '../infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import '../infrastructure/video_session/livekit_cloud_adapter.dart';
+import '../infrastructure/video_session/livekit_room_adapter.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
 import '../infrastructure/expert_availability_exception/firestore_expert_availability_exception_repository.dart';
@@ -274,13 +275,16 @@ final class MentoraCompositionRoot {
       ),
     );
 
-    // Video session foundation: LiveKit Cloud exists only behind the
-    // VideoSessionProvider port; the adapter is simulated until the real
-    // integration wave. Agora's legacy path is untouched.
+    // Video sessions: LiveKit Cloud exists only in Infrastructure. The
+    // session adapter resolves rooms/identities and credentials (fake token
+    // provider until the real token backend); the room adapter runs the
+    // real RTC connection. Agora's legacy path is untouched.
     final videoSessions = VideoSessionApplicationService(
       session: authenticationSession,
       provider: const LiveKitCloudAdapter(),
     );
+
+    const liveConsultationRooms = LiveKitRoomProvider();
 
     // Consultation reviews: one review per completed reservation, plain
     // chronological reads — no ranking, no averages.
@@ -324,6 +328,7 @@ final class MentoraCompositionRoot {
       startup: startup,
       timezoneResolver: timezoneResolver,
       videoSessions: videoSessions,
+      liveConsultationRooms: liveConsultationRooms,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,

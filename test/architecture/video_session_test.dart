@@ -5,6 +5,7 @@ import 'package:mentora/application/video_session/video_session_failure.dart';
 import 'package:mentora/domain/booking/booking_overview.dart';
 import 'package:mentora/domain/video_session/video_session_provider.dart';
 import 'package:mentora/infrastructure/video_session/livekit_cloud_adapter.dart';
+import 'package:mentora/infrastructure/video_session/video_token_provider.dart';
 
 void main() {
   group('VideoSessionApplicationService', () {
@@ -101,10 +102,10 @@ void main() {
     });
   });
 
-  group('LiveKitCloudAdapter — simulated foundation', () {
+  group('LiveKitCloudAdapter — session credentials', () {
     const adapter = LiveKitCloudAdapter();
 
-    test('creates and joins one deterministic room per booking', () async {
+    test('resolves the room and identity conventions', () async {
       final request = VideoSessionRequest(
         bookingId: 'booking_1',
         participantId: 'client_1',
@@ -116,16 +117,58 @@ void main() {
 
       expect(created.sessionId, 'mentora_consultation_booking_1');
       expect(joined.sessionId, created.sessionId);
-      expect(joined.participantIdentity, 'client_1');
+      expect(joined.participantIdentity, 'booking_1_client_client_1');
       expect(joined.role, VideoParticipantRole.client);
-      expect(joined.serverUrl, contains('simulated.livekit.cloud'));
-      expect(joined.accessToken, 'simulated:booking_1:client_1:client');
+      expect(joined.serverUrl, startsWith('wss://'));
     });
 
-    test('closing the simulated session completes', () async {
+    test('tokens come from the provider, JWT-shaped, never hard-coded', () async {
+      VideoSessionRequest request(String bookingId) => VideoSessionRequest(
+        bookingId: bookingId,
+        participantId: 'client_1',
+        role: VideoParticipantRole.client,
+      );
+
+      final first = await adapter.joinSession(request('booking_1'));
+      final second = await adapter.joinSession(request('booking_2'));
+
+      expect(first.accessToken.split('.'), hasLength(3));
+      expect(second.accessToken, isNot(first.accessToken));
+    });
+
+    test('token provider failures surface as provider failures', () async {
+      const adapter = LiveKitCloudAdapter(
+        tokenProvider: _FailingTokenProvider(),
+      );
+
+      await expectLater(
+        adapter.joinSession(
+          VideoSessionRequest(
+            bookingId: 'booking_1',
+            participantId: 'client_1',
+            role: VideoParticipantRole.client,
+          ),
+        ),
+        throwsA(isA<VideoSessionProviderFailure>()),
+      );
+    });
+
+    test('closing the session completes', () async {
       await adapter.closeSession('mentora_consultation_booking_1');
     });
   });
+}
+
+final class _FailingTokenProvider implements VideoTokenProvider {
+  const _FailingTokenProvider();
+
+  @override
+  Future<VideoAccessCredentials> credentialsFor({
+    required String roomName,
+    required String identity,
+  }) async {
+    throw StateError('token backend down');
+  }
 }
 
 BookingOverview _booking({String status = 'confirmed'}) {

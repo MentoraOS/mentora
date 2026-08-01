@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/video_session/video_session_application_service.dart';
+import 'package:mentora/domain/video_session/live_consultation_room.dart';
 import 'package:mentora/domain/video_session/video_session_provider.dart';
 import 'package:mentora/infrastructure/video_session/livekit_cloud_adapter.dart';
 import 'package:mentora/domain/booking/booking_overview.dart';
 import 'package:mentora/screens/consultation_dashboard_screen.dart';
+import 'package:mentora/screens/live_consultation_screen.dart';
+import 'package:mentora/widgets/video_track_view.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -42,7 +47,7 @@ void main() {
     expect(find.text('Consultation vidéo'), findsOneWidget);
   });
 
-  testWidgets('joining goes through the video session boundary', (
+  testWidgets('joining opens the live room through the video boundary', (
     tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1080, 2400));
@@ -54,11 +59,7 @@ void main() {
     await tester.tap(find.text('Rejoindre la consultation'));
     await tester.pumpAndSettle();
 
-    // Foundation wave: the simulated session is prepared, no real room.
-    expect(
-      find.textContaining('Salle prête : mentora_consultation_b1'),
-      findsOneWidget,
-    );
+    expect(find.byType(LiveConsultationScreen), findsOneWidget);
   });
 
   testWidgets('an expert session sees the client framing', (tester) async {
@@ -134,9 +135,74 @@ Widget _app(BookingOverview booking, {bool isExpert = false}) {
           provider: const LiveKitCloudAdapter(),
         ),
       ),
+      Provider<LiveConsultationRoomProvider>.value(
+        value: const _FakeRoomProvider(),
+      ),
+      Provider<VideoTrackViewBuilder>.value(
+        value: (context, track) => const SizedBox.shrink(),
+      ),
     ],
     child: MaterialApp(home: ConsultationDashboardScreen(booking: booking)),
   );
+}
+
+final class _FakeRoomProvider implements LiveConsultationRoomProvider {
+  const _FakeRoomProvider();
+
+  @override
+  LiveConsultationRoom createRoom(VideoSessionInfo session) => _FakeRoom();
+}
+
+final class _FakeRoom implements LiveConsultationRoom {
+  final StreamController<void> _changes = StreamController<void>.broadcast();
+
+  LiveConsultationConnectionState _state =
+      LiveConsultationConnectionState.disconnected;
+
+  @override
+  Future<void> connect() async {
+    _state = LiveConsultationConnectionState.connected;
+  }
+
+  @override
+  Future<void> disconnect() async {
+    _state = LiveConsultationConnectionState.disconnected;
+  }
+
+  @override
+  Future<void> reconnect() => connect();
+
+  @override
+  Future<void> setMicrophoneEnabled(bool enabled) async {}
+
+  @override
+  Future<void> setCameraEnabled(bool enabled) async {}
+
+  @override
+  LiveConsultationConnectionState get connectionState => _state;
+
+  @override
+  bool get microphoneEnabled => true;
+
+  @override
+  bool get cameraEnabled => true;
+
+  @override
+  String? get remoteParticipantIdentity => null;
+
+  @override
+  Object? get localVideoTrack => null;
+
+  @override
+  Object? get remoteVideoTrack => null;
+
+  @override
+  Stream<void> get changes => _changes.stream;
+
+  @override
+  Future<void> dispose() async {
+    await _changes.close();
+  }
 }
 
 final class _Session extends Fake implements AuthenticationSession {

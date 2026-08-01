@@ -27,6 +27,9 @@ import 'application/scheduling/selectable_occurrence_application_service.dart';
 import 'application/startup/mentora_startup.dart';
 import 'application/video_session/video_session_application_service.dart';
 import 'application/workspace/workspace_state.dart';
+import 'domain/video_session/live_consultation_room.dart';
+import 'infrastructure/video_session/livekit_video_view.dart';
+import 'widgets/video_track_view.dart';
 import 'core/bootstrap/mentora_os.dart';
 
 import 'core/routing/app_router.dart';
@@ -120,6 +123,11 @@ void main() async {
         Provider<VideoSessionApplicationService>.value(
           value: dependencies.videoSessions,
         ),
+        Provider<LiveConsultationRoomProvider>.value(
+          value: dependencies.liveConsultationRooms,
+        ),
+        // The single place where LiveKit rendering meets the widget tree.
+        Provider<VideoTrackViewBuilder>.value(value: buildLiveKitVideoView),
         Provider<WorkspaceState>.value(value: dependencies.workspaceState),
         ChangeNotifierProvider(create: (_) => MentoraThemeProvider()),
       ],
