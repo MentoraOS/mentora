@@ -220,6 +220,10 @@ void main() {
         'lib/application/booking/'
             'consultation_completion_application_service.dart',
         'lib/application/review/review_application_service.dart',
+        // The authorized READERS: intelligence consumers reading the
+        // memory as their single business source (ARC-SUM01).
+        'lib/application/consultation_summary/'
+            'consultation_summary_application_service.dart',
       ];
 
       final portOffenders = <String>[];

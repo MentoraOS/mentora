@@ -11,6 +11,7 @@ import '../application/consultation_brief/consultation_brief_application_service
 import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_memory/consultation_memory_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
+import '../application/consultation_summary/consultation_summary_application_service.dart';
 import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
@@ -46,6 +47,7 @@ final class MentoraDependencies {
     required this.consultationCompletion,
     required this.consultationDocuments,
     required this.consultationMemory,
+    required this.consultationSummaries,
     required this.consultationPrivateNotes,
     required this.conversations,
     required this.expertBookingOccupancy,
@@ -101,6 +103,9 @@ final class MentoraDependencies {
 
   /// One memory per reservation: durable business facts only (ARC-MEM01).
   final ConsultationMemoryApplicationService consultationMemory;
+
+  /// Summary lifecycle over the memory — metadata only, no engine yet.
+  final ConsultationSummaryApplicationService consultationSummaries;
 
   /// Expert-only private consultation notes.
   final ConsultationPrivateNotesApplicationService consultationPrivateNotes;

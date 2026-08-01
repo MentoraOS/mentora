@@ -14,6 +14,7 @@ import '../application/consultation_brief/consultation_brief_application_service
 import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_memory/consultation_memory_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
+import '../application/consultation_summary/consultation_summary_application_service.dart';
 import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
@@ -41,6 +42,8 @@ import '../infrastructure/consultation_brief/firestore_consultation_brief_reposi
 import '../infrastructure/consultation_documents/firebase_consultation_document_repository.dart';
 import '../infrastructure/consultation_memory/firestore_memory_repository.dart';
 import '../infrastructure/consultation_notes/firestore_consultation_private_notes_repository.dart';
+import '../infrastructure/consultation_summary/firestore_summary_repository.dart';
+import '../infrastructure/consultation_summary/simulated_summary_provider.dart';
 import '../infrastructure/conversation/firestore_conversation_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
@@ -308,6 +311,16 @@ final class MentoraCompositionRoot {
 
     const liveConsultationRooms = LiveKitRoomProvider();
 
+    // Summary foundation: the first official memory consumer. Metadata
+    // only; the simulated provider is replaced by a real engine routed
+    // through the AI gateway in its own wave.
+    final consultationSummaries = ConsultationSummaryApplicationService(
+      session: authenticationSession,
+      memory: consultationMemory,
+      provider: const SimulatedSummaryProvider(),
+      repository: FirestoreSummaryRepository(firestore: firebase.firestore),
+    );
+
     // AI Gateway foundation: the single doorway every future intelligence
     // capability must pass through. One simulated provider, no selection
     // logic, no engine, no generated content.
@@ -366,6 +379,7 @@ final class MentoraCompositionRoot {
       consultationCompletion: consultationCompletion,
       consultationDocuments: consultationDocuments,
       consultationMemory: consultationMemory,
+      consultationSummaries: consultationSummaries,
       consultationPrivateNotes: consultationPrivateNotes,
       conversations: conversations,
       expertBookingOccupancy: expertBookingOccupancy,
