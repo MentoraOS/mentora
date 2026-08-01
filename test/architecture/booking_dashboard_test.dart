@@ -151,6 +151,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Annulée'), findsOneWidget);
       expect(find.text('Confirmée'), findsNothing);
+
+      // Completion streams the same way: the card moves to Terminées.
+      repository.push([_overview(bookingId: 'b1', status: 'completed')]);
+      await tester.pumpAndSettle();
+      expect(find.text('Terminées'), findsOneWidget);
+      expect(find.text('Terminée'), findsOneWidget);
+      expect(find.text('Annulée'), findsNothing);
     });
 
     testWidgets('cancelling from a confirmed card notifies both parties', (

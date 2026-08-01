@@ -109,6 +109,27 @@ final class BookingNotificationApplicationService {
     );
   }
 
+  Future<void> notifyBookingCompleted({
+    required String bookingId,
+    required String expertId,
+    required String expertName,
+    required String displayDate,
+    required String displayTime,
+  }) {
+    return _notifyBoth(
+      event: BookingNotificationEvent.bookingCompleted,
+      bookingId: bookingId,
+      expertId: expertId,
+      clientTitle: 'Consultation terminée',
+      clientBody:
+          'Votre consultation avec $expertName du $displayDate à '
+          '$displayTime est terminée.',
+      expertTitle: 'Consultation terminée',
+      expertBody:
+          'La consultation du $displayDate à $displayTime est terminée.',
+    );
+  }
+
   Future<void> notifyConsultationUpcoming({
     required String bookingId,
     required String expertId,

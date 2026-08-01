@@ -9,6 +9,7 @@ import 'application/booking/booking_confirmation_application_service.dart';
 import 'application/booking/booking_dashboard_application_service.dart';
 import 'application/booking/booking_creation_application_service.dart';
 import 'application/booking/booking_reschedule_application_service.dart';
+import 'application/booking/consultation_completion_application_service.dart';
 import 'application/booking/expert_booking_occupancy_application_service.dart';
 import 'application/consultation_brief/consultation_brief_application_service.dart';
 import 'application/consultation_documents/consultation_document_application_service.dart';
@@ -80,6 +81,9 @@ void main() async {
         ),
         Provider<ConsultationBriefApplicationService>.value(
           value: dependencies.consultationBrief,
+        ),
+        Provider<ConsultationCompletionApplicationService>.value(
+          value: dependencies.consultationCompletion,
         ),
         Provider<ConsultationDocumentApplicationService>.value(
           value: dependencies.consultationDocuments,

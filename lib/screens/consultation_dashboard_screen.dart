@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
+import '../application/booking/consultation_completion_application_service.dart';
+import '../application/booking/consultation_completion_failure.dart';
+import '../application/notification/booking_notification_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/video_session/video_session_failure.dart';
 import '../domain/booking/booking_overview.dart';
@@ -19,12 +22,25 @@ import '../widgets/consultation_timeline.dart';
 /// Notes, documents, messages and video are placeholders for their own
 /// future milestones; joining the consultation stays disabled until the
 /// video flow exists.
-class ConsultationDashboardScreen extends StatelessWidget {
+class ConsultationDashboardScreen extends StatefulWidget {
   const ConsultationDashboardScreen({super.key, required this.booking});
 
   final BookingOverview booking;
 
+  @override
+  State<ConsultationDashboardScreen> createState() =>
+      _ConsultationDashboardScreenState();
+}
+
+class _ConsultationDashboardScreenState
+    extends State<ConsultationDashboardScreen> {
   static final NumberFormat _money = NumberFormat('#,##0', 'fr_FR');
+
+  BookingOverview get booking => widget.booking;
+
+  /// Local echo of the official completion; the durable state lives in the
+  /// booking document and streams into the dashboards.
+  bool _completed = false;
 
   Future<void> _joinConsultation(BuildContext context) async {
     var message = 'La salle vidéo est indisponible. Réessayez plus tard.';
@@ -59,10 +75,78 @@ class ConsultationDashboardScreen extends StatelessWidget {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  Future<void> _completeConsultation() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Terminer la consultation'),
+        content: const Text(
+          'Confirmer la fin de cette consultation ? '
+          'La réservation sera officiellement clôturée.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Terminer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    var message = 'La clôture a échoué. Réessayez plus tard.';
+    try {
+      await context.read<ConsultationCompletionApplicationService>().complete(
+        booking.bookingId,
+      );
+
+      if (mounted) {
+        // Best-effort by contract: a notification failure never blocks the
+        // completed consultation.
+        await context
+            .read<BookingNotificationApplicationService>()
+            .notifyBookingCompleted(
+              bookingId: booking.bookingId,
+              expertId: booking.expertId,
+              expertName: booking.expertName,
+              displayDate: booking.bookingDate,
+              displayTime: booking.bookingTime,
+            );
+      }
+
+      if (!mounted) return;
+      setState(() => _completed = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Consultation terminée.')),
+      );
+      return;
+    } on ConsultationCompletionInvalidStateFailure {
+      message = 'Cette consultation ne peut plus être terminée.';
+    } on ConsultationCompletionNotFoundFailure {
+      message = 'Cette réservation est introuvable.';
+    } on ConsultationCompletionFailure {
+      // Keep the generic message.
+    } catch (_) {
+      // Keep the generic message.
+    }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = context.read<AuthenticationSession>();
     final isExpert = session.isExpert;
+    final canComplete =
+        !_completed &&
+        (booking.status == 'confirmed' || booking.status == 'paid');
 
     return Scaffold(
       backgroundColor: MentoraColors.navy,
@@ -116,7 +200,9 @@ class ConsultationDashboardScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _StatusBadge(status: booking.status),
+                  _StatusBadge(
+                    status: _completed ? 'completed' : booking.status,
+                  ),
                 ],
               ),
             ),
@@ -219,6 +305,25 @@ class ConsultationDashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
+            if (canComplete) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: _completeConsultation,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: MentoraColors.gold,
+                    side: const BorderSide(color: MentoraColors.gold),
+                  ),
+                  icon: const Icon(Icons.task_alt),
+                  label: const Text(
+                    'Terminer la consultation',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
           ],
         ),

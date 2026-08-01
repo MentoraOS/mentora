@@ -13,6 +13,7 @@ enum BookingNotificationEvent {
   bookingConfirmed,
   bookingCancelled,
   bookingRescheduled,
+  bookingCompleted,
   consultationUpcoming,
 }
 

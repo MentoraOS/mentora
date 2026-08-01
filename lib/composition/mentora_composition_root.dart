@@ -7,6 +7,7 @@ import '../application/booking/booking_confirmation_application_service.dart';
 import '../application/booking/booking_dashboard_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
+import '../application/booking/consultation_completion_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/consultation_brief/consultation_brief_application_service.dart';
 import '../application/consultation_documents/consultation_document_application_service.dart';
@@ -28,6 +29,7 @@ import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_cancellation_repository.dart';
 import '../infrastructure/booking/firestore_booking_confirmation_repository.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
+import '../infrastructure/booking/firestore_consultation_completion_repository.dart';
 import '../infrastructure/booking/firestore_booking_overview_repository.dart';
 import '../infrastructure/consultation_brief/firestore_consultation_brief_repository.dart';
 import '../infrastructure/consultation_documents/firebase_consultation_document_repository.dart';
@@ -236,6 +238,15 @@ final class MentoraCompositionRoot {
       availabilityExceptions: availabilityExceptionRepository,
     );
 
+    // Booking-owned completion: a confirmed/paid consultation officially
+    // becomes completed; every other reservation fact is preserved.
+    final consultationCompletion = ConsultationCompletionApplicationService(
+      session: authenticationSession,
+      repository: FirestoreConsultationCompletionRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     // Consultation brief: a plain persistent snapshot keyed by booking.
     final consultationBrief = ConsultationBriefApplicationService(
       session: authenticationSession,
@@ -286,6 +297,7 @@ final class MentoraCompositionRoot {
       bookingNotifications: bookingNotifications,
       bookingReschedule: bookingReschedule,
       consultationBrief: consultationBrief,
+      consultationCompletion: consultationCompletion,
       consultationDocuments: consultationDocuments,
       consultationPrivateNotes: consultationPrivateNotes,
       expertBookingOccupancy: expertBookingOccupancy,
