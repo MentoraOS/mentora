@@ -69,6 +69,34 @@ final class SelectableOccurrenceApplicationService {
     required int hour,
     required int minute,
   }) async {
+    final intent = await revalidateForReservation(
+      expertId: expertId,
+      offer: offer,
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+    );
+
+    return intent.selection;
+  }
+
+  /// [revalidate], additionally returning the authoritative expert timezone
+  /// identity established during the same authoritative pass.
+  ///
+  /// AD-022 C3 consumes this to interpret the accepted selection into the
+  /// canonical reservation snapshot without a second Catalog lookup.
+  Future<({CivilSelection selection, String expertTimezone})>
+  revalidateForReservation({
+    required String expertId,
+    required ConsultationOffer offer,
+    required int year,
+    required int month,
+    required int day,
+    required int hour,
+    required int minute,
+  }) async {
     final expert = await _requireAuthoritativeInputs(
       expertId: expertId,
       offer: offer,
@@ -108,7 +136,7 @@ final class SelectableOccurrenceApplicationService {
       throw const SelectableOccurrenceNotOfferedFailure();
     }
 
-    return selected;
+    return (selection: selected, expertTimezone: expert.expertTimezone!);
   }
 
   Future<ExpertCatalogEntry> _requireAuthoritativeInputs({

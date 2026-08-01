@@ -21,7 +21,10 @@ void main() {
         '/screens/',
         '/core/booking/',
         '/expert_availability/',
-        '/scheduling/',
+        // AD-022 C3: Booking consumes revalidation and interpretation
+        // through the Application scheduling seam; the Scheduling MODULE
+        // stays forbidden (Booking interprets no timezone, ARC-013 holds).
+        '/core/scheduling/',
         '/financial/',
         "import '../../core/engines/payment/",
         'PaymentEngine',

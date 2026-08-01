@@ -297,7 +297,10 @@ void main() {
       expect(router, isNot(contains('DateTime.now(')));
     });
 
-    test('Booking does not consume C2', () {
+    test('Booking consumes C2 only through revalidation, never raw', () {
+      // AD-022 C3: Booking creation revalidates through the Application
+      // service and snapshots the interpreted occurrence. It never touches
+      // the materialization machinery or the availability grammar itself.
       final booking = <File>[
         ..._dartFilesUnder('lib/domain/booking'),
         ..._dartFilesUnder('lib/application/booking'),
@@ -305,18 +308,18 @@ void main() {
       ].map((file) => file.readAsStringSync()).join('\n');
 
       for (final forbidden in const [
-        'SelectableOccurrence',
         'OccurrenceMaterializer',
-        'CivilOccurrenceMaterialization',
-        'CivilSelection',
-        'CivilDate',
+        'CivilOccurrenceMaterialization(',
+        'materializeMonth',
+        'materializeDay',
         'RecurringAvailability',
-        'expertTimezone',
-        'startUtc',
-        'endUtc',
+        'RecurringStartTick',
+        'LegacyAvailabilityGrammar',
+        'parseRecurringAvailability',
       ]) {
         expect(booking, isNot(contains(forbidden)), reason: forbidden);
       }
+      expect(booking, contains('revalidateForReservation'));
 
       // The ARCH-008 conflict identity is unchanged.
       final creation = _read('lib/domain/booking/booking_creation.dart');

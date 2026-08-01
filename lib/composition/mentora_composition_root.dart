@@ -14,6 +14,7 @@ import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
+import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
 import '../infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
 import '../infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
@@ -91,11 +92,6 @@ final class MentoraCompositionRoot {
       firestore: firebase.firestore,
     );
 
-    final bookingCreation = BookingCreationApplicationService(
-      session: authenticationSession,
-      repository: bookingCreationRepository,
-    );
-
     final expertAvailability = ExpertAvailabilityApplicationService(
       session: authenticationSession,
       repository: expertAvailabilityRepository,
@@ -133,6 +129,17 @@ final class MentoraCompositionRoot {
     // Scheduling-owned timezone interpretation. The concrete resolver is
     // constructed here and exposed only through its port.
     const timezoneResolver = LaunchMarketTimezoneResolver();
+
+    // AD-022 C3: Booking creation revalidates the structured selection (C2)
+    // and snapshots the Scheduling-interpreted canonical occurrence.
+    final bookingCreation = BookingCreationApplicationService(
+      session: authenticationSession,
+      repository: bookingCreationRepository,
+      selectableOccurrences: selectableOccurrences,
+      interpretation: const CivilOccurrenceInterpretationAdapter(
+        resolver: timezoneResolver,
+      ),
+    );
 
     return MentoraDependencies(
       authenticationSession: authenticationSession,

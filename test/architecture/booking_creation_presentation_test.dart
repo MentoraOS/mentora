@@ -4,10 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/booking/booking_creation_application_service.dart';
+import 'package:mentora/application/expert_catalog/expert_catalog_application_service.dart';
 import 'package:mentora/application/scheduling/civil_selection.dart';
+import 'package:mentora/application/scheduling/selectable_occurrence_application_service.dart';
 import 'package:mentora/domain/booking/booking_creation.dart';
 import 'package:mentora/domain/booking/booking_creation_repository.dart';
 import 'package:mentora/domain/expert_catalog/consultation_offer.dart';
+import 'package:mentora/domain/expert_catalog/expert_catalog_entry.dart';
+import 'package:mentora/domain/expert_catalog/expert_catalog_repository.dart';
+import 'package:mentora/infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
+import 'package:mentora/infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
+import 'package:mentora/infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import 'package:mentora/screens/payment_screen.dart';
 import 'package:mentora/screens/pre_consultation_screen.dart';
 import 'package:provider/provider.dart';
@@ -92,6 +99,15 @@ Widget _app(_Repository repository) {
   final service = BookingCreationApplicationService(
     session: _Session(),
     repository: repository,
+    selectableOccurrences: SelectableOccurrenceApplicationService(
+      expertCatalog: ExpertCatalogApplicationService(
+        repository: const _CatalogRepository(),
+      ),
+      materialization: const CivilOccurrenceMaterializationAdapter(),
+    ),
+    interpretation: const CivilOccurrenceInterpretationAdapter(
+      resolver: LaunchMarketTimezoneResolver(),
+    ),
     channelFactory: () => 'mentora_test',
   );
   return Provider<BookingCreationApplicationService>.value(
@@ -141,6 +157,33 @@ final class _Repository implements BookingCreationRepository {
     if (error case final cause?) throw cause;
     if (pending case final completer?) return completer.future;
     return result;
+  }
+}
+
+final class _CatalogRepository implements ExpertCatalogRepository {
+  const _CatalogRepository();
+
+  static final ExpertCatalogEntry _expert = ExpertCatalogEntry(
+    id: 'expert_1',
+    name: 'Expert',
+    job: 'Coach',
+    country: 'ML',
+    rating: '5',
+    online: true,
+    availability: const {
+      'Lundi': ['09:00'],
+    },
+    expertTimezone: 'Africa/Bamako',
+  );
+
+  @override
+  Stream<List<ExpertCatalogEntry>> watchExperts() {
+    return Stream.value([_expert]);
+  }
+
+  @override
+  Future<ExpertCatalogEntry?> findById(String expertId) async {
+    return _expert.id == expertId ? _expert : null;
   }
 }
 

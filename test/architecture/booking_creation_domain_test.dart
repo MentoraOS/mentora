@@ -64,6 +64,67 @@ void main() {
       expect(() => _bookingWith(amountMinor: -1), throwsArgumentError);
     });
   });
+
+  group('BookingCreation — AD-022 C3 canonical occurrence snapshot', () {
+    test('retains the accepted occurrence exactly', () {
+      final booking = _booking();
+
+      expect(booking.startUtc, DateTime.utc(2026, 8, 3, 9, 0));
+      expect(booking.endUtc, DateTime.utc(2026, 8, 3, 10, 0));
+      expect(booking.expertTimezone, 'Africa/Bamako');
+    });
+
+    test('preserves the named identity, never an offset substitute', () {
+      // Identity and offset are distinct concepts: Africa/Bamako must not
+      // collapse to UTC even while their offsets coincide.
+      final booking = _booking();
+
+      expect(booking.expertTimezone, isNot('UTC'));
+      expect(booking.expertTimezone, isNot('+00:00'));
+    });
+
+    test('rejects non-UTC boundaries', () {
+      expect(
+        () => _bookingWith(startUtc: DateTime(2026, 8, 3, 9, 0)),
+        throwsArgumentError,
+      );
+      expect(
+        () => _bookingWith(endUtc: DateTime(2026, 8, 3, 10, 0)),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects an end at or before the start', () {
+      expect(
+        () => _bookingWith(endUtc: DateTime.utc(2026, 8, 3, 9, 0)),
+        throwsArgumentError,
+      );
+      expect(
+        () => _bookingWith(endUtc: DateTime.utc(2026, 8, 3, 8, 0)),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects boundaries inconsistent with the offer duration', () {
+      // endUtc − startUtc must equal the snapshotted offer duration exactly
+      // (AD-022 decision 3); no buffer is part of the reservation.
+      expect(
+        () => _bookingWith(endUtc: DateTime.utc(2026, 8, 3, 10, 15)),
+        throwsArgumentError,
+      );
+      expect(
+        () => _bookingWith(endUtc: DateTime.utc(2026, 8, 3, 9, 30)),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects a blank timezone identity', () {
+      expect(
+        () => _booking(<String, String>{'expertTimezone': '  '}),
+        throwsArgumentError,
+      );
+    });
+  });
 }
 
 BookingCreation _booking([Map<String, String> override = const {}]) {
@@ -74,7 +135,10 @@ BookingCreation _bookingWith({
   Map<String, String> override = const {},
   int durationMinutes = 60,
   int amountMinor = 50000,
+  DateTime? startUtc,
+  DateTime? endUtc,
 }) {
+  final start = startUtc ?? DateTime.utc(2026, 8, 3, 9, 0);
   return BookingCreation(
     clientId: override['clientId'] ?? 'client_1',
     expertId: override['expertId'] ?? 'expert_1',
@@ -88,5 +152,8 @@ BookingCreation _bookingWith({
     durationMinutes: durationMinutes,
     amountMinor: amountMinor,
     currency: override['currency'] ?? 'XOF',
+    startUtc: start,
+    endUtc: endUtc ?? start.add(Duration(minutes: durationMinutes)),
+    expertTimezone: override['expertTimezone'] ?? 'Africa/Bamako',
   );
 }

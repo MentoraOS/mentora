@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_creation_failure.dart';
+import '../application/expert_catalog/expert_catalog_failure.dart';
 import '../application/scheduling/civil_selection.dart';
+import '../application/scheduling/selectable_occurrence_failure.dart';
 import '../domain/expert_catalog/consultation_offer.dart';
 import '../widgets/session_progress.dart';
 import '../ai/mentora_ai_service.dart';
@@ -37,14 +39,9 @@ class PreConsultationScreen extends StatefulWidget {
 class _PreConsultationScreenState extends State<PreConsultationScreen> {
   static String _two(int value) => value.toString().padLeft(2, '0');
 
-  /// Deterministic date transport for the legacy `bookingDate` field. Derived
-  /// from the structured occurrence; never parsed back from a localized
-  /// string.
-  String get _bookingDate {
-    final start = widget.occurrence;
-    return '${start.year}-${_two(start.month)}-${_two(start.day)}';
-  }
-
+  /// Display-only time rendering derived from the structured occurrence;
+  /// never parsed back from a localized string. The persisted legacy strings
+  /// are derived by the Booking Application service (AD-022 C3).
   String get _bookingTime {
     final start = widget.occurrence;
     return '${_two(start.hour)}:${_two(start.minute)}';
@@ -417,8 +414,7 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
           .create(
             expertId: widget.expertId,
             expertName: widget.expertName,
-            bookingDate: _bookingDate,
-            bookingTime: _bookingTime,
+            occurrence: widget.occurrence,
             clientNeed: needController.text.trim(),
             aiSummary: aiBrief?.summary ?? '',
             offer: widget.offer,
@@ -438,6 +434,16 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
     } on BookingCreationSlotConflictFailure {
       _showCreationFailure(
         'Ce créneau vient d’être réservé. Choisissez un autre créneau.',
+      );
+    } on SelectableOccurrenceFailure {
+      // AD-022 C3: revalidation/interpretation failures stay distinguishable
+      // from Booking persistence failures and fail closed.
+      _showCreationFailure(
+        'Ce créneau ne peut plus être confirmé. Choisissez un autre créneau.',
+      );
+    } on ExpertCatalogFailure {
+      _showCreationFailure(
+        'Vérification du créneau impossible. Réessayez plus tard.',
       );
     } on BookingCreationUnauthenticatedFailure {
       _showCreationFailure('Utilisateur non connecté');

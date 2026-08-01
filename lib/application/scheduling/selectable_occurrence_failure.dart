@@ -59,3 +59,14 @@ final class SelectableOccurrenceNotOfferedFailure
   const SelectableOccurrenceNotOfferedFailure()
     : super('the selected occurrence is not offered by this expert');
 }
+
+/// The validated civil selection could not be interpreted into canonical UTC
+/// boundaries (AD-022 decisions 1–3). Unknown temporal truth is never
+/// substituted with an approximation.
+final class SelectableOccurrenceInterpretationFailure
+    extends SelectableOccurrenceFailure {
+  const SelectableOccurrenceInterpretationFailure({required this.cause})
+    : super('the selection could not be interpreted into UTC boundaries');
+
+  final Object cause;
+}

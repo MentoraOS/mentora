@@ -126,16 +126,18 @@ void main() {
       expect(facade, contains("export 'domains/occurrence_interpreter.dart';"));
     });
 
-    test('Booking remains untouched by Wave B', () {
+    test('Booking consumes Wave B results without its Scheduling types', () {
+      // AD-022 C3 snapshots startUtc/endUtc/expertTimezone into Booking; the
+      // Wave B interpretation types themselves stay out of the Booking
+      // Domain, which never interprets timezones.
       final booking = _read('lib/domain/booking/booking_creation.dart');
 
       for (final forbidden in const [
-        'startUtc',
-        'endUtc',
-        'expertTimezone',
         'reservationExpiresAt',
         'ReservationOccurrence',
         'CivilDateTime',
+        'OccurrenceInterpreter',
+        'TimezoneResolver',
       ]) {
         expect(booking, isNot(contains(forbidden)), reason: forbidden);
       }

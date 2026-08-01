@@ -22,6 +22,9 @@ void main() {
           durationMinutes: 120,
           amountMinor: 100000,
           currency: 'XOF',
+          startUtc: DateTime.utc(2026, 8, 3, 9, 0),
+          endUtc: DateTime.utc(2026, 8, 3, 11, 0),
+          expertTimezone: 'Africa/Bamako',
         ),
       );
 
@@ -40,6 +43,9 @@ void main() {
         'agoraChannel',
         'clientNeed',
         'aiSummary',
+        'startUtc',
+        'endUtc',
+        'expertTimezone',
         'createdAt',
       });
       expect(data['expertId'], 'expert_1');
@@ -51,6 +57,20 @@ void main() {
       expect(data['duration'], 120);
       expect(data['currency'], 'XOF');
       expect(data['createdAt'], isA<FieldValue>());
+      // AD-022 C3: canonical occurrence snapshot persists as Timestamps and
+      // the verbatim named timezone identity — a round trip through the
+      // Timestamp representation restores the exact UTC instants.
+      expect(data['startUtc'], isA<Timestamp>());
+      expect(data['endUtc'], isA<Timestamp>());
+      expect(
+        (data['startUtc'] as Timestamp).toDate().toUtc(),
+        DateTime.utc(2026, 8, 3, 9, 0),
+      );
+      expect(
+        (data['endUtc'] as Timestamp).toDate().toUtc(),
+        DateTime.utc(2026, 8, 3, 11, 0),
+      );
+      expect(data['expertTimezone'], 'Africa/Bamako');
       expect(data, isNot(contains('ledger')));
       expect(data, isNot(contains('escrow')));
     });

@@ -21,6 +21,11 @@ final class BookingCreationFirestoreMapper {
       'agoraChannel': booking.agoraChannel,
       'clientNeed': booking.clientNeed,
       'aiSummary': booking.aiSummary,
+      // AD-022 C3: canonical reservation occurrence snapshot. UTC instants
+      // persist as Timestamps; the timezone identity persists verbatim.
+      'startUtc': Timestamp.fromDate(booking.startUtc),
+      'endUtc': Timestamp.fromDate(booking.endUtc),
+      'expertTimezone': booking.expertTimezone,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }

@@ -2,12 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/booking/booking_creation_application_service.dart';
 import 'package:mentora/application/booking/booking_creation_failure.dart';
+import 'package:mentora/application/expert_catalog/expert_catalog_application_service.dart';
+import 'package:mentora/application/scheduling/civil_selection.dart';
+import 'package:mentora/application/scheduling/selectable_occurrence_application_service.dart';
 import 'package:mentora/domain/booking/booking_creation.dart';
 import 'package:mentora/domain/booking/booking_creation_repository.dart';
 import 'package:mentora/domain/expert_catalog/consultation_offer.dart';
 import 'package:mentora/domain/expert_catalog/expert_catalog_entry.dart';
+import 'package:mentora/domain/expert_catalog/expert_catalog_repository.dart';
 import 'package:mentora/domain/expert_catalog/legacy_rate_offer_adapter.dart';
 import 'package:mentora/infrastructure/booking/booking_creation_firestore_mapper.dart';
+import 'package:mentora/infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
+import 'package:mentora/infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
+import 'package:mentora/infrastructure/scheduling/launch_market_timezone_resolver.dart';
 
 ExpertCatalogEntry catalogEntry({
   String id = 'expert_1',
@@ -22,7 +29,13 @@ ExpertCatalogEntry catalogEntry({
     country: 'ML',
     rating: '4.9',
     online: true,
-    availability: const <String, List<String>>{},
+    // AD-022 C2/C3: the modern creation path revalidates against the
+    // authoritative availability and timezone; the commercial assertions
+    // below are unchanged.
+    availability: const <String, List<String>>{
+      'Lundi': ['09:00'],
+    },
+    expertTimezone: 'Africa/Bamako',
     rate30: rate30,
     rate60: rate60,
     rate120: rate120,
@@ -51,8 +64,7 @@ void main() {
         await service.create(
           expertId: 'expert_1',
           expertName: 'Expert',
-          bookingDate: 'Lundi',
-          bookingTime: '09:00',
+          occurrence: _occurrence(selected),
           clientNeed: 'Need',
           aiSummary: 'Summary',
           offer: selected,
@@ -201,8 +213,44 @@ BookingCreationApplicationService _service(_Repository repository) {
   return BookingCreationApplicationService(
     session: _Session('client_1'),
     repository: repository,
+    selectableOccurrences: SelectableOccurrenceApplicationService(
+      expertCatalog: ExpertCatalogApplicationService(
+        repository: const _CatalogRepository(),
+      ),
+      materialization: const CivilOccurrenceMaterializationAdapter(),
+    ),
+    interpretation: const CivilOccurrenceInterpretationAdapter(
+      resolver: LaunchMarketTimezoneResolver(),
+    ),
     channelFactory: () => 'mentora_test_channel',
   );
+}
+
+/// Monday 3 August 2026 at 09:00 — the canonical AD-022 example — carrying
+/// the selected offer's authoritative duration.
+CivilSelection _occurrence(ConsultationOffer offer) {
+  return CivilSelection(
+    year: 2026,
+    month: 8,
+    day: 3,
+    hour: 9,
+    minute: 0,
+    durationMinutes: offer.durationMinutes,
+  );
+}
+
+final class _CatalogRepository implements ExpertCatalogRepository {
+  const _CatalogRepository();
+
+  @override
+  Stream<List<ExpertCatalogEntry>> watchExperts() {
+    return Stream.value([catalogEntry()]);
+  }
+
+  @override
+  Future<ExpertCatalogEntry?> findById(String expertId) async {
+    return expertId == 'expert_1' ? catalogEntry() : null;
+  }
 }
 
 Future<String> _create(
@@ -213,8 +261,7 @@ Future<String> _create(
   return service.create(
     expertId: expertId,
     expertName: 'Expert',
-    bookingDate: 'Lundi',
-    bookingTime: '09:00',
+    occurrence: _occurrence(offer),
     clientNeed: 'Need',
     aiSummary: 'Summary',
     offer: offer,

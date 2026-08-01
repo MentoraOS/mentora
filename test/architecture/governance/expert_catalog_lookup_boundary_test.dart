@@ -112,13 +112,13 @@ void main() {
         ..._dartFilesUnder('lib/infrastructure/booking'),
       ].map((file) => file.readAsStringSync()).join('\n');
 
+      // AD-022 C3 later authorized the Booking snapshot fields
+      // (startUtc/endUtc/expertTimezone); the Catalog lookup itself and the
+      // Scheduling interpretation types remain outside Booking.
       for (final forbidden in const [
         'findById',
         'ExpertCatalogApplicationService',
         'ExpertCatalogRepository',
-        'startUtc',
-        'endUtc',
-        'expertTimezone',
         'reservationExpiresAt',
         'AuthoritativeClock',
         'CivilDateTime',
