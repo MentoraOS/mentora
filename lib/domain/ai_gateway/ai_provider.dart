@@ -21,7 +21,7 @@ enum AIProviderType { simulated, openAI, deepgram, gemini }
 /// The intelligence tasks the gateway can route. Exactly one exists
 /// today; future waves ADD tasks here (translation, assistant, analytics,
 /// recommendation, search, classification) without touching callers.
-enum AITask { summary, transcription, translation }
+enum AITask { summary, transcription, translation, assistant }
 
 /// Generic transport envelope for every future AI usage.
 ///

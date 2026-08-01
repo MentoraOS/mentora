@@ -1,4 +1,5 @@
 import '../application/ai_gateway/ai_gateway_application_service.dart';
+import '../application/assistant/consultation_assistant_application_service.dart';
 import '../application/authentication/authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
@@ -67,6 +68,7 @@ final class MentoraDependencies {
     required this.liveConsultationRooms,
     required this.transcripts,
     required this.translations,
+    required this.consultationAssistant,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -159,6 +161,9 @@ final class MentoraDependencies {
 
   /// Real-time translation: a living projection of the transcript.
   final RealtimeTranslationApplicationService translations;
+
+  /// Consultation copilot: proposes only, over the memory alone.
+  final ConsultationAssistantApplicationService consultationAssistant;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

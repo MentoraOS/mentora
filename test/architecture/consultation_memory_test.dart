@@ -224,6 +224,8 @@ void main() {
         // memory as their single business source (ARC-SUM01).
         'lib/application/consultation_summary/'
             'consultation_summary_application_service.dart',
+        'lib/application/assistant/'
+            'consultation_assistant_application_service.dart',
       ];
 
       final portOffenders = <String>[];
