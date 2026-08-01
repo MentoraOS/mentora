@@ -32,7 +32,8 @@ void main() {
     await tester.pumpWidget(_app(_booking()));
 
     expect(find.text('Informations de consultation'), findsOneWidget);
-    expect(find.text('Notes privées'), findsOneWidget);
+    // Private notes are expert-only: the client never sees the card.
+    expect(find.text('Notes privées'), findsNothing);
     expect(find.text('Documents partagés'), findsOneWidget);
     expect(find.text('Messages'), findsOneWidget);
     expect(find.text('Consultation vidéo'), findsOneWidget);
@@ -62,6 +63,8 @@ void main() {
     await tester.pumpWidget(_app(_booking(), isExpert: true));
 
     expect(find.text('Avec votre client'), findsOneWidget);
+    // The expert does get the private notes card.
+    expect(find.text('Notes privées'), findsOneWidget);
   });
 
   testWidgets('legacy bookings without modern fields stay readable', (

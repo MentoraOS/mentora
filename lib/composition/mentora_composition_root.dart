@@ -8,6 +8,7 @@ import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/consultation_brief/consultation_brief_application_service.dart';
+import '../application/consultation_notes/consultation_private_notes_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
@@ -25,6 +26,7 @@ import '../infrastructure/booking/firestore_booking_confirmation_repository.dart
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_booking_overview_repository.dart';
 import '../infrastructure/consultation_brief/firestore_consultation_brief_repository.dart';
+import '../infrastructure/consultation_notes/firestore_consultation_private_notes_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
 import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
@@ -220,6 +222,14 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Expert-only private consultation notes: plain write/read snapshot.
+    final consultationPrivateNotes = ConsultationPrivateNotesApplicationService(
+      session: authenticationSession,
+      repository: FirestoreConsultationPrivateNotesRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     // Dashboard read projection: live stream of the user's reservations.
     final bookingDashboard = BookingDashboardApplicationService(
       session: authenticationSession,
@@ -237,6 +247,7 @@ final class MentoraCompositionRoot {
       bookingNotifications: bookingNotifications,
       bookingReschedule: bookingReschedule,
       consultationBrief: consultationBrief,
+      consultationPrivateNotes: consultationPrivateNotes,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       expertCatalog: expertCatalog,
