@@ -1,6 +1,6 @@
 import '../../domain/consultation_memory/consultation_memory.dart';
+import '../../domain/consultation_summary/ai_summary_provider.dart';
 import '../../domain/consultation_summary/consultation_summary.dart';
-import '../../domain/consultation_summary/summary_provider.dart';
 import '../../domain/consultation_summary/summary_repository.dart';
 import '../authentication/authentication_session.dart';
 import '../consultation_memory/consultation_memory_application_service.dart';
@@ -10,15 +10,15 @@ import '../consultation_memory/consultation_memory_application_service.dart';
 ///
 /// The only business source it may read is the memory, through
 /// ConsultationMemoryApplicationService (ARC-SUM01): never any other
-/// business module directly. Generation runs (today:
-/// simulates) behind the SummaryProvider port and only summary METADATA
-/// is ever persisted — no text, no engine content. A provider failure is
+/// business module directly. Generation runs behind the AISummaryProvider
+/// port — whose implementation routes through the AI gateway — and the
+/// resulting text is persisted with the metadata. A provider failure is
 /// persisted as FAILED and surfaces typed: never a fake success.
 final class ConsultationSummaryApplicationService {
   const ConsultationSummaryApplicationService({
     required AuthenticationSession session,
     required ConsultationMemoryApplicationService memory,
-    required SummaryProvider provider,
+    required AISummaryProvider provider,
     required SummaryRepository repository,
   }) : _session = session,
        _memory = memory,
@@ -27,11 +27,11 @@ final class ConsultationSummaryApplicationService {
 
   final AuthenticationSession _session;
   final ConsultationMemoryApplicationService _memory;
-  final SummaryProvider _provider;
+  final AISummaryProvider _provider;
   final SummaryRepository _repository;
 
-  /// Generates (today: simulates) the reservation's summary and returns
-  /// its resulting state.
+  /// Generates the reservation's summary through the governed chain and
+  /// returns its resulting state, text included.
   Future<ConsultationSummary> generate(String bookingId) async {
     final userId = _requireUserId();
 
@@ -50,16 +50,21 @@ final class ConsultationSummaryApplicationService {
 
     await _saveStatus(bookingId, userId, SummaryStatus.generating);
 
-    SummaryStatus status;
+    SummaryGenerationResult result;
     try {
-      status = await _provider.generate(bookingId: bookingId, memory: memory);
+      result = await _provider.generate(bookingId: bookingId, memory: memory);
     } catch (error) {
       // Never a fake success: the failure is durable and typed.
       await _saveStatusBestEffort(bookingId, userId, SummaryStatus.failed);
       throw SummaryUnavailableFailure(cause: error);
     }
 
-    await _saveStatus(bookingId, userId, status);
+    await _saveStatus(
+      bookingId,
+      userId,
+      SummaryStatus.available,
+      summaryText: result.summaryText,
+    );
     return getSummary(bookingId);
   }
 
@@ -77,6 +82,7 @@ final class ConsultationSummaryApplicationService {
           ConsultationSummary(
             bookingId: bookingId,
             status: SummaryStatus.notGenerated,
+            summaryText: null,
             createdAt: null,
             updatedAt: null,
           );
@@ -92,13 +98,15 @@ final class ConsultationSummaryApplicationService {
   Future<void> _saveStatus(
     String bookingId,
     String userId,
-    SummaryStatus status,
-  ) async {
+    SummaryStatus status, {
+    String? summaryText,
+  }) async {
     try {
       await _repository.saveStatus(
         bookingId: bookingId,
         userId: userId,
         status: status,
+        summaryText: summaryText,
       );
     } on SummaryStateNotFoundException {
       throw const SummaryNotFoundFailure();

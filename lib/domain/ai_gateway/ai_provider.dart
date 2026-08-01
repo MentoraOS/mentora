@@ -14,10 +14,14 @@ abstract interface class AIProvider {
   Future<bool> health();
 }
 
-/// The engines the gateway can route to. Today only the simulated one
-/// exists; real engine kinds are ADDED here by their own waves — no name
-/// is reserved in advance.
-enum AIProviderType { simulated }
+/// The engines the gateway can route to. Real engine kinds are ADDED
+/// here by their own waves.
+enum AIProviderType { simulated, openAI }
+
+/// The intelligence tasks the gateway can route. Exactly one exists
+/// today; future waves ADD tasks here (translation, assistant, analytics,
+/// recommendation, search, classification) without touching callers.
+enum AITask { summary }
 
 /// Generic transport envelope for every future AI usage.
 ///
@@ -26,6 +30,10 @@ enum AIProviderType { simulated }
 /// payloads today; they only travel.
 final class AIRequest {
   final String requestId;
+
+  /// The task this request belongs to; the gateway routes on it. A null
+  /// task goes to the gateway's default provider.
+  final AITask? task;
 
   /// Optional plain text to transport.
   final String? text;
@@ -44,6 +52,7 @@ final class AIRequest {
 
   factory AIRequest({
     required String requestId,
+    AITask? task,
     String? text,
     List<Object> conversation = const [],
     Object? audio,
@@ -56,6 +65,7 @@ final class AIRequest {
 
     return AIRequest._(
       requestId: requestId,
+      task: task,
       text: text,
       conversation: List.unmodifiable(conversation),
       audio: audio,
@@ -66,6 +76,7 @@ final class AIRequest {
 
   const AIRequest._({
     required this.requestId,
+    required this.task,
     required this.text,
     required this.conversation,
     required this.audio,
@@ -82,17 +93,21 @@ final class AIRequest {
       context.isEmpty;
 }
 
-/// Generic response envelope. Deliberately WITHOUT any generated content:
-/// future waves extend it additively when real engines exist.
+/// Generic response envelope.
 final class AIResponse {
   final AIProviderType providerType;
   final String responseId;
   final AIResponseStatus status;
 
+  /// The engine's answer, transported VERBATIM — the gateway never
+  /// parses, enriches or rewrites it. Null for status-only providers.
+  final String? text;
+
   const AIResponse({
     required this.providerType,
     required this.responseId,
     required this.status,
+    this.text,
   });
 }
 

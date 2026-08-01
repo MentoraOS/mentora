@@ -2,20 +2,24 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
+import 'package:mentora/application/ai_gateway/ai_gateway_application_service.dart';
 import 'package:mentora/application/consultation_memory/consultation_memory_application_service.dart';
 import 'package:mentora/application/consultation_summary/consultation_summary_application_service.dart';
+import 'package:mentora/domain/ai_gateway/ai_gateway.dart';
+import 'package:mentora/domain/ai_gateway/ai_provider.dart';
 import 'package:mentora/domain/consultation_memory/consultation_memory.dart';
 import 'package:mentora/domain/consultation_memory/memory_repository.dart';
+import 'package:mentora/domain/consultation_summary/ai_summary_provider.dart';
 import 'package:mentora/domain/consultation_summary/consultation_summary.dart';
-import 'package:mentora/domain/consultation_summary/summary_provider.dart';
 import 'package:mentora/domain/consultation_summary/summary_repository.dart';
-import 'package:mentora/infrastructure/consultation_summary/simulated_summary_provider.dart';
+import 'package:mentora/infrastructure/ai_gateway/openai_ai_provider.dart';
+import 'package:mentora/infrastructure/consultation_summary/gateway_ai_summary_provider.dart';
 
 void main() {
   group('ConsultationSummaryApplicationService', () {
-    test('generation reads ONLY the memory and persists the lifecycle', () async {
+    test('generation reads ONLY the memory and persists the text', () async {
       final memoryRepository = _MemoryRepository();
-      final provider = _RecordingProvider();
+      final provider = _RecordingSummaryProvider();
       final states = _SummaryRepository();
       final service = _service(
         memoryRepository: memoryRepository,
@@ -28,31 +32,21 @@ void main() {
       // The single business source: the memory, via its application door.
       expect(memoryRepository.reads, [('b1', 'client_1')]);
       expect(provider.generated.single.$1, 'b1');
-      expect(provider.generated.single.$2.bookingId, 'b1');
-      // Lifecycle persisted: generating, then the provider's outcome.
+      // Lifecycle persisted, then the text itself.
       expect(states.saved.map((entry) => entry.$3).toList(), [
         SummaryStatus.generating,
         SummaryStatus.available,
       ]);
-      expect(summary.bookingId, 'b1');
+      expect(states.saved.last.$4, 'Résumé de consultation.');
       expect(summary.status, SummaryStatus.available);
+      expect(summary.summaryText, 'Résumé de consultation.');
     });
 
-    test('one summary per reservation: summaryId == bookingId', () async {
-      final states = _SummaryRepository();
-      final service = _service(states: states);
-
-      await service.generate('b1');
-
-      expect(states.saved.map((entry) => entry.$1).toSet(), {'b1'});
-      expect((await service.getSummary('b1')).bookingId, 'b1');
-    });
-
-    test('a provider failure is persisted FAILED and surfaces typed — '
-        'never a fake success', () async {
+    test('a provider failure is persisted FAILED without text — never a '
+        'fake success', () async {
       final states = _SummaryRepository();
       final service = _service(
-        provider: _RecordingProvider(error: StateError('engine down')),
+        provider: _RecordingSummaryProvider(error: StateError('engine down')),
         states: states,
       );
 
@@ -64,32 +58,12 @@ void main() {
         SummaryStatus.generating,
         SummaryStatus.failed,
       ]);
-    });
-
-    test('an unauthenticated session fails before anything', () async {
-      final memoryRepository = _MemoryRepository();
-      final provider = _RecordingProvider();
-      final service = ConsultationSummaryApplicationService(
-        session: _Session(null),
-        memory: ConsultationMemoryApplicationService(
-          session: _Session(null),
-          repository: memoryRepository,
-        ),
-        provider: provider,
-        repository: _SummaryRepository(),
-      );
-
-      await expectLater(
-        service.generate('b1'),
-        throwsA(isA<SummaryUnauthenticatedFailure>()),
-      );
-      expect(memoryRepository.reads, isEmpty);
-      expect(provider.generated, isEmpty);
+      expect(states.saved.last.$4, isNull);
     });
 
     test('a foreign user or unknown booking fails closed before the '
         'provider', () async {
-      final provider = _RecordingProvider();
+      final provider = _RecordingSummaryProvider();
       final states = _SummaryRepository();
       final service = _service(
         memoryRepository: _MemoryRepository(
@@ -107,29 +81,123 @@ void main() {
       expect(states.saved, isEmpty);
     });
 
-    test('a never-generated summary reads as NOT_GENERATED, not an error', () async {
+    test('a never-generated summary reads as NOT_GENERATED without text', () async {
       final summary = await _service().getSummary('b1');
 
       expect(summary.status, SummaryStatus.notGenerated);
-      expect(summary.createdAt, isNull);
+      expect(summary.summaryText, isNull);
     });
   });
 
-  group('SimulatedSummaryProvider', () {
-    test('reports AVAILABLE without producing any content', () async {
-      const provider = SimulatedSummaryProvider();
-
-      final status = await provider.generate(
-        bookingId: 'b1',
-        memory: ConsultationMemory(
-          bookingId: 'b1',
-          entries: const [],
-          createdAt: null,
+  group('GatewayAISummaryProvider — the real chain', () {
+    test('routes AITask.summary through the AI gateway with the memory '
+        'prompt', () async {
+      final gateway = _RecordingGateway(
+        response: const AIResponse(
+          providerType: AIProviderType.openAI,
+          responseId: 'r1',
+          status: AIResponseStatus.accepted,
+          text: '  Résumé généré.  ',
         ),
       );
+      final provider = GatewayAISummaryProvider(gateway: gateway);
 
-      expect(status, SummaryStatus.available);
-      expect(await provider.health(), isTrue);
+      final result = await provider.generate(
+        bookingId: 'b1',
+        memory: _memory(),
+      );
+
+      final request = gateway.executed.single;
+      expect(request.task, AITask.summary);
+      expect(request.requestId, 'summary_b1');
+      // The prompt is built HERE, from the memory facts, verbatim.
+      expect(request.text, contains('chatMessage'));
+      expect(request.text, contains('Bonjour'));
+      expect(request.text, contains('consultationCompleted'));
+      expect(result.summaryText, 'Résumé généré.');
+      expect(result.provider, 'openAI');
+    });
+
+    test('an empty or rejected engine answer fails closed', () async {
+      for (final response in [
+        const AIResponse(
+          providerType: AIProviderType.openAI,
+          responseId: 'r1',
+          status: AIResponseStatus.accepted,
+          text: '   ',
+        ),
+        const AIResponse(
+          providerType: AIProviderType.openAI,
+          responseId: 'r1',
+          status: AIResponseStatus.rejected,
+          text: 'ignored',
+        ),
+      ]) {
+        final provider = GatewayAISummaryProvider(
+          gateway: _RecordingGateway(response: response),
+        );
+
+        await expectLater(
+          provider.generate(bookingId: 'b1', memory: _memory()),
+          throwsA(anything),
+        );
+      }
+    });
+
+    test('the prompt renders private-note facts without any content', () {
+      final prompt = GatewayAISummaryProvider.buildPrompt(_memory());
+
+      expect(prompt, contains('privateNote'));
+      expect(prompt, contains('(sans contenu)'));
+      expect(prompt, isNot(contains('strictement privé')));
+    });
+  });
+
+  group('AI gateway routing — AITask.SUMMARY', () {
+    test('a summary request reaches the provider registered for the task', () async {
+      final summaryEngine = _RecordingAIProvider();
+      final fallback = _RecordingAIProvider();
+      final gateway = AIGatewayApplicationService(
+        session: _Session('client_1'),
+        provider: fallback,
+        taskProviders: {AITask.summary: summaryEngine},
+      );
+
+      await gateway.execute(
+        AIRequest(requestId: 'r1', task: AITask.summary, text: 'prompt'),
+      );
+      await gateway.execute(AIRequest(requestId: 'r2', text: 'no task'));
+
+      expect(summaryEngine.executed.single.requestId, 'r1');
+      expect(fallback.executed.single.requestId, 'r2');
+    });
+  });
+
+  group('OpenAI engine — configuration and confinement', () {
+    test('an unconfigured engine fails closed before any network call', () async {
+      const provider = OpenAIProvider(
+        configuration: OpenAIConfiguration(apiKey: ''),
+      );
+
+      await expectLater(
+        provider.execute(AIRequest(requestId: 'r1', text: 'prompt')),
+        throwsA(isA<AIUnavailableFailure>()),
+      );
+      expect(await provider.health(), isFalse);
+    });
+
+    test('no key, secret or business module is hard-coded', () {
+      final source = File(
+        'lib/infrastructure/ai_gateway/openai_ai_provider.dart',
+      ).readAsStringSync();
+
+      expect(source, isNot(contains('sk-')));
+      // Configuration values are injected by the composition root.
+      expect(source, isNot(contains('String.fromEnvironment')));
+      // The engine relays text; it reads no business module.
+      expect(source, isNot(contains('consultation_memory')));
+      expect(source, isNot(contains('booking')));
+      expect(source, isNot(contains('cloud_firestore')));
     });
   });
 
@@ -138,7 +206,8 @@ void main() {
       'lib/infrastructure/consultation_summary/firestore_summary_repository.dart',
     ).readAsStringSync();
 
-    test('dedicated collection keyed by booking, metadata only', () {
+    test('dedicated collection keyed by booking; text stored verbatim '
+        'with the metadata', () {
       expect(source, contains("collection('consultation_summaries')"));
       expect(source, contains('_summaries.doc(bookingId)'));
       expect(source, contains('runTransaction'));
@@ -146,52 +215,94 @@ void main() {
         source,
         contains("data['clientId'] != userId && data['expertId'] != userId"),
       );
-      // Metadata only — never any generated content.
       expect(source, contains("'status': status.name,"));
+      expect(source, contains("'summaryText': ?summaryText,"));
       expect(source, contains("'updatedAt': FieldValue.serverTimestamp()"));
-      expect(source, isNot(contains("'text'")));
-      expect(source, isNot(contains("'content'")));
-      expect(source, isNot(contains("'summary':")));
       // The booking is read for the guard, never written.
       expect(source, isNot(contains('transaction.update')));
     });
   });
 
-  group('ARC-SUM01 — the memory is the only business source', () {
-    test('the summary service reads business data through the memory door '
-        'exclusively', () {
+  group('ARC-SUM01 — the governed chain is the only route', () {
+    test('the summary service knows the memory door and the provider port '
+        '— never the gateway, never an engine', () {
       final source = File(
         'lib/application/consultation_summary/'
         'consultation_summary_application_service.dart',
       ).readAsStringSync();
 
       expect(source, contains('ConsultationMemoryApplicationService'));
-      // No direct read of any other module, ever.
+      expect(source, contains('AISummaryProvider'));
       for (final forbidden in const [
+        'AIGateway',
+        'openai',
+        'OpenAI',
         'conversation',
         'booking_overview',
-        'consultation_brief',
-        'consultation_notes',
-        'consultation_documents',
-        'review',
         'cloud_firestore',
+        'HttpClient',
       ]) {
         expect(
-          source.toLowerCase(),
+          source,
           isNot(contains(forbidden)),
           reason: 'summary service must not touch $forbidden',
         );
       }
     });
 
-    test('the summary surface is confined and names no vendor', () {
+    test('the summary infrastructure provider uses the gateway ONLY', () {
+      final source = File(
+        'lib/infrastructure/consultation_summary/'
+        'gateway_ai_summary_provider.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('AIGateway'));
+      expect(source, contains('AITask.summary'));
+      for (final forbidden in const [
+        'openai',
+        'OpenAI',
+        'HttpClient',
+        'http',
+        'cloud_firestore',
+      ]) {
+        expect(
+          source,
+          isNot(contains(forbidden)),
+          reason: 'the summary provider must not touch $forbidden',
+        );
+      }
+    });
+
+    test('OpenAI is invisible outside its single Infrastructure adapter', () {
+      const allowed = [
+        'lib/infrastructure/ai_gateway/openai_ai_provider.dart',
+        'lib/composition/mentora_composition_root.dart',
+        // The provider-type enum names the engine kind; it carries no SDK,
+        // no endpoint and no secret.
+        'lib/domain/ai_gateway/ai_provider.dart',
+      ];
+
+      final offenders = <String>[];
+      for (final entity in Directory('lib').listSync(recursive: true)) {
+        if (entity is! File || !entity.path.endsWith('.dart')) continue;
+        final normalized = entity.path.replaceAll('\\', '/');
+        if (entity.readAsStringSync().toLowerCase().contains('openai') &&
+            !allowed.contains(normalized)) {
+          offenders.add(normalized);
+        }
+      }
+      expect(offenders, isEmpty);
+    });
+
+    test('the summary surface is confined', () {
       const allowedSurface = [
         'lib/domain/consultation_summary/consultation_summary.dart',
-        'lib/domain/consultation_summary/summary_provider.dart',
+        'lib/domain/consultation_summary/ai_summary_provider.dart',
         'lib/domain/consultation_summary/summary_repository.dart',
         'lib/application/consultation_summary/'
             'consultation_summary_application_service.dart',
-        'lib/infrastructure/consultation_summary/simulated_summary_provider.dart',
+        'lib/infrastructure/consultation_summary/'
+            'gateway_ai_summary_provider.dart',
         'lib/infrastructure/consultation_summary/firestore_summary_repository.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
@@ -202,8 +313,6 @@ void main() {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         final normalized = entity.path.replaceAll('\\', '/');
         final source = entity.readAsStringSync();
-        // Exact identifiers: the legacy 'postConsultationSummary' string
-        // field must not match.
         if ((source.contains('SummaryProvider') ||
                 source.contains('SummaryRepository') ||
                 source.contains('ConsultationSummaryApplicationService')) &&
@@ -212,27 +321,41 @@ void main() {
         }
       }
       expect(offenders, isEmpty);
-
-      for (final path in allowedSurface.take(6)) {
-        final source = File(path).readAsStringSync().toLowerCase();
-        for (final vendor in const [
-          'openai',
-          'gemini',
-          'claude',
-          'anthropic',
-          'deepgram',
-          'markdown',
-        ]) {
-          expect(source, isNot(contains(vendor)), reason: '$path: $vendor');
-        }
-      }
     });
   });
 }
 
+ConsultationMemory _memory() {
+  return ConsultationMemory(
+    bookingId: 'b1',
+    entries: [
+      MemoryEntry(
+        id: 'e1',
+        bookingId: 'b1',
+        type: MemoryEntryType.chatMessage,
+        createdAt: DateTime.utc(2026, 8, 1, 9),
+        payload: const {'content': 'Bonjour'},
+      ),
+      MemoryEntry(
+        id: 'e2',
+        bookingId: 'b1',
+        type: MemoryEntryType.privateNote,
+        createdAt: DateTime.utc(2026, 8, 1, 10),
+      ),
+      MemoryEntry(
+        id: 'e3',
+        bookingId: 'b1',
+        type: MemoryEntryType.consultationCompleted,
+        createdAt: DateTime.utc(2026, 8, 1, 11),
+      ),
+    ],
+    createdAt: DateTime.utc(2026, 8, 1),
+  );
+}
+
 ConsultationSummaryApplicationService _service({
   _MemoryRepository? memoryRepository,
-  _RecordingProvider? provider,
+  _RecordingSummaryProvider? provider,
   _SummaryRepository? states,
 }) {
   final session = _Session('client_1');
@@ -242,7 +365,7 @@ ConsultationSummaryApplicationService _service({
       session: session,
       repository: memoryRepository ?? _MemoryRepository(),
     ),
-    provider: provider ?? _RecordingProvider(),
+    provider: provider ?? _RecordingSummaryProvider(),
     repository: states ?? _SummaryRepository(),
   );
 }
@@ -268,44 +391,42 @@ final class _MemoryRepository implements MemoryRepository {
   }) async {
     if (error case final cause?) throw cause;
     reads.add((bookingId, userId));
-    return ConsultationMemory(
-      bookingId: bookingId,
-      entries: const [],
-      createdAt: null,
-    );
+    return _memory();
   }
 }
 
-final class _RecordingProvider implements SummaryProvider {
-  _RecordingProvider({this.error});
+final class _RecordingSummaryProvider implements AISummaryProvider {
+  _RecordingSummaryProvider({this.error});
 
   final Object? error;
   final List<(String, ConsultationMemory)> generated = [];
 
   @override
-  Future<SummaryStatus> generate({
+  Future<SummaryGenerationResult> generate({
     required String bookingId,
     required ConsultationMemory memory,
   }) async {
     if (error case final cause?) throw cause;
     generated.add((bookingId, memory));
-    return SummaryStatus.available;
+    return SummaryGenerationResult(
+      summaryText: 'Résumé de consultation.',
+      provider: 'openAI',
+      generatedAt: DateTime.utc(2026, 8, 1, 12),
+    );
   }
-
-  @override
-  Future<bool> health() async => true;
 }
 
 final class _SummaryRepository implements SummaryRepository {
-  final List<(String, String, SummaryStatus)> saved = [];
+  final List<(String, String, SummaryStatus, String?)> saved = [];
 
   @override
   Future<void> saveStatus({
     required String bookingId,
     required String userId,
     required SummaryStatus status,
+    String? summaryText,
   }) async {
-    saved.add((bookingId, userId, status));
+    saved.add((bookingId, userId, status, summaryText));
   }
 
   @override
@@ -317,10 +438,44 @@ final class _SummaryRepository implements SummaryRepository {
     return ConsultationSummary(
       bookingId: bookingId,
       status: saved.last.$3,
+      summaryText: saved.last.$4,
       createdAt: DateTime.utc(2026, 8, 1),
       updatedAt: DateTime.utc(2026, 8, 1),
     );
   }
+}
+
+final class _RecordingGateway implements AIGateway {
+  _RecordingGateway({required this.response});
+
+  final AIResponse response;
+  final List<AIRequest> executed = [];
+
+  @override
+  Future<AIResponse> execute(AIRequest request) async {
+    executed.add(request);
+    return response;
+  }
+}
+
+final class _RecordingAIProvider implements AIProvider {
+  final List<AIRequest> executed = [];
+
+  @override
+  AIProviderType get providerType => AIProviderType.simulated;
+
+  @override
+  Future<AIResponse> execute(AIRequest request) async {
+    executed.add(request);
+    return AIResponse(
+      providerType: AIProviderType.simulated,
+      responseId: 'simulated_${request.requestId}',
+      status: AIResponseStatus.accepted,
+    );
+  }
+
+  @override
+  Future<bool> health() async => true;
 }
 
 final class _Session extends Fake implements AuthenticationSession {

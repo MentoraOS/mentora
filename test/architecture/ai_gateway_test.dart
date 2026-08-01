@@ -103,7 +103,8 @@ void main() {
       expect(() => AIRequest(requestId: '  '), throwsArgumentError);
     });
 
-    test('the response envelope carries no generated content', () {
+    test('the response envelope carries the envelope fields and the '
+        'verbatim engine text only', () {
       final source = File(
         'lib/domain/ai_gateway/ai_provider.dart',
       ).readAsStringSync();
@@ -115,8 +116,9 @@ void main() {
       expect(responseBlock, contains('providerType'));
       expect(responseBlock, contains('responseId'));
       expect(responseBlock, contains('status'));
-      expect(responseBlock, isNot(contains('text')));
-      expect(responseBlock, isNot(contains('content')));
+      // The engine answer travels VERBATIM — never parsed or enriched.
+      expect(responseBlock, contains('final String? text;'));
+      expect(responseBlock, contains('VERBATIM'));
     });
   });
 
@@ -127,12 +129,17 @@ void main() {
         'lib/domain/ai_gateway/ai_provider.dart',
         'lib/application/ai_gateway/ai_gateway_application_service.dart',
         'lib/infrastructure/ai_gateway/simulated_ai_provider.dart',
+        // The engine adapters: the ONLY places knowing a real vendor.
+        'lib/infrastructure/ai_gateway/openai_ai_provider.dart',
+        // Task-side providers routing through the gateway contract.
+        'lib/infrastructure/consultation_summary/'
+            'gateway_ai_summary_provider.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
       ];
-      // No AI vendor SDK may be imported anywhere in lib — a real engine
-      // adapter joins lib/infrastructure/ai_gateway/ in its own wave and
-      // relaxes this list for that directory only.
+      // No AI vendor SDK may be imported anywhere in lib — the OpenAI
+      // adapter speaks plain HTTP through dart:io, so even the engine
+      // directory carries no vendor package.
       const forbiddenImports = [
         "import 'package:openai",
         "import 'package:dart_openai",
@@ -165,10 +172,12 @@ void main() {
       expect(vendorOffenders, isEmpty);
     });
 
-    test('the gateway layer itself names no vendor', () {
+    test('the gateway contract and routing name no vendor', () {
+      // The AIProviderType registry (domain ai_provider.dart) names engine
+      // KINDS — that is its purpose; the engine itself lives only in its
+      // Infrastructure adapter. Everything else stays vendor-free.
       for (final path in const [
         'lib/domain/ai_gateway/ai_gateway.dart',
-        'lib/domain/ai_gateway/ai_provider.dart',
         'lib/application/ai_gateway/ai_gateway_application_service.dart',
         'lib/infrastructure/ai_gateway/simulated_ai_provider.dart',
       ]) {

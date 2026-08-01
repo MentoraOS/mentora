@@ -1,21 +1,25 @@
-/// The official summary of one consultation — METADATA ONLY today.
+/// The official summary of one consultation.
 ///
 /// One reservation owns exactly one summary, identified by the booking id
-/// itself (summaryId == bookingId). No generated text, no engine content
-/// of any kind exists anywhere yet: this wave is the architecture that a
-/// future wave fills by swapping the simulated provider for a real one
-/// behind the AI gateway. Nothing else will change.
+/// itself (summaryId == bookingId). The text is produced exclusively
+/// through the governed chain memory -> summary service -> AI gateway ->
+/// engine adapter; it is null until a generation succeeded.
 final class ConsultationSummary {
   /// Also the summary identity: summaryId == bookingId.
   final String bookingId;
 
   final SummaryStatus status;
+
+  /// The generated summary, verbatim; null until AVAILABLE.
+  final String? summaryText;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   const ConsultationSummary({
     required this.bookingId,
     required this.status,
+    required this.summaryText,
     required this.createdAt,
     required this.updatedAt,
   });

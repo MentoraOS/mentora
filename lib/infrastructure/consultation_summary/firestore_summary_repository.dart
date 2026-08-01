@@ -5,10 +5,9 @@ import '../../domain/consultation_summary/summary_repository.dart';
 
 /// Summary state lives in its own `consultation_summaries` collection,
 /// one document per reservation KEYED BY the booking id (summaryId ==
-/// bookingId). ONLY metadata is persisted — bookingId, status, createdAt,
-/// updatedAt — never any generated content. Writes run in a transaction
-/// guarding existence and participation; the booking document is read,
-/// never written.
+/// bookingId): the lifecycle metadata plus, once generated, the summary
+/// text verbatim. Writes run in a transaction guarding existence and
+/// participation; the booking document is read, never written.
 final class FirestoreSummaryRepository implements SummaryRepository {
   const FirestoreSummaryRepository({required FirebaseFirestore firestore})
     : _firestore = firestore;
@@ -23,6 +22,7 @@ final class FirestoreSummaryRepository implements SummaryRepository {
     required String bookingId,
     required String userId,
     required SummaryStatus status,
+    String? summaryText,
   }) async {
     final bookingDocument = _firestore.collection('bookings').doc(bookingId);
     final summaryDocument = _summaries.doc(bookingId);
@@ -42,6 +42,7 @@ final class FirestoreSummaryRepository implements SummaryRepository {
         transaction.set(summaryDocument, <String, dynamic>{
           'bookingId': bookingId,
           'status': status.name,
+          'summaryText': ?summaryText,
           if (!existing.exists) 'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
@@ -77,12 +78,14 @@ final class FirestoreSummaryRepository implements SummaryRepository {
 
       final createdAt = summary['createdAt'];
       final updatedAt = summary['updatedAt'];
+      final summaryText = summary['summaryText'];
       return ConsultationSummary(
         bookingId: bookingId,
         status: SummaryStatus.values.firstWhere(
           (status) => status.name == summary['status'],
           orElse: () => SummaryStatus.notGenerated,
         ),
+        summaryText: summaryText is String ? summaryText : null,
         createdAt: createdAt is Timestamp ? createdAt.toDate() : null,
         updatedAt: updatedAt is Timestamp ? updatedAt.toDate() : null,
       );

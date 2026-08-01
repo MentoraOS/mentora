@@ -1,6 +1,7 @@
 import 'consultation_summary.dart';
 
-/// Port for summary STATE persistence — metadata only, never content.
+/// Port for summary persistence: the lifecycle metadata and, once a
+/// generation succeeded, the summary text itself.
 abstract interface class SummaryRepository {
   /// Persists the reservation's summary status (summaryId == bookingId).
   ///
@@ -10,6 +11,7 @@ abstract interface class SummaryRepository {
     required String bookingId,
     required String userId,
     required SummaryStatus status,
+    String? summaryText,
   });
 
   /// The persisted summary state, or null when none was ever recorded.

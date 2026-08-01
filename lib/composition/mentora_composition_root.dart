@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../application/ai_gateway/ai_gateway_application_service.dart';
+import '../domain/ai_gateway/ai_provider.dart';
 import '../application/authentication/default_authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
@@ -31,6 +32,7 @@ import '../application/transcript/transcript_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
+import '../infrastructure/ai_gateway/openai_ai_provider.dart';
 import '../infrastructure/ai_gateway/simulated_ai_provider.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_cancellation_repository.dart';
@@ -43,7 +45,7 @@ import '../infrastructure/consultation_documents/firebase_consultation_document_
 import '../infrastructure/consultation_memory/firestore_memory_repository.dart';
 import '../infrastructure/consultation_notes/firestore_consultation_private_notes_repository.dart';
 import '../infrastructure/consultation_summary/firestore_summary_repository.dart';
-import '../infrastructure/consultation_summary/simulated_summary_provider.dart';
+import '../infrastructure/consultation_summary/gateway_ai_summary_provider.dart';
 import '../infrastructure/conversation/firestore_conversation_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
@@ -311,22 +313,37 @@ final class MentoraCompositionRoot {
 
     const liveConsultationRooms = LiveKitRoomProvider();
 
-    // Summary foundation: the first official memory consumer. Metadata
-    // only; the simulated provider is replaced by a real engine routed
-    // through the AI gateway in its own wave.
-    final consultationSummaries = ConsultationSummaryApplicationService(
-      session: authenticationSession,
-      memory: consultationMemory,
-      provider: const SimulatedSummaryProvider(),
-      repository: FirestoreSummaryRepository(firestore: firebase.firestore),
-    );
-
-    // AI Gateway foundation: the single doorway every future intelligence
-    // capability must pass through. One simulated provider, no selection
-    // logic, no engine, no generated content.
+    // AI Gateway: the single doorway every intelligence capability must
+    // pass through. Requests route BY TASK; every deployment value of the
+    // OpenAI engine is injected from the environment — never hard-coded.
     final aiGateway = AIGatewayApplicationService(
       session: authenticationSession,
       provider: const SimulatedAIProvider(),
+      taskProviders: const {
+        AITask.summary: OpenAIProvider(
+          configuration: OpenAIConfiguration(
+            apiKey: String.fromEnvironment('MENTORA_OPENAI_API_KEY'),
+            endpoint: String.fromEnvironment(
+              'MENTORA_OPENAI_ENDPOINT',
+              defaultValue: 'https://api.openai.com/v1/chat/completions',
+            ),
+            model: String.fromEnvironment(
+              'MENTORA_OPENAI_MODEL',
+              defaultValue: 'gpt-4o-mini',
+            ),
+          ),
+        ),
+      },
+    );
+
+    // The official summary chain: memory -> summary service -> gateway
+    // (task SUMMARY) -> engine adapter. The prompt lives in the summary
+    // Infrastructure provider; no other layer knows the engine.
+    final consultationSummaries = ConsultationSummaryApplicationService(
+      session: authenticationSession,
+      memory: consultationMemory,
+      provider: GatewayAISummaryProvider(gateway: aiGateway),
+      repository: FirestoreSummaryRepository(firestore: firebase.firestore),
     );
 
     // Transcript foundation: opaque audio transport behind its port. The
