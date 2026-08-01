@@ -15,6 +15,7 @@ import '../widgets/consultation_brief_card.dart';
 import '../widgets/consultation_documents_card.dart';
 import '../widgets/consultation_private_notes_card.dart';
 import '../widgets/consultation_review_card.dart';
+import '../widgets/consultation_summary_card.dart';
 import '../widgets/consultation_timeline.dart';
 import 'conversation_screen.dart';
 import 'live_consultation_screen.dart';
@@ -271,6 +272,13 @@ class _ConsultationDashboardScreenState
               title: 'Documents partagés',
               icon: Icons.folder_shared,
               child: ConsultationDocumentsCard(bookingId: booking.bookingId),
+            ),
+            const SizedBox(height: 16),
+
+            _DashboardCard(
+              title: 'Résumé IA',
+              icon: Icons.psychology_outlined,
+              child: ConsultationSummaryCard(bookingId: booking.bookingId),
             ),
             const SizedBox(height: 16),
 

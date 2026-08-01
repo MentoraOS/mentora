@@ -12,6 +12,7 @@ abstract interface class SummaryRepository {
     required String userId,
     required SummaryStatus status,
     String? summaryText,
+    String? provider,
   });
 
   /// The persisted summary state, or null when none was ever recorded.

@@ -306,6 +306,9 @@ void main() {
         'lib/infrastructure/consultation_summary/firestore_summary_repository.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
+        // The single authorized UI consumer (via the application door).
+        'lib/widgets/consultation_summary_card.dart',
+        'lib/main.dart',
       ];
 
       final offenders = <String>[];
@@ -425,6 +428,7 @@ final class _SummaryRepository implements SummaryRepository {
     required String userId,
     required SummaryStatus status,
     String? summaryText,
+    String? provider,
   }) async {
     saved.add((bookingId, userId, status, summaryText));
   }
@@ -439,6 +443,7 @@ final class _SummaryRepository implements SummaryRepository {
       bookingId: bookingId,
       status: saved.last.$3,
       summaryText: saved.last.$4,
+      provider: null,
       createdAt: DateTime.utc(2026, 8, 1),
       updatedAt: DateTime.utc(2026, 8, 1),
     );

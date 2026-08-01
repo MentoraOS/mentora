@@ -64,6 +64,7 @@ final class ConsultationSummaryApplicationService {
       userId,
       SummaryStatus.available,
       summaryText: result.summaryText,
+      provider: result.provider,
     );
     return getSummary(bookingId);
   }
@@ -83,6 +84,7 @@ final class ConsultationSummaryApplicationService {
             bookingId: bookingId,
             status: SummaryStatus.notGenerated,
             summaryText: null,
+            provider: null,
             createdAt: null,
             updatedAt: null,
           );
@@ -100,6 +102,7 @@ final class ConsultationSummaryApplicationService {
     String userId,
     SummaryStatus status, {
     String? summaryText,
+    String? provider,
   }) async {
     try {
       await _repository.saveStatus(
@@ -107,6 +110,7 @@ final class ConsultationSummaryApplicationService {
         userId: userId,
         status: status,
         summaryText: summaryText,
+        provider: provider,
       );
     } on SummaryStateNotFoundException {
       throw const SummaryNotFoundFailure();

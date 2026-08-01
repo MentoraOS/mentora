@@ -13,6 +13,9 @@ final class ConsultationSummary {
   /// The generated summary, verbatim; null until AVAILABLE.
   final String? summaryText;
 
+  /// The engine kind that produced the text; null until AVAILABLE.
+  final String? provider;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -20,6 +23,7 @@ final class ConsultationSummary {
     required this.bookingId,
     required this.status,
     required this.summaryText,
+    this.provider,
     required this.createdAt,
     required this.updatedAt,
   });

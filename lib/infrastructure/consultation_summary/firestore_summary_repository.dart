@@ -23,6 +23,7 @@ final class FirestoreSummaryRepository implements SummaryRepository {
     required String userId,
     required SummaryStatus status,
     String? summaryText,
+    String? provider,
   }) async {
     final bookingDocument = _firestore.collection('bookings').doc(bookingId);
     final summaryDocument = _summaries.doc(bookingId);
@@ -43,6 +44,7 @@ final class FirestoreSummaryRepository implements SummaryRepository {
           'bookingId': bookingId,
           'status': status.name,
           'summaryText': ?summaryText,
+          'provider': ?provider,
           if (!existing.exists) 'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
@@ -79,6 +81,7 @@ final class FirestoreSummaryRepository implements SummaryRepository {
       final createdAt = summary['createdAt'];
       final updatedAt = summary['updatedAt'];
       final summaryText = summary['summaryText'];
+      final provider = summary['provider'];
       return ConsultationSummary(
         bookingId: bookingId,
         status: SummaryStatus.values.firstWhere(
@@ -86,6 +89,7 @@ final class FirestoreSummaryRepository implements SummaryRepository {
           orElse: () => SummaryStatus.notGenerated,
         ),
         summaryText: summaryText is String ? summaryText : null,
+        provider: provider is String ? provider : null,
         createdAt: createdAt is Timestamp ? createdAt.toDate() : null,
         updatedAt: updatedAt is Timestamp ? updatedAt.toDate() : null,
       );
