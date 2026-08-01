@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability/expert_availability_failure.dart';
+import '../application/expert_timezone/expert_timezone_application_service.dart';
+import '../application/expert_timezone/expert_timezone_failure.dart';
 import '../domain/expert_availability/expert_availability.dart';
 import '../theme/mentora_theme.dart';
 
@@ -42,10 +44,78 @@ class _ExpertAgendaScreenState extends State<ExpertAgendaScreen> {
   bool saving = false;
   String? failureMessage;
 
+  /// AD-022 Clarification A: the declared authoritative timezone identity.
+  /// Without it, none of the expert's slots is reservable (fail closed).
+  String? declaredTimezone;
+  String? selectedTimezone;
+  bool timezoneLoading = true;
+  bool timezoneSaving = false;
+  bool timezoneLoadFailed = false;
+
   @override
   void initState() {
     super.initState();
     _loadAvailability();
+    _loadTimezone();
+  }
+
+  Future<void> _loadTimezone() async {
+    setState(() {
+      timezoneLoading = true;
+      timezoneLoadFailed = false;
+    });
+    try {
+      final timezone = await context
+          .read<ExpertTimezoneApplicationService>()
+          .loadCurrentTimezone();
+      if (!mounted) return;
+      setState(() {
+        declaredTimezone = timezone;
+        selectedTimezone = timezone;
+        timezoneLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        timezoneLoading = false;
+        timezoneLoadFailed = true;
+      });
+    }
+  }
+
+  Future<void> _confirmTimezone() async {
+    final timezone = selectedTimezone;
+    if (timezone == null) return;
+
+    setState(() => timezoneSaving = true);
+    try {
+      await context.read<ExpertTimezoneApplicationService>().declareTimezone(
+        timezone,
+      );
+      if (!mounted) return;
+      setState(() => declaredTimezone = timezone);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Fuseau horaire confirmé')));
+    } on ExpertTimezoneFailure {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Impossible d’enregistrer le fuseau horaire.'),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Impossible d’enregistrer le fuseau horaire.'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => timezoneSaving = false);
+      }
+    }
   }
 
   Future<void> _loadAvailability() async {
@@ -177,6 +247,21 @@ class _ExpertAgendaScreenState extends State<ExpertAgendaScreen> {
 
             const SizedBox(height: 24),
 
+            _TimezoneCard(
+              loading: timezoneLoading,
+              loadFailed: timezoneLoadFailed,
+              declaredTimezone: declaredTimezone,
+              selectedTimezone: selectedTimezone,
+              saving: timezoneSaving,
+              onChanged: (timezone) {
+                setState(() => selectedTimezone = timezone);
+              },
+              onConfirm: timezoneSaving ? null : _confirmTimezone,
+              onReload: _loadTimezone,
+            ),
+
+            const SizedBox(height: 24),
+
             if (loading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 48),
@@ -216,6 +301,129 @@ class _ExpertAgendaScreenState extends State<ExpertAgendaScreen> {
             const SizedBox(height: 40),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// AD-022 Clarification A: the expert EXPLICITLY confirms the timezone
+/// identity. The card only offers launch-market identities the platform can
+/// interpret; nothing is ever derived from the country or the device.
+class _TimezoneCard extends StatelessWidget {
+  const _TimezoneCard({
+    required this.loading,
+    required this.loadFailed,
+    required this.declaredTimezone,
+    required this.selectedTimezone,
+    required this.saving,
+    required this.onChanged,
+    required this.onConfirm,
+    required this.onReload,
+  });
+
+  final bool loading;
+  final bool loadFailed;
+  final String? declaredTimezone;
+  final String? selectedTimezone;
+  final bool saving;
+  final ValueChanged<String?> onChanged;
+  final VoidCallback? onConfirm;
+  final VoidCallback onReload;
+
+  /// Display labels only; the persisted value is the identity itself.
+  static const Map<String, String> _labels = {
+    'Africa/Bamako': 'Africa/Bamako (Mali)',
+    'Africa/Dakar': 'Africa/Dakar (Sénégal)',
+    'Africa/Abidjan': 'Africa/Abidjan (Côte d’Ivoire)',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Fuseau horaire',
+            style: TextStyle(
+              color: MentoraColors.gold,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (loading)
+            const LinearProgressIndicator(
+              color: MentoraColors.gold,
+              backgroundColor: Colors.white12,
+            )
+          else if (loadFailed) ...[
+            const Text(
+              'Impossible de charger le fuseau horaire.',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            TextButton.icon(
+              onPressed: onReload,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Recharger'),
+            ),
+          ] else ...[
+            if (declaredTimezone == null)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 10),
+                child: Text(
+                  'Sans fuseau horaire confirmé, vos créneaux ne '
+                  'sont pas réservables par les clients.',
+                  style: TextStyle(color: Colors.orangeAccent),
+                ),
+              ),
+            DropdownButtonFormField<String>(
+              initialValue: selectedTimezone,
+              dropdownColor: MentoraColors.navy,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: .06),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                hintText: 'Choisissez votre fuseau horaire',
+                hintStyle: const TextStyle(color: Colors.white38),
+              ),
+              items: ExpertTimezoneApplicationService.supportedTimezones
+                  .map(
+                    (timezone) => DropdownMenuItem<String>(
+                      value: timezone,
+                      child: Text(_labels[timezone] ?? timezone),
+                    ),
+                  )
+                  .toList(),
+              onChanged: onChanged,
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: selectedTimezone == null ? null : onConfirm,
+                icon: const Icon(Icons.public),
+                label: Text(
+                  saving
+                      ? 'Enregistrement...'
+                      : declaredTimezone == null
+                      ? 'Confirmer le fuseau horaire'
+                      : 'Mettre à jour le fuseau horaire',
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

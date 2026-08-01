@@ -3,6 +3,7 @@ import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
+import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
@@ -20,6 +21,7 @@ final class MentoraDependencies {
     required this.expertBookingOccupancy,
     required this.expertAvailability,
     required this.expertCatalog,
+    required this.expertTimezone,
     required this.favoriteExperts,
     required this.profile,
     required this.selectableOccurrences,
@@ -35,6 +37,10 @@ final class MentoraDependencies {
   final ExpertBookingOccupancyApplicationService expertBookingOccupancy;
   final ExpertAvailabilityApplicationService expertAvailability;
   final ExpertCatalogApplicationService expertCatalog;
+
+  /// AD-022 Clarification A: expert-side explicit timezone declaration.
+  final ExpertTimezoneApplicationService expertTimezone;
+
   final FavoriteExpertsApplicationService favoriteExperts;
   final ProfileApplicationService profile;
 

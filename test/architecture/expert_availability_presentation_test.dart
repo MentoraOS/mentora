@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/expert_availability/expert_availability_application_service.dart';
+import 'package:mentora/application/expert_timezone/expert_timezone_application_service.dart';
 import 'package:mentora/domain/expert_availability/expert_availability.dart';
 import 'package:mentora/domain/expert_availability/expert_availability_repository.dart';
+import 'package:mentora/domain/expert_timezone/expert_timezone_declaration_repository.dart';
 import 'package:mentora/domain/session/session_model.dart';
 import 'package:mentora/screens/expert_agenda_screen.dart';
 import 'package:provider/provider.dart';
@@ -97,11 +99,33 @@ Widget _app(_AgendaRepository repository) {
     session: _ExpertSession(),
     repository: repository,
   );
+  final timezoneService = ExpertTimezoneApplicationService(
+    session: _ExpertSession(),
+    repository: _TimezoneRepository(),
+  );
 
-  return Provider<ExpertAvailabilityApplicationService>.value(
-    value: service,
+  return MultiProvider(
+    providers: [
+      Provider<ExpertAvailabilityApplicationService>.value(value: service),
+      Provider<ExpertTimezoneApplicationService>.value(value: timezoneService),
+    ],
     child: const MaterialApp(home: ExpertAgendaScreen()),
   );
+}
+
+final class _TimezoneRepository implements ExpertTimezoneDeclarationRepository {
+  String? stored = 'Africa/Bamako';
+
+  @override
+  Future<String?> loadByExpertId(String expertId) async => stored;
+
+  @override
+  Future<void> saveByExpertId({
+    required String expertId,
+    required String timezone,
+  }) async {
+    stored = timezone;
+  }
 }
 
 ExpertAvailability _availability({required String revision}) {

@@ -5,6 +5,7 @@ import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
+import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
@@ -20,6 +21,7 @@ import '../infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
+import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.dart';
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
 import 'mentora_dependencies.dart';
@@ -101,6 +103,15 @@ final class MentoraCompositionRoot {
       repository: expertCatalogRepository,
     );
 
+    // AD-022 Clarification A: expert-side explicit timezone declaration,
+    // persisted on the Catalog document the funnel already reads.
+    final expertTimezone = ExpertTimezoneApplicationService(
+      session: authenticationSession,
+      repository: FirestoreExpertTimezoneRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     final favoriteExpertsRepository = FirestoreFavoriteExpertsRepository(
       firestore: firebase.firestore,
     );
@@ -147,6 +158,7 @@ final class MentoraCompositionRoot {
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       expertCatalog: expertCatalog,
+      expertTimezone: expertTimezone,
       favoriteExperts: favoriteExperts,
       profile: profile,
       selectableOccurrences: selectableOccurrences,
