@@ -134,12 +134,14 @@ void main() {
         'lib/infrastructure/ai_gateway/deepgram_adapter.dart',
         'lib/infrastructure/ai_gateway/gemini_adapter.dart',
         'lib/infrastructure/ai_gateway/openai_assistant_adapter.dart',
+        'lib/infrastructure/ai_gateway/openai_action_items_adapter.dart',
         // Task-side providers routing through the gateway contract.
         'lib/infrastructure/consultation_summary/'
             'gateway_ai_summary_provider.dart',
         'lib/infrastructure/transcript/ai_transcript_provider.dart',
         'lib/infrastructure/translation/ai_translation_provider.dart',
         'lib/infrastructure/assistant/ai_assistant_provider.dart',
+        'lib/infrastructure/action_items/ai_action_items_provider.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
       ];

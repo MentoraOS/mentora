@@ -1,4 +1,5 @@
 import '../application/ai_gateway/ai_gateway_application_service.dart';
+import '../application/action_items/consultation_action_items_application_service.dart';
 import '../application/assistant/consultation_assistant_application_service.dart';
 import '../application/authentication/authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
@@ -69,6 +70,7 @@ final class MentoraDependencies {
     required this.transcripts,
     required this.translations,
     required this.consultationAssistant,
+    required this.consultationActionItems,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -164,6 +166,9 @@ final class MentoraDependencies {
 
   /// Consultation copilot: proposes only, over the memory alone.
   final ConsultationAssistantApplicationService consultationAssistant;
+
+  /// Action recommendations: proposals only, the expert decides.
+  final ConsultationActionItemsApplicationService consultationActionItems;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

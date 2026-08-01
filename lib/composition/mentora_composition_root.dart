@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../application/action_items/consultation_action_items_application_service.dart';
 import '../application/ai_gateway/ai_gateway_application_service.dart';
 import '../application/assistant/consultation_assistant_application_service.dart';
 import '../domain/ai_gateway/ai_provider.dart';
@@ -37,6 +38,7 @@ import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/ai_gateway/deepgram_adapter.dart';
 import '../infrastructure/ai_gateway/gemini_adapter.dart';
 import '../infrastructure/ai_gateway/openai_ai_provider.dart';
+import '../infrastructure/ai_gateway/openai_action_items_adapter.dart';
 import '../infrastructure/ai_gateway/openai_assistant_adapter.dart';
 import '../infrastructure/ai_gateway/simulated_ai_provider.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
@@ -67,6 +69,7 @@ import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.d
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/notification/simulated_notification_provider.dart';
 import '../infrastructure/payment/simulated_payment_provider.dart';
+import '../infrastructure/action_items/ai_action_items_provider.dart';
 import '../infrastructure/assistant/ai_assistant_provider.dart';
 import '../infrastructure/transcript/ai_transcript_provider.dart';
 import '../infrastructure/translation/ai_translation_provider.dart';
@@ -384,6 +387,19 @@ final class MentoraCompositionRoot {
             ),
           ),
         ),
+        AITask.actionItems: OpenAIActionItemsAdapter(
+          configuration: OpenAIConfiguration(
+            apiKey: String.fromEnvironment('MENTORA_OPENAI_API_KEY'),
+            endpoint: String.fromEnvironment(
+              'MENTORA_OPENAI_ENDPOINT',
+              defaultValue: 'https://api.openai.com/v1/chat/completions',
+            ),
+            model: String.fromEnvironment(
+              'MENTORA_OPENAI_ACTION_ITEMS_MODEL',
+              defaultValue: 'gpt-4o-mini',
+            ),
+          ),
+        ),
       },
     );
 
@@ -422,6 +438,14 @@ final class MentoraCompositionRoot {
       session: authenticationSession,
       memory: consultationMemory,
       provider: AIAssistantProvider(gateway: aiGateway),
+    );
+
+    // Action recommendations: proposals only, over the memory alone —
+    // no automation, no workflow, no notification. The expert decides.
+    final consultationActionItems = ConsultationActionItemsApplicationService(
+      session: authenticationSession,
+      memory: consultationMemory,
+      provider: AIActionItemsProvider(gateway: aiGateway),
     );
 
     // Consultation reviews: one review per completed reservation, plain
@@ -486,6 +510,7 @@ final class MentoraCompositionRoot {
       transcripts: transcripts,
       translations: translations,
       consultationAssistant: consultationAssistant,
+      consultationActionItems: consultationActionItems,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,

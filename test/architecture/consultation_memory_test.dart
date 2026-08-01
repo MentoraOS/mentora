@@ -226,6 +226,8 @@ void main() {
             'consultation_summary_application_service.dart',
         'lib/application/assistant/'
             'consultation_assistant_application_service.dart',
+        'lib/application/action_items/'
+            'consultation_action_items_application_service.dart',
       ];
 
       final portOffenders = <String>[];

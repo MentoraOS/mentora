@@ -277,6 +277,7 @@ void main() {
       const allowed = [
         'lib/infrastructure/ai_gateway/openai_ai_provider.dart',
         'lib/infrastructure/ai_gateway/openai_assistant_adapter.dart',
+        'lib/infrastructure/ai_gateway/openai_action_items_adapter.dart',
         'lib/composition/mentora_composition_root.dart',
         // The provider-type enum names the engine kind; it carries no SDK,
         // no endpoint and no secret.
