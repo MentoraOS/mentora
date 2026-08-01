@@ -22,6 +22,7 @@ import 'application/payment/payment_collection_application_service.dart';
 import 'application/profile/profile_application_service.dart';
 import 'application/scheduling/selectable_occurrence_application_service.dart';
 import 'application/startup/mentora_startup.dart';
+import 'application/video_session/video_session_application_service.dart';
 import 'application/workspace/workspace_state.dart';
 import 'core/bootstrap/mentora_os.dart';
 
@@ -103,6 +104,9 @@ void main() async {
         Provider<ProfileApplicationService>.value(value: dependencies.profile),
         Provider<SelectableOccurrenceApplicationService>.value(
           value: dependencies.selectableOccurrences,
+        ),
+        Provider<VideoSessionApplicationService>.value(
+          value: dependencies.videoSessions,
         ),
         Provider<WorkspaceState>.value(value: dependencies.workspaceState),
         ChangeNotifierProvider(create: (_) => MentoraThemeProvider()),

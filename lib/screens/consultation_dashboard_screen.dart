@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
+import '../application/video_session/video_session_application_service.dart';
+import '../application/video_session/video_session_failure.dart';
 import '../domain/booking/booking_overview.dart';
 import '../core/routing/app_router.dart';
 import '../theme/mentora_theme.dart';
@@ -23,6 +25,39 @@ class ConsultationDashboardScreen extends StatelessWidget {
   final BookingOverview booking;
 
   static final NumberFormat _money = NumberFormat('#,##0', 'fr_FR');
+
+  Future<void> _joinConsultation(BuildContext context) async {
+    var message = 'La salle vidéo est indisponible. Réessayez plus tard.';
+    try {
+      final session = await context
+          .read<VideoSessionApplicationService>()
+          .joinConsultation(booking);
+      if (!context.mounted) return;
+      // Foundation wave: the session is prepared but no real room opens yet.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Salle prête : ${session.sessionId}. '
+            'La vidéo arrive dans une prochaine version.',
+          ),
+        ),
+      );
+      return;
+    } on VideoSessionInvalidStateFailure {
+      message =
+          'Cette consultation ne peut pas être rejointe '
+          'pour le moment.';
+    } on VideoSessionFailure {
+      // Keep the generic message.
+    } catch (_) {
+      // Keep the generic message.
+    }
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,20 +209,14 @@ class ConsultationDashboardScreen extends StatelessWidget {
               width: double.infinity,
               height: 56,
               child: ElevatedButton.icon(
-                // Disabled until the video flow exists (its own milestone).
-                onPressed: null,
+                // The vendor-agnostic video boundary; the room itself is
+                // simulated until the LiveKit integration wave.
+                onPressed: () => _joinConsultation(context),
                 icon: const Icon(Icons.videocam),
                 label: const Text(
                   'Rejoindre la consultation',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Center(
-              child: Text(
-                'Disponible prochainement',
-                style: TextStyle(color: Colors.white54, fontSize: 12),
               ),
             ),
             const SizedBox(height: 20),

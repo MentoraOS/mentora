@@ -17,6 +17,7 @@ import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
+import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/workspace_state.dart';
 
 import '../core/scheduling/scheduling.dart';
@@ -45,6 +46,7 @@ final class MentoraDependencies {
     required this.selectableOccurrences,
     required this.startup,
     required this.timezoneResolver,
+    required this.videoSessions,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -103,6 +105,9 @@ final class MentoraDependencies {
   /// Exposed as the port, never as the concrete implementation. It is not
   /// provided to Presentation: Presentation must not interpret timezones.
   final TimezoneResolver timezoneResolver;
+
+  /// Video sessions behind the vendor-agnostic provider port.
+  final VideoSessionApplicationService videoSessions;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

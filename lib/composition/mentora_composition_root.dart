@@ -20,6 +20,7 @@ import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
+import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
@@ -35,6 +36,7 @@ import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.
 import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
 import '../infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
 import '../infrastructure/scheduling/launch_market_timezone_resolver.dart';
+import '../infrastructure/video_session/livekit_cloud_adapter.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
@@ -242,6 +244,14 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Video session foundation: LiveKit Cloud exists only behind the
+    // VideoSessionProvider port; the adapter is simulated until the real
+    // integration wave. Agora's legacy path is untouched.
+    final videoSessions = VideoSessionApplicationService(
+      session: authenticationSession,
+      provider: const LiveKitCloudAdapter(),
+    );
+
     // Dashboard read projection: live stream of the user's reservations.
     final bookingDashboard = BookingDashboardApplicationService(
       session: authenticationSession,
@@ -271,6 +281,7 @@ final class MentoraCompositionRoot {
       selectableOccurrences: selectableOccurrences,
       startup: startup,
       timezoneResolver: timezoneResolver,
+      videoSessions: videoSessions,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,

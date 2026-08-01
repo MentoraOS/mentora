@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
+import 'package:mentora/application/video_session/video_session_application_service.dart';
+import 'package:mentora/domain/video_session/video_session_provider.dart';
+import 'package:mentora/infrastructure/video_session/livekit_cloud_adapter.dart';
 import 'package:mentora/domain/booking/booking_overview.dart';
 import 'package:mentora/screens/consultation_dashboard_screen.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +42,7 @@ void main() {
     expect(find.text('Consultation vidéo'), findsOneWidget);
   });
 
-  testWidgets('joining stays disabled until the video flow exists', (
+  testWidgets('joining goes through the video session boundary', (
     tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1080, 2400));
@@ -48,12 +51,14 @@ void main() {
     await tester.pumpWidget(_app(_booking()));
 
     await tester.ensureVisible(find.text('Rejoindre la consultation'));
-    // ElevatedButton.icon builds a private subtype, so match by predicate.
-    final button = tester.widget<ElevatedButton>(
-      find.byWidgetPredicate((widget) => widget is ElevatedButton),
+    await tester.tap(find.text('Rejoindre la consultation'));
+    await tester.pumpAndSettle();
+
+    // Foundation wave: the simulated session is prepared, no real room.
+    expect(
+      find.textContaining('Salle prête : mentora_consultation_b1'),
+      findsOneWidget,
     );
-    expect(button.onPressed, isNull);
-    expect(find.text('Disponible prochainement'), findsOneWidget);
   });
 
   testWidgets('an expert session sees the client framing', (tester) async {
@@ -119,8 +124,17 @@ BookingOverview _booking() {
 }
 
 Widget _app(BookingOverview booking, {bool isExpert = false}) {
-  return Provider<AuthenticationSession>.value(
-    value: _Session(isExpert: isExpert),
+  final session = _Session(isExpert: isExpert);
+  return MultiProvider(
+    providers: [
+      Provider<AuthenticationSession>.value(value: session),
+      Provider<VideoSessionApplicationService>.value(
+        value: VideoSessionApplicationService(
+          session: session,
+          provider: const LiveKitCloudAdapter(),
+        ),
+      ),
+    ],
     child: MaterialApp(home: ConsultationDashboardScreen(booking: booking)),
   );
 }
