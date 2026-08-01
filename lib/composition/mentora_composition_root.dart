@@ -4,6 +4,7 @@ import '../application/authentication/default_authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
+import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
@@ -20,6 +21,7 @@ import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_cancellation_repository.dart';
 import '../infrastructure/booking/firestore_booking_confirmation_repository.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
+import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
 import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
 import '../infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
@@ -192,12 +194,27 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Reschedule reuses the C2/C3 temporal path with the reservation's
+    // snapshotted duration; conflict exclusion stays a future contract.
+    final bookingReschedule = BookingRescheduleApplicationService(
+      session: authenticationSession,
+      repository: FirestoreBookingRescheduleRepository(
+        firestore: firebase.firestore,
+      ),
+      expertCatalog: expertCatalog,
+      materialization: const CivilOccurrenceMaterializationAdapter(),
+      interpretation: const CivilOccurrenceInterpretationAdapter(
+        resolver: timezoneResolver,
+      ),
+    );
+
     return MentoraDependencies(
       authenticationSession: authenticationSession,
       bookingCancellation: bookingCancellation,
       bookingConfirmation: bookingConfirmation,
       bookingCreation: bookingCreation,
       bookingNotifications: bookingNotifications,
+      bookingReschedule: bookingReschedule,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       expertCatalog: expertCatalog,

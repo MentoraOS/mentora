@@ -29,6 +29,7 @@ import '../../screens/escrow_screen.dart';
 import '../../screens/expert_profile_screen.dart';
 import '../../screens/waiting_room_screen.dart';
 import '../../screens/booking_detail_screen.dart';
+import '../../screens/reschedule_booking_screen.dart';
 import '../../screens/booking_screen.dart';
 import '../../presentation/authentication/authentication_screens.dart';
 import 'route_guard.dart';
@@ -241,6 +242,17 @@ class AppRouter {
     return push(
       context,
       BookingDetailScreen(bookingId: bookingId, booking: booking),
+    );
+  }
+
+  static Future<bool?> openRescheduleBooking({
+    required BuildContext context,
+    required String bookingId,
+    required Map<String, dynamic> booking,
+  }) {
+    return push<bool>(
+      context,
+      RescheduleBookingScreen(bookingId: bookingId, booking: booking),
     );
   }
 

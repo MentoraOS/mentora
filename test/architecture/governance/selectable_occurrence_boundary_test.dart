@@ -307,15 +307,15 @@ void main() {
         ..._dartFilesUnder('lib/infrastructure/booking'),
       ].map((file) => file.readAsStringSync()).join('\n');
 
+      // The reschedule wave consumes materialization through the Application
+      // PORT; the raw Scheduling machinery stays out of Booking.
       for (final forbidden in const [
         'OccurrenceMaterializer',
-        'CivilOccurrenceMaterialization(',
-        'materializeMonth',
-        'materializeDay',
         'RecurringAvailability',
         'RecurringStartTick',
         'LegacyAvailabilityGrammar',
         'parseRecurringAvailability',
+        '/core/scheduling/',
       ]) {
         expect(booking, isNot(contains(forbidden)), reason: forbidden);
       }

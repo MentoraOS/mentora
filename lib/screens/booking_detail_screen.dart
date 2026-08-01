@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_cancellation_failure.dart';
 import '../application/notification/booking_notification_application_service.dart';
+import '../core/routing/app_router.dart';
 import '../theme/mentora_theme.dart';
 
 class BookingDetailScreen extends StatelessWidget {
@@ -184,6 +185,23 @@ class BookingDetailScreen extends StatelessWidget {
               ),
 
             const Spacer(),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton.icon(
+                onPressed: status == 'cancelled' || status == 'completed'
+                    ? null
+                    : () => AppRouter.openRescheduleBooking(
+                        context: context,
+                        bookingId: bookingId,
+                        booking: booking,
+                      ),
+                icon: const Icon(Icons.event_repeat),
+                label: const Text('Reprogrammer'),
+              ),
+            ),
+            const SizedBox(height: 12),
 
             SizedBox(
               width: double.infinity,
