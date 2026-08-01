@@ -25,6 +25,7 @@ import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
 import '../application/transcript/realtime_transcript_application_service.dart';
+import '../application/translation/realtime_translation_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/workspace_state.dart';
 
@@ -65,6 +66,7 @@ final class MentoraDependencies {
     required this.videoSessions,
     required this.liveConsultationRooms,
     required this.transcripts,
+    required this.translations,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -154,6 +156,9 @@ final class MentoraDependencies {
 
   /// Real-time transcription: a living stream behind the governed chain.
   final RealtimeTranscriptApplicationService transcripts;
+
+  /// Real-time translation: a living projection of the transcript.
+  final RealtimeTranslationApplicationService translations;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

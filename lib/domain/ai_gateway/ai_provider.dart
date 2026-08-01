@@ -16,12 +16,12 @@ abstract interface class AIProvider {
 
 /// The engines the gateway can route to. Real engine kinds are ADDED
 /// here by their own waves.
-enum AIProviderType { simulated, openAI, deepgram }
+enum AIProviderType { simulated, openAI, deepgram, gemini }
 
 /// The intelligence tasks the gateway can route. Exactly one exists
 /// today; future waves ADD tasks here (translation, assistant, analytics,
 /// recommendation, search, classification) without touching callers.
-enum AITask { summary, transcription }
+enum AITask { summary, transcription, translation }
 
 /// Generic transport envelope for every future AI usage.
 ///

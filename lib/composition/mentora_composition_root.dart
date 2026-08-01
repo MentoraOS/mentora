@@ -29,10 +29,12 @@ import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
 import '../application/transcript/realtime_transcript_application_service.dart';
+import '../application/translation/realtime_translation_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/ai_gateway/deepgram_adapter.dart';
+import '../infrastructure/ai_gateway/gemini_adapter.dart';
 import '../infrastructure/ai_gateway/openai_ai_provider.dart';
 import '../infrastructure/ai_gateway/simulated_ai_provider.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
@@ -64,6 +66,7 @@ import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/notification/simulated_notification_provider.dart';
 import '../infrastructure/payment/simulated_payment_provider.dart';
 import '../infrastructure/transcript/ai_transcript_provider.dart';
+import '../infrastructure/translation/ai_translation_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
 import '../infrastructure/review/firestore_consultation_review_repository.dart';
 import 'mentora_dependencies.dart';
@@ -351,6 +354,20 @@ final class MentoraCompositionRoot {
             ),
           ),
         ),
+        AITask.translation: GeminiAdapter(
+          configuration: GeminiConfiguration(
+            apiKey: String.fromEnvironment('MENTORA_GEMINI_API_KEY'),
+            endpoint: String.fromEnvironment(
+              'MENTORA_GEMINI_ENDPOINT',
+              defaultValue:
+                  'https://generativelanguage.googleapis.com/v1beta/models',
+            ),
+            model: String.fromEnvironment(
+              'MENTORA_GEMINI_MODEL',
+              defaultValue: 'gemini-1.5-flash',
+            ),
+          ),
+        ),
       },
     );
 
@@ -371,6 +388,15 @@ final class MentoraCompositionRoot {
     final transcripts = RealtimeTranscriptApplicationService(
       session: authenticationSession,
       provider: AITranscriptProvider(gateway: aiGateway),
+    );
+
+    // Real-time translation: a living projection of the transcript flux,
+    // routed through the gateway to the engine registered for the task.
+    // The transcript stays the single truth; languages are injected per
+    // session. No persistence here.
+    final translations = RealtimeTranslationApplicationService(
+      session: authenticationSession,
+      provider: AITranslationProvider(gateway: aiGateway),
     );
 
     // Consultation reviews: one review per completed reservation, plain
@@ -433,6 +459,7 @@ final class MentoraCompositionRoot {
       videoSessions: videoSessions,
       liveConsultationRooms: liveConsultationRooms,
       transcripts: transcripts,
+      translations: translations,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,

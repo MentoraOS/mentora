@@ -83,10 +83,11 @@ void main() {
     // ConversationAudioStream and LiveTranscriptProvider were realized by
     // the transcript foundation wave (domain/transcript) and left the
     // hooks file; the remaining three stay empty and unreferenced.
+    // The translation hook was realized by the realtime translation wave
+    // (domain/translation) and left the hooks file.
     const names = [
       'VideoFrameObserver',
       'ConsultationRecordingProvider',
-      'RealtimeTranslationProvider',
     ];
 
     test('the remaining hooks exist as empty dependency-free contracts', () {
