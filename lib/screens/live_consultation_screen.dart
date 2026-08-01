@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../application/authentication/authentication_session.dart';
+import '../domain/assistant/assistant_provider.dart';
 import '../domain/translation/translation_provider.dart';
 import '../domain/video_session/live_consultation_room.dart';
 import '../domain/video_session/video_session_provider.dart';
 import '../theme/mentora_theme.dart';
+import '../widgets/assistant_controller.dart';
+import '../widgets/assistant_overlay.dart';
 import '../widgets/live_subtitle_overlay.dart';
 import '../widgets/subtitle_controller.dart';
 import '../widgets/video_track_view.dart';
@@ -19,6 +23,7 @@ class LiveConsultationScreen extends StatefulWidget {
     super.key,
     required this.session,
     this.subtitles,
+    this.assistant,
   });
 
   final VideoSessionInfo session;
@@ -29,6 +34,11 @@ class LiveConsultationScreen extends StatefulWidget {
   /// logic ever lives in this screen.
   final TranslationStream? subtitles;
 
+  /// The already-produced copilot flux; null shows none. STRICTLY
+  /// expert-only: without an expert session the overlay never appears
+  /// (fail closed) — the client never sees the copilot.
+  final AssistantStream? assistant;
+
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
 }
@@ -37,6 +47,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   LiveConsultationRoom? _room;
   StreamSubscription<void>? _subscription;
   SubtitleController? _subtitles;
+  AssistantController? _assistant;
   String? _failureMessage;
 
   @override
@@ -44,6 +55,19 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     super.initState();
     if (widget.subtitles case final translation?) {
       _subtitles = SubtitleController(translation: translation);
+    }
+    if (widget.assistant case final copilot?) {
+      // Fail closed: no expert session, no copilot — the client never
+      // sees this surface.
+      var isExpert = false;
+      try {
+        isExpert = context.read<AuthenticationSession>().isExpert;
+      } catch (_) {
+        isExpert = false;
+      }
+      if (isExpert) {
+        _assistant = AssistantController(assistant: copilot);
+      }
     }
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
@@ -96,6 +120,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   void dispose() {
     _subscription?.cancel();
     _subtitles?.dispose();
+    _assistant?.dispose();
     final room = _room;
     if (room != null) unawaited(room.dispose());
     super.dispose();
@@ -177,6 +202,12 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                 if (_subtitles case final subtitles?)
                   Positioned.fill(
                     child: LiveSubtitleOverlay(controller: subtitles),
+                  ),
+                // Expert-only copilot: compact, retractable, passive —
+                // never a popup, never the focus.
+                if (_assistant case final assistant?)
+                  Positioned.fill(
+                    child: AssistantOverlay(controller: assistant),
                   ),
               ],
             ),
