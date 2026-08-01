@@ -23,6 +23,7 @@ import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
+import '../application/recording/consultation_recording_application_service.dart';
 import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
@@ -71,6 +72,7 @@ final class MentoraDependencies {
     required this.translations,
     required this.consultationAssistant,
     required this.consultationActionItems,
+    required this.consultationRecording,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -169,6 +171,9 @@ final class MentoraDependencies {
 
   /// Action recommendations: proposals only, the expert decides.
   final ConsultationActionItemsApplicationService consultationActionItems;
+
+  /// Recording lifecycle: Mentora-owned, double consent mandatory.
+  final ConsultationRecordingApplicationService consultationRecording;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

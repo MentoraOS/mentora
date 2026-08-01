@@ -85,10 +85,9 @@ void main() {
     // hooks file; the remaining three stay empty and unreferenced.
     // The translation hook was realized by the realtime translation wave
     // (domain/translation) and left the hooks file.
-    const names = [
-      'VideoFrameObserver',
-      'ConsultationRecordingProvider',
-    ];
+    // The recording hook was realized by the recording foundation wave
+    // (domain/recording) and left the hooks file.
+    const names = ['VideoFrameObserver'];
 
     test('the remaining hooks exist as empty dependency-free contracts', () {
       final source = File(

@@ -27,6 +27,7 @@ import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
+import '../application/recording/consultation_recording_application_service.dart';
 import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
@@ -74,6 +75,7 @@ import '../infrastructure/assistant/ai_assistant_provider.dart';
 import '../infrastructure/transcript/ai_transcript_provider.dart';
 import '../infrastructure/translation/ai_translation_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
+import '../infrastructure/recording/simulated_recording_provider.dart';
 import '../infrastructure/review/firestore_consultation_review_repository.dart';
 import 'mentora_dependencies.dart';
 
@@ -448,6 +450,14 @@ final class MentoraCompositionRoot {
       provider: AIActionItemsProvider(gateway: aiGateway),
     );
 
+    // Recording lifecycle: Mentora-owned, double consent mandatory. The
+    // simulated provider walks the lifecycle without media; the LiveKit
+    // egress provider replaces it the day its backend exists.
+    final consultationRecording = ConsultationRecordingApplicationService(
+      session: authenticationSession,
+      provider: const SimulatedRecordingProvider(),
+    );
+
     // Consultation reviews: one review per completed reservation, plain
     // chronological reads — no ranking, no averages.
     final reviews = ReviewApplicationService(
@@ -511,6 +521,7 @@ final class MentoraCompositionRoot {
       translations: translations,
       consultationAssistant: consultationAssistant,
       consultationActionItems: consultationActionItems,
+      consultationRecording: consultationRecording,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,
