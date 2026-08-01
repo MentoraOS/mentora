@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/booking/booking_creation_application_service.dart';
 import 'package:mentora/application/expert_catalog/expert_catalog_application_service.dart';
+import 'package:mentora/application/notification/booking_notification_application_service.dart';
 import 'package:mentora/application/scheduling/civil_selection.dart';
 import 'package:mentora/application/scheduling/selectable_occurrence_application_service.dart';
 import 'package:mentora/domain/booking/booking_creation.dart';
@@ -14,6 +15,7 @@ import 'package:mentora/domain/expert_catalog/expert_catalog_entry.dart';
 import 'package:mentora/domain/expert_catalog/expert_catalog_repository.dart';
 import 'package:mentora/infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
 import 'package:mentora/infrastructure/scheduling/civil_occurrence_materialization_adapter.dart';
+import 'package:mentora/infrastructure/notification/simulated_notification_provider.dart';
 import 'package:mentora/infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import 'package:mentora/screens/payment_screen.dart';
 import 'package:mentora/screens/pre_consultation_screen.dart';
@@ -110,8 +112,17 @@ Widget _app(_Repository repository) {
     ),
     channelFactory: () => 'mentora_test',
   );
-  return Provider<BookingCreationApplicationService>.value(
-    value: service,
+  final notifications = BookingNotificationApplicationService(
+    session: _Session(),
+    provider: SimulatedNotificationProvider(),
+  );
+  return MultiProvider(
+    providers: [
+      Provider<BookingCreationApplicationService>.value(value: service),
+      Provider<BookingNotificationApplicationService>.value(
+        value: notifications,
+      ),
+    ],
     child: MaterialApp(
       home: PreConsultationScreen(
         expertName: 'Expert',

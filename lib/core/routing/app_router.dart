@@ -300,6 +300,7 @@ class AppRouter {
   static Future<void> openPayment({
     required BuildContext context,
     required String bookingId,
+    required String expertId,
     required String expertName,
     required String selectedDate,
     required String selectedTime,
@@ -311,6 +312,7 @@ class AppRouter {
       context,
       PaymentScreen(
         bookingId: bookingId,
+        expertId: expertId,
         expertName: expertName,
         selectedDate: selectedDate,
         selectedTime: selectedTime,

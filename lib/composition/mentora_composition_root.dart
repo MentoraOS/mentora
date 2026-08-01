@@ -8,6 +8,7 @@ import '../application/expert_availability/expert_availability_application_servi
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
+import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
@@ -26,6 +27,7 @@ import '../infrastructure/expert_availability/firestore_expert_availability_repo
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
 import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.dart';
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
+import '../infrastructure/notification/simulated_notification_provider.dart';
 import '../infrastructure/payment/simulated_payment_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
 import 'mentora_dependencies.dart';
@@ -156,6 +158,13 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Booking lifecycle notifications: best-effort, never a workflow
+    // condition. The simulated provider is replaced by a real channel later.
+    final bookingNotifications = BookingNotificationApplicationService(
+      session: authenticationSession,
+      provider: SimulatedNotificationProvider(),
+    );
+
     // Product-facing Payment Provider boundary (AD-021 decision 12). The
     // simulated adapter is replaced by a real PSP adapter later; nothing
     // upstream changes.
@@ -176,6 +185,7 @@ final class MentoraCompositionRoot {
       authenticationSession: authenticationSession,
       bookingConfirmation: bookingConfirmation,
       bookingCreation: bookingCreation,
+      bookingNotifications: bookingNotifications,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       expertCatalog: expertCatalog,

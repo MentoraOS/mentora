@@ -6,6 +6,7 @@ import '../application/expert_availability/expert_availability_application_servi
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
+import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../application/profile/profile_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
@@ -21,6 +22,7 @@ final class MentoraDependencies {
     required this.authenticationSession,
     required this.bookingConfirmation,
     required this.bookingCreation,
+    required this.bookingNotifications,
     required this.expertBookingOccupancy,
     required this.expertAvailability,
     required this.expertCatalog,
@@ -42,6 +44,10 @@ final class MentoraDependencies {
   final BookingConfirmationApplicationService bookingConfirmation;
 
   final BookingCreationApplicationService bookingCreation;
+
+  /// Best-effort booking lifecycle notifications; never a workflow condition.
+  final BookingNotificationApplicationService bookingNotifications;
+
   final ExpertBookingOccupancyApplicationService expertBookingOccupancy;
   final ExpertAvailabilityApplicationService expertAvailability;
   final ExpertCatalogApplicationService expertCatalog;

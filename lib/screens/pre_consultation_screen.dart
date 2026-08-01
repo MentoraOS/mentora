@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_creation_failure.dart';
 import '../application/expert_catalog/expert_catalog_failure.dart';
+import '../application/notification/booking_notification_application_service.dart';
 import '../application/scheduling/civil_selection.dart';
 import '../application/scheduling/selectable_occurrence_failure.dart';
 import '../domain/expert_catalog/consultation_offer.dart';
@@ -421,9 +422,22 @@ class _PreConsultationScreenState extends State<PreConsultationScreen> {
           );
 
       if (!mounted) return;
+      // Best-effort lifecycle notification; never blocks the funnel.
+      await context
+          .read<BookingNotificationApplicationService>()
+          .notifyBookingCreated(
+            bookingId: bookingId,
+            expertId: widget.expertId,
+            expertName: widget.expertName,
+            displayDate: _displayDate,
+            displayTime: _bookingTime,
+          );
+
+      if (!mounted) return;
       AppRouter.openPayment(
         context: context,
         bookingId: bookingId,
+        expertId: widget.expertId,
         expertName: widget.expertName,
         selectedDate: _displayDate,
         selectedTime: _bookingTime,

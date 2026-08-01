@@ -4,6 +4,7 @@ import 'booking_success_screen.dart';
 import 'package:intl/intl.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
 import '../application/booking/booking_confirmation_failure.dart';
+import '../application/notification/booking_notification_application_service.dart';
 import '../application/payment/payment_collection_application_service.dart';
 import '../domain/payment/payment_collection_provider.dart';
 import 'payment_success_animation.dart';
@@ -12,6 +13,7 @@ import '../core/routing/app_router.dart';
 
 class PaymentScreen extends StatefulWidget {
   final String bookingId;
+  final String expertId;
   final String expertName;
   final String selectedDate;
   final String selectedTime;
@@ -27,6 +29,7 @@ class PaymentScreen extends StatefulWidget {
   const PaymentScreen({
     super.key,
     required this.bookingId,
+    required this.expertId,
     required this.expertName,
     required this.selectedDate,
     required this.selectedTime,
@@ -397,6 +400,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     >()
                                     .confirmPaid(widget.bookingId);
                                 confirmed = true;
+                              }
+                              // Best-effort lifecycle notification; never a
+                              // condition of the confirmed reservation.
+                              if (confirmed && context.mounted) {
+                                await context
+                                    .read<
+                                      BookingNotificationApplicationService
+                                    >()
+                                    .notifyBookingConfirmed(
+                                      bookingId: widget.bookingId,
+                                      expertId: widget.expertId,
+                                      expertName: widget.expertName,
+                                      displayDate: widget.selectedDate,
+                                      displayTime: widget.selectedTime,
+                                    );
                               }
                             case PaymentCollectionRejected():
                               failureText =

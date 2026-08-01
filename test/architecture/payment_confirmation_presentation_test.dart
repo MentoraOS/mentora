@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/booking/booking_confirmation_application_service.dart';
+import 'package:mentora/application/notification/booking_notification_application_service.dart';
 import 'package:mentora/application/payment/payment_collection_application_service.dart';
 import 'package:mentora/domain/booking/booking_confirmation_repository.dart';
+import 'package:mentora/domain/notification/booking_notification_provider.dart';
+import 'package:mentora/infrastructure/notification/simulated_notification_provider.dart';
 import 'package:mentora/domain/payment/payment_collection_provider.dart';
 import 'package:mentora/infrastructure/payment/simulated_payment_provider.dart';
 import 'package:mentora/screens/booking_success_screen.dart';
@@ -19,12 +22,25 @@ void main() {
     tester,
   ) async {
     final repository = _ConfirmationRepository();
-    await tester.pumpWidget(_app(confirmation: repository));
+    final notifications = SimulatedNotificationProvider();
+    await tester.pumpWidget(
+      _app(confirmation: repository, notifications: notifications),
+    );
 
     await _pay(tester);
 
     expect(repository.calls, [('booking_1', 'client_1')]);
     expect(find.byType(BookingSuccessScreen), findsOneWidget);
+
+    // Both parties are notified of the confirmed reservation (best-effort).
+    expect(notifications.sent, hasLength(2));
+    expect(notifications.sent.map((n) => n.event).toSet(), {
+      BookingNotificationEvent.bookingConfirmed,
+    });
+    expect(notifications.sent.map((n) => n.recipientId).toSet(), {
+      'client_1',
+      'expert_1',
+    });
   });
 
   testWidgets('a definitive rejection never confirms and never navigates', (
@@ -104,6 +120,7 @@ Future<void> _pay(WidgetTester tester) async {
 Widget _app({
   required _ConfirmationRepository confirmation,
   PaymentCollectionProvider provider = const SimulatedPaymentProvider(),
+  SimulatedNotificationProvider? notifications,
 }) {
   return MultiProvider(
     providers: [
@@ -116,10 +133,17 @@ Widget _app({
           repository: confirmation,
         ),
       ),
+      Provider<BookingNotificationApplicationService>.value(
+        value: BookingNotificationApplicationService(
+          session: _Session(),
+          provider: notifications ?? SimulatedNotificationProvider(),
+        ),
+      ),
     ],
     child: const MaterialApp(
       home: PaymentScreen(
         bookingId: 'booking_1',
+        expertId: 'expert_1',
         expertName: 'Expert',
         selectedDate: '03/08/2026',
         selectedTime: '09:00',
