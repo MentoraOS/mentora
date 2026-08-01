@@ -14,6 +14,7 @@ import 'application/booking/expert_booking_occupancy_application_service.dart';
 import 'application/consultation_brief/consultation_brief_application_service.dart';
 import 'application/consultation_documents/consultation_document_application_service.dart';
 import 'application/consultation_notes/consultation_private_notes_application_service.dart';
+import 'application/conversation/conversation_application_service.dart';
 import 'application/expert_availability/expert_availability_application_service.dart';
 import 'application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import 'application/expert_catalog/expert_catalog_application_service.dart';
@@ -97,6 +98,9 @@ void main() async {
         ),
         Provider<ConsultationPrivateNotesApplicationService>.value(
           value: dependencies.consultationPrivateNotes,
+        ),
+        Provider<ConversationApplicationService>.value(
+          value: dependencies.conversations,
         ),
         Provider<ExpertAvailabilityApplicationService>.value(
           value: dependencies.expertAvailability,

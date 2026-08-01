@@ -12,6 +12,7 @@ import '../application/booking/expert_booking_occupancy_application_service.dart
 import '../application/consultation_brief/consultation_brief_application_service.dart';
 import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
+import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
@@ -35,6 +36,7 @@ import '../infrastructure/booking/firestore_booking_overview_repository.dart';
 import '../infrastructure/consultation_brief/firestore_consultation_brief_repository.dart';
 import '../infrastructure/consultation_documents/firebase_consultation_document_repository.dart';
 import '../infrastructure/consultation_notes/firestore_consultation_private_notes_repository.dart';
+import '../infrastructure/conversation/firestore_conversation_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
 import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
@@ -295,6 +297,16 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Real-time consultation chat: one conversation per reservation,
+    // Firestore streams only, the communication foundation for the future
+    // intelligence layers.
+    final conversations = ConversationApplicationService(
+      session: authenticationSession,
+      repository: FirestoreConversationRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     // Dashboard read projection: live stream of the user's reservations.
     final bookingDashboard = BookingDashboardApplicationService(
       session: authenticationSession,
@@ -315,6 +327,7 @@ final class MentoraCompositionRoot {
       consultationCompletion: consultationCompletion,
       consultationDocuments: consultationDocuments,
       consultationPrivateNotes: consultationPrivateNotes,
+      conversations: conversations,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       availabilityExceptions: availabilityExceptions,

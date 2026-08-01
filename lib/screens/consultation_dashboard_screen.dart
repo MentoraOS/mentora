@@ -16,6 +16,7 @@ import '../widgets/consultation_documents_card.dart';
 import '../widgets/consultation_private_notes_card.dart';
 import '../widgets/consultation_review_card.dart';
 import '../widgets/consultation_timeline.dart';
+import 'conversation_screen.dart';
 import 'live_consultation_screen.dart';
 import 'review_screen.dart';
 
@@ -280,11 +281,37 @@ class _ConsultationDashboardScreenState
             ),
             const SizedBox(height: 16),
 
-            const _DashboardCard(
+            _DashboardCard(
               title: 'Messages',
               icon: Icons.chat_bubble_outline,
-              child: _PlaceholderBody(
-                'La messagerie de consultation arrive bientôt.',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Échangez en direct avec votre interlocuteur avant, '
+                    'pendant et après la consultation.',
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ConversationScreen(
+                            bookingId: booking.bookingId,
+                            title: booking.expertName,
+                          ),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: MentoraColors.gold,
+                      side: const BorderSide(color: MentoraColors.gold),
+                    ),
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Ouvrir le chat'),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),

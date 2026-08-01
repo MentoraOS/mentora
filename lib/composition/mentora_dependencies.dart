@@ -9,6 +9,7 @@ import '../application/booking/expert_booking_occupancy_application_service.dart
 import '../application/consultation_brief/consultation_brief_application_service.dart';
 import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
+import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
@@ -41,6 +42,7 @@ final class MentoraDependencies {
     required this.consultationCompletion,
     required this.consultationDocuments,
     required this.consultationPrivateNotes,
+    required this.conversations,
     required this.expertBookingOccupancy,
     required this.expertAvailability,
     required this.availabilityExceptions,
@@ -90,6 +92,9 @@ final class MentoraDependencies {
 
   /// Expert-only private consultation notes.
   final ConsultationPrivateNotesApplicationService consultationPrivateNotes;
+
+  /// Real-time consultation chat (one conversation per reservation).
+  final ConversationApplicationService conversations;
 
   final ExpertBookingOccupancyApplicationService expertBookingOccupancy;
   final ExpertAvailabilityApplicationService expertAvailability;
