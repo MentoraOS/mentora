@@ -1,39 +1,46 @@
 import 'consultation_audio_stream.dart';
+import 'transcript_chunk.dart';
 
-/// Transcription engine boundary — CONTRACT ONLY.
+/// Real-time transcription boundary.
 ///
-/// A provider attaches to the consultation's opaque audio stream, runs,
-/// and reports lifecycle events. No provider in Mentora today produces
-/// any transcription: the simulated implementation only emits simulated
-/// lifecycle events, and real engines plug in behind this same port in
-/// their own future waves.
+/// The provider attaches to one session's opaque audio and returns the
+/// LIVING transcript stream — a continuous flux, never a bag of
+/// independent texts. The implementation routes every piece of audio
+/// through the AI gateway; no engine name ever crosses this contract, so
+/// engines are added by registering another gateway adapter and nothing
+/// in the business layers changes.
 abstract interface class TranscriptProvider {
-  /// Attaches the provider to one session's audio.
-  ///
-  /// Fails closed with [TranscriptAlreadyActiveFailure] when a session is
-  /// already attached.
-  Future<void> start({
+  /// Attaches to the session's audio and starts the living stream.
+  Future<TranscriptStream> start({
     required String sessionId,
     required ConsultationAudioStream audio,
   });
-
-  /// Detaches from the audio; a no-op when nothing runs.
-  Future<void> stop();
-
-  /// The provider's lifecycle events.
-  Stream<TranscriptEvent> stream();
 }
 
-/// Lifecycle-only events: deliberately NO transcription content of any
-/// kind — future waves extend this additively.
-final class TranscriptEvent {
+/// One session's continuous transcription flux.
+abstract interface class TranscriptStream {
+  String get sessionId;
+
+  TranscriptStatus get status;
+
+  /// The live chunks, in speaking order. Errors surface ON this stream —
+  /// fail closed, never silently swallowed.
+  Stream<TranscriptChunk> get chunks;
+
+  /// Detaches from the audio and seals the flux.
+  Future<TranscriptResult> stop();
+}
+
+/// The lifecycle of one living stream. Nothing else.
+enum TranscriptStatus { transcribing, stopped, failed }
+
+/// The sealed outcome of one transcription session.
+final class TranscriptResult {
   final String sessionId;
-  final TranscriptEventKind kind;
+  final TranscriptStatus status;
 
-  const TranscriptEvent({required this.sessionId, required this.kind});
+  const TranscriptResult({required this.sessionId, required this.status});
 }
-
-enum TranscriptEventKind { started, audioReceived, stopped }
 
 sealed class TranscriptFailure implements Exception {
   const TranscriptFailure();
@@ -43,7 +50,7 @@ final class TranscriptUnauthenticatedFailure extends TranscriptFailure {
   const TranscriptUnauthenticatedFailure();
 }
 
-/// A provider only ever serves one session at a time.
+/// One live transcription at a time, ever.
 final class TranscriptAlreadyActiveFailure extends TranscriptFailure {
   const TranscriptAlreadyActiveFailure();
 }

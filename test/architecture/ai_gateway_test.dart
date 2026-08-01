@@ -131,9 +131,11 @@ void main() {
         'lib/infrastructure/ai_gateway/simulated_ai_provider.dart',
         // The engine adapters: the ONLY places knowing a real vendor.
         'lib/infrastructure/ai_gateway/openai_ai_provider.dart',
+        'lib/infrastructure/ai_gateway/deepgram_adapter.dart',
         // Task-side providers routing through the gateway contract.
         'lib/infrastructure/consultation_summary/'
             'gateway_ai_summary_provider.dart',
+        'lib/infrastructure/transcript/ai_transcript_provider.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
       ];

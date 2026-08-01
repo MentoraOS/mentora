@@ -28,10 +28,11 @@ import '../application/profile/profile_application_service.dart';
 import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
-import '../application/transcript/transcript_application_service.dart';
+import '../application/transcript/realtime_transcript_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
+import '../infrastructure/ai_gateway/deepgram_adapter.dart';
 import '../infrastructure/ai_gateway/openai_ai_provider.dart';
 import '../infrastructure/ai_gateway/simulated_ai_provider.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
@@ -62,7 +63,7 @@ import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.d
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/notification/simulated_notification_provider.dart';
 import '../infrastructure/payment/simulated_payment_provider.dart';
-import '../infrastructure/transcript/simulated_transcript_provider.dart';
+import '../infrastructure/transcript/ai_transcript_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
 import '../infrastructure/review/firestore_consultation_review_repository.dart';
 import 'mentora_dependencies.dart';
@@ -333,6 +334,23 @@ final class MentoraCompositionRoot {
             ),
           ),
         ),
+        AITask.transcription: DeepgramAdapter(
+          configuration: DeepgramConfiguration(
+            apiKey: String.fromEnvironment('MENTORA_DEEPGRAM_API_KEY'),
+            endpoint: String.fromEnvironment(
+              'MENTORA_DEEPGRAM_ENDPOINT',
+              defaultValue: 'https://api.deepgram.com/v1/listen',
+            ),
+            model: String.fromEnvironment(
+              'MENTORA_DEEPGRAM_MODEL',
+              defaultValue: 'nova-2',
+            ),
+            language: String.fromEnvironment(
+              'MENTORA_DEEPGRAM_LANGUAGE',
+              defaultValue: 'fr',
+            ),
+          ),
+        ),
       },
     );
 
@@ -346,12 +364,13 @@ final class MentoraCompositionRoot {
       repository: FirestoreSummaryRepository(firestore: firebase.firestore),
     );
 
-    // Transcript foundation: opaque audio transport behind its port. The
-    // simulated provider emits lifecycle events only — no transcription
-    // exists anywhere yet.
-    final transcripts = TranscriptApplicationService(
+    // Real-time transcription: the LiveKit audio bridge feeds the
+    // application service, whose provider routes every piece of audio
+    // through the gateway to the engine registered for the task. The
+    // transcript stays a living stream — no persistence here.
+    final transcripts = RealtimeTranscriptApplicationService(
       session: authenticationSession,
-      provider: SimulatedTranscriptProvider(),
+      provider: AITranscriptProvider(gateway: aiGateway),
     );
 
     // Consultation reviews: one review per completed reservation, plain

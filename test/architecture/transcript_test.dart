@@ -3,28 +3,57 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
-import 'package:mentora/application/transcript/transcript_application_service.dart';
+import 'package:mentora/application/transcript/realtime_transcript_application_service.dart';
+import 'package:mentora/domain/ai_gateway/ai_gateway.dart';
+import 'package:mentora/domain/ai_gateway/ai_provider.dart';
 import 'package:mentora/domain/transcript/consultation_audio_stream.dart';
+import 'package:mentora/domain/transcript/transcript_chunk.dart';
 import 'package:mentora/domain/transcript/transcript_provider.dart';
-import 'package:mentora/infrastructure/transcript/simulated_transcript_provider.dart';
+import 'package:mentora/infrastructure/ai_gateway/deepgram_adapter.dart';
+import 'package:mentora/infrastructure/transcript/ai_transcript_provider.dart';
 
 void main() {
-  group('TranscriptApplicationService', () {
-    test('start and stop delegate to the provider behind the port', () async {
+  group('RealtimeTranscriptApplicationService', () {
+    test('start attaches one living stream through the provider port', () async {
       final provider = _RecordingProvider();
       final service = _service(provider);
       final audio = _AudioStream();
 
-      await service.start(sessionId: 'mentora_consultation_b1', audio: audio);
-      await service.stop();
+      final stream = await service.start(
+        sessionId: 'mentora_consultation_b1',
+        audio: audio,
+      );
 
       expect(provider.started, [('mentora_consultation_b1', audio)]);
-      expect(provider.stopped, 1);
+      expect(stream.status, TranscriptStatus.transcribing);
+      expect(service.chunks(), isNotNull);
+    });
+
+    test('one live transcription at a time — fail closed', () async {
+      final service = _service(_RecordingProvider());
+      await service.start(sessionId: 's1', audio: _AudioStream());
+
+      await expectLater(
+        service.start(sessionId: 's2', audio: _AudioStream()),
+        throwsA(isA<TranscriptAlreadyActiveFailure>()),
+      );
+    });
+
+    test('stop seals the flux and allows a fresh session', () async {
+      final service = _service(_RecordingProvider());
+      await service.start(sessionId: 's1', audio: _AudioStream());
+
+      final result = await service.stop();
+
+      expect(result.sessionId, 's1');
+      expect(result.status, TranscriptStatus.stopped);
+      // A new session can start again.
+      await service.start(sessionId: 's2', audio: _AudioStream());
     });
 
     test('an unauthenticated session fails typed before the provider', () async {
       final provider = _RecordingProvider();
-      final service = TranscriptApplicationService(
+      final service = RealtimeTranscriptApplicationService(
         session: _Session(null),
         provider: provider,
       );
@@ -33,150 +62,258 @@ void main() {
         service.start(sessionId: 's1', audio: _AudioStream()),
         throwsA(isA<TranscriptUnauthenticatedFailure>()),
       );
-      expect(() => service.events(), throwsA(isA<TranscriptFailure>()));
       expect(provider.started, isEmpty);
     });
 
-    test('provider errors surface as typed transcript failures', () async {
-      final service = _service(_RecordingProvider(error: StateError('down')));
+    test('chunks and stop without an active session fail closed', () async {
+      final service = _service(_RecordingProvider());
 
+      expect(
+        () => service.chunks(),
+        throwsA(isA<TranscriptUnavailableFailure>()),
+      );
       await expectLater(
-        service.start(sessionId: 's1', audio: _AudioStream()),
+        service.stop(),
         throwsA(isA<TranscriptUnavailableFailure>()),
       );
     });
+  });
 
-    test('typed provider failures pass through unchanged', () {
-      final service = _service(
-        _RecordingProvider(error: const TranscriptAlreadyActiveFailure()),
+  group('AITranscriptProvider — the governed flux', () {
+    test('every audio frame routes through the gateway with '
+        'AITask.transcription and becomes a chunk', () async {
+      final gateway = _RecordingGateway(
+        answers: ['Bonjour docteur.', 'Bonjour, comment allez-vous ?'],
+      );
+      final audio = _AudioStream();
+      final provider = AITranscriptProvider(gateway: gateway);
+      final live = await provider.start(sessionId: 's1', audio: audio);
+      final chunks = <TranscriptChunk>[];
+      final subscription = live.chunks.listen(chunks.add);
+
+      audio.push(_frame(participant: 'b1_client_userA'));
+      audio.push(_frame(participant: 'b1_expert_userB'));
+      await Future<void>.delayed(Duration.zero);
+      await subscription.cancel();
+
+      final requests = gateway.executed;
+      expect(requests, hasLength(2));
+      expect(requests.map((request) => request.task).toSet(), {
+        AITask.transcription,
+      });
+      expect(requests.first.context['sessionId'], 's1');
+      expect(requests.first.context['participantIdentity'], 'b1_client_userA');
+
+      expect(chunks.map((chunk) => chunk.text).toList(), [
+        'Bonjour docteur.',
+        'Bonjour, comment allez-vous ?',
+      ]);
+      expect(chunks.first.sessionId, 's1');
+      expect(chunks.first.participantIdentity, 'b1_client_userA');
+      expect(chunks.last.participantIdentity, 'b1_expert_userB');
+      expect(chunks.every((chunk) => chunk.isFinal), isTrue);
+      expect(live.status, TranscriptStatus.transcribing);
+    });
+
+    test('silence produces no chunk and no error', () async {
+      final gateway = _RecordingGateway(answers: ['   ']);
+      final audio = _AudioStream();
+      final live = await AITranscriptProvider(gateway: gateway)
+          .start(sessionId: 's1', audio: audio);
+      final chunks = <TranscriptChunk>[];
+      final subscription = live.chunks.listen(chunks.add);
+
+      audio.push(_frame());
+      await Future<void>.delayed(Duration.zero);
+      await subscription.cancel();
+
+      expect(chunks, isEmpty);
+      expect(live.status, TranscriptStatus.transcribing);
+    });
+
+    test('an engine failure marks the flux failed — never a fake chunk', () async {
+      final gateway = _RecordingGateway(error: StateError('engine down'));
+      final audio = _AudioStream();
+      final live = await AITranscriptProvider(gateway: gateway)
+          .start(sessionId: 's1', audio: audio);
+      final errors = <Object>[];
+      final subscription = live.chunks.listen((_) {}, onError: errors.add);
+
+      audio.push(_frame());
+      await Future<void>.delayed(Duration.zero);
+      await subscription.cancel();
+
+      expect(errors, hasLength(1));
+      expect(live.status, TranscriptStatus.failed);
+    });
+
+    test('stopping detaches from the audio and seals the result', () async {
+      final gateway = _RecordingGateway(answers: ['Un.']);
+      final audio = _AudioStream();
+      final live = await AITranscriptProvider(gateway: gateway)
+          .start(sessionId: 's1', audio: audio);
+
+      final result = await live.stop();
+      audio.push(_frame());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(result.status, TranscriptStatus.stopped);
+      expect(gateway.executed, isEmpty);
+    });
+  });
+
+  group('DeepgramAdapter — configuration and fail closed', () {
+    test('an unconfigured engine fails closed before any network call', () async {
+      const adapter = DeepgramAdapter(
+        configuration: DeepgramConfiguration(apiKey: ''),
+      );
+
+      await expectLater(
+        adapter.execute(
+          AIRequest(requestId: 'r1', audio: const [1, 2, 3]),
+        ),
+        throwsA(isA<AIUnavailableFailure>()),
+      );
+      expect(await adapter.health(), isFalse);
+    });
+
+    test('a non-byte audio payload is refused, never guessed', () {
+      const adapter = DeepgramAdapter(
+        configuration: DeepgramConfiguration(apiKey: 'injected'),
       );
 
       expect(
-        () => service.start(sessionId: 's1', audio: _AudioStream()),
-        throwsA(isA<TranscriptAlreadyActiveFailure>()),
-      );
-    });
-  });
-
-  group('SimulatedTranscriptProvider', () {
-    test('the opaque audio flow produces lifecycle events only', () async {
-      final provider = SimulatedTranscriptProvider();
-      final audio = _AudioStream();
-      final events = <TranscriptEvent>[];
-      final subscription = provider.stream().listen(events.add);
-
-      await provider.start(sessionId: 's1', audio: audio);
-      audio.push(const ConsultationAudioFrame(
-        sessionId: 's1',
-        participantIdentity: 'b1_client_userA',
-        payload: 'opaque_audio_handle',
-      ));
-      await Future<void>.delayed(Duration.zero);
-      await provider.stop();
-      await Future<void>.delayed(Duration.zero);
-      await subscription.cancel();
-
-      expect(events.map((event) => event.kind).toList(), [
-        TranscriptEventKind.started,
-        TranscriptEventKind.audioReceived,
-        TranscriptEventKind.stopped,
-      ]);
-      expect(events.map((event) => event.sessionId).toSet(), {'s1'});
-    });
-
-    test('a second start fails closed while a session is active', () async {
-      final provider = SimulatedTranscriptProvider();
-      await provider.start(sessionId: 's1', audio: _AudioStream());
-
-      await expectLater(
-        provider.start(sessionId: 's2', audio: _AudioStream()),
-        throwsA(isA<TranscriptAlreadyActiveFailure>()),
+        () => adapter.execute(
+          AIRequest(requestId: 'r1', audio: 'a_vendor_track_handle'),
+        ),
+        throwsA(isA<AIUnavailableFailure>()),
       );
     });
 
-    test('stopping detaches from the audio and is idempotent', () async {
-      final provider = SimulatedTranscriptProvider();
-      final audio = _AudioStream();
-      final events = <TranscriptEvent>[];
-      final subscription = provider.stream().listen(events.add);
+    test('no key, secret, URL or business module is hard-coded outside '
+        'the injectable configuration', () {
+      final source = File(
+        'lib/infrastructure/ai_gateway/deepgram_adapter.dart',
+      ).readAsStringSync();
 
-      await provider.start(sessionId: 's1', audio: audio);
-      await provider.stop();
-      await provider.stop();
-      // Audio after stop never produces an event.
-      audio.push(const ConsultationAudioFrame(
-        sessionId: 's1',
-        participantIdentity: 'x',
-        payload: 'opaque',
-      ));
-      await Future<void>.delayed(Duration.zero);
-      await subscription.cancel();
-
-      expect(events.map((event) => event.kind).toList(), [
-        TranscriptEventKind.started,
-        TranscriptEventKind.stopped,
-      ]);
+      expect(source, isNot(contains('String.fromEnvironment')));
+      expect(source, contains('required this.apiKey'));
+      expect(source, isNot(contains('consultation_memory')));
+      expect(source, isNot(contains('cloud_firestore')));
+      expect(source, contains('AIProviderType.deepgram'));
     });
   });
 
-  group('Transcript foundation — governance', () {
-    test('no AI vendor exists anywhere in the transcript layer', () {
-      const files = [
-        'lib/domain/transcript/consultation_audio_stream.dart',
-        'lib/domain/transcript/transcript_provider.dart',
-        'lib/application/transcript/transcript_application_service.dart',
-        'lib/infrastructure/transcript/livekit_audio_stream_adapter.dart',
-        'lib/infrastructure/transcript/simulated_transcript_provider.dart',
-      ];
-      for (final path in files) {
-        final source = File(path).readAsStringSync().toLowerCase();
-        for (final vendor in const [
-          'openai',
-          'deepgram',
-          'google speech',
-          'assemblyai',
-          'azure',
-        ]) {
-          expect(source, isNot(contains(vendor)), reason: '$path: $vendor');
-        }
+  group('Governance — the transcription chain is the only route', () {
+    test('the application service knows only the provider port', () {
+      final source = File(
+        'lib/application/transcript/'
+        'realtime_transcript_application_service.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('TranscriptProvider'));
+      for (final forbidden in const [
+        'AIGateway',
+        'Deepgram',
+        'deepgram',
+        'HttpClient',
+        'cloud_firestore',
+        'livekit',
+      ]) {
+        expect(
+          source,
+          isNot(contains(forbidden)),
+          reason: 'the transcript service must not know $forbidden',
+        );
       }
     });
 
-    test('the domain audio contract is pure and the events carry no '
-        'transcription content', () {
-      final audio = File(
-        'lib/domain/transcript/consultation_audio_stream.dart',
-      ).readAsStringSync();
-      final provider = File(
-        'lib/domain/transcript/transcript_provider.dart',
+    test('the transcript provider uses the gateway ONLY', () {
+      final source = File(
+        'lib/infrastructure/transcript/ai_transcript_provider.dart',
       ).readAsStringSync();
 
-      expect(audio, isNot(contains('import ')));
-      // Lifecycle only: sessionId + kind, no transcription payload fields.
-      expect(provider, contains('final String sessionId;'));
-      expect(provider, contains('final TranscriptEventKind kind;'));
-      expect(provider, isNot(contains('String transcript')));
-      expect(provider, isNot(contains('String content')));
+      expect(source, contains('AIGateway'));
+      expect(source, contains('AITask.transcription'));
+      for (final forbidden in const [
+        'Deepgram',
+        'deepgram',
+        'HttpClient',
+        'cloud_firestore',
+      ]) {
+        expect(
+          source,
+          isNot(contains(forbidden)),
+          reason: 'the transcript provider must not know $forbidden',
+        );
+      }
     });
 
-    test('the LiveKit audio bridge forwards opaque handles only', () {
+    test('Deepgram is invisible outside its single Infrastructure adapter', () {
+      const allowed = [
+        'lib/infrastructure/ai_gateway/deepgram_adapter.dart',
+        'lib/composition/mentora_composition_root.dart',
+        // The provider-type enum names engine KINDS only.
+        'lib/domain/ai_gateway/ai_provider.dart',
+      ];
+
+      final offenders = <String>[];
+      for (final entity in Directory('lib').listSync(recursive: true)) {
+        if (entity is! File || !entity.path.endsWith('.dart')) continue;
+        final normalized = entity.path.replaceAll('\\', '/');
+        if (entity.readAsStringSync().toLowerCase().contains('deepgram') &&
+            !allowed.contains(normalized)) {
+          offenders.add(normalized);
+        }
+      }
+      expect(offenders, isEmpty);
+    });
+
+    test('the transcript stays a living stream — no persistence anywhere', () {
+      for (final path in const [
+        'lib/domain/transcript/transcript_chunk.dart',
+        'lib/domain/transcript/transcript_provider.dart',
+        'lib/domain/transcript/consultation_audio_stream.dart',
+        'lib/application/transcript/'
+            'realtime_transcript_application_service.dart',
+        'lib/infrastructure/transcript/ai_transcript_provider.dart',
+      ]) {
+        final source = File(path).readAsStringSync();
+        expect(source, isNot(contains('cloud_firestore')), reason: path);
+        expect(source, isNot(contains('Firestore')), reason: path);
+      }
+    });
+
+    test('a chunk carries exactly the five authorized facts', () {
       final source = File(
-        'lib/infrastructure/transcript/livekit_audio_stream_adapter.dart',
+        'lib/domain/transcript/transcript_chunk.dart',
       ).readAsStringSync();
 
-      expect(source, contains("import 'package:livekit_client/"));
-      expect(source, contains('AudioTrack'));
-      expect(source, contains('TrackSubscribedEvent'));
-      // Transport only: nothing is decoded, interpreted or stored.
-      expect(source, isNot(contains('decode')));
-      expect(source, isNot(contains('Firestore')));
-      expect(source, isNot(contains('http')));
+      final fields = RegExp(r'final \w+\??' r' \w+;')
+          .allMatches(source)
+          .map((match) => match.group(0))
+          .toList();
+      expect(fields, [
+        'final String sessionId;',
+        'final String participantIdentity;',
+        'final String text;',
+        'final bool isFinal;',
+        'final DateTime createdAt;',
+      ]);
     });
   });
 }
 
-TranscriptApplicationService _service(TranscriptProvider provider) {
-  return TranscriptApplicationService(
+ConsultationAudioFrame _frame({String participant = 'b1_client_userA'}) {
+  return ConsultationAudioFrame(
+    sessionId: 's1',
+    participantIdentity: participant,
+    payload: const [1, 2, 3],
+  );
+}
+
+RealtimeTranscriptApplicationService _service(TranscriptProvider provider) {
+  return RealtimeTranscriptApplicationService(
     session: _Session('client_1'),
     provider: provider,
   );
@@ -193,28 +330,60 @@ final class _AudioStream implements ConsultationAudioStream {
 }
 
 final class _RecordingProvider implements TranscriptProvider {
-  _RecordingProvider({this.error});
-
-  final Object? error;
   final List<(String, ConsultationAudioStream)> started = [];
-  int stopped = 0;
 
   @override
-  Future<void> start({
+  Future<TranscriptStream> start({
     required String sessionId,
     required ConsultationAudioStream audio,
   }) async {
-    if (error case final cause?) throw cause;
     started.add((sessionId, audio));
+    return _FakeStream(sessionId);
   }
+}
+
+final class _FakeStream implements TranscriptStream {
+  _FakeStream(this.sessionId);
 
   @override
-  Future<void> stop() async {
-    stopped += 1;
-  }
+  final String sessionId;
 
   @override
-  Stream<TranscriptEvent> stream() => const Stream.empty();
+  TranscriptStatus get status => TranscriptStatus.transcribing;
+
+  @override
+  Stream<TranscriptChunk> get chunks => const Stream.empty();
+
+  @override
+  Future<TranscriptResult> stop() async {
+    return TranscriptResult(
+      sessionId: sessionId,
+      status: TranscriptStatus.stopped,
+    );
+  }
+}
+
+final class _RecordingGateway implements AIGateway {
+  _RecordingGateway({this.answers = const [], this.error});
+
+  final List<String> answers;
+  final Object? error;
+  final List<AIRequest> executed = [];
+
+  @override
+  Future<AIResponse> execute(AIRequest request) async {
+    if (error case final cause?) throw cause;
+    executed.add(request);
+    final answer = answers.length >= executed.length
+        ? answers[executed.length - 1]
+        : '';
+    return AIResponse(
+      providerType: AIProviderType.deepgram,
+      responseId: 'r_${executed.length}',
+      status: AIResponseStatus.accepted,
+      text: answer,
+    );
+  }
 }
 
 final class _Session extends Fake implements AuthenticationSession {

@@ -24,7 +24,7 @@ import '../application/profile/profile_application_service.dart';
 import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
-import '../application/transcript/transcript_application_service.dart';
+import '../application/transcript/realtime_transcript_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/workspace_state.dart';
 
@@ -152,8 +152,8 @@ final class MentoraDependencies {
   /// Live room handles behind the vendor-neutral room contract.
   final LiveConsultationRoomProvider liveConsultationRooms;
 
-  /// Transcript foundation: opaque audio transport, no AI anywhere yet.
-  final TranscriptApplicationService transcripts;
+  /// Real-time transcription: a living stream behind the governed chain.
+  final RealtimeTranscriptApplicationService transcripts;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;
