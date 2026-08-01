@@ -12,6 +12,7 @@ import '../application/booking/consultation_completion_application_service.dart'
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/consultation_brief/consultation_brief_application_service.dart';
 import '../application/consultation_documents/consultation_document_application_service.dart';
+import '../application/consultation_memory/consultation_memory_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
 import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
@@ -38,6 +39,7 @@ import '../infrastructure/booking/firestore_consultation_completion_repository.d
 import '../infrastructure/booking/firestore_booking_overview_repository.dart';
 import '../infrastructure/consultation_brief/firestore_consultation_brief_repository.dart';
 import '../infrastructure/consultation_documents/firebase_consultation_document_repository.dart';
+import '../infrastructure/consultation_memory/firestore_memory_repository.dart';
 import '../infrastructure/consultation_notes/firestore_consultation_private_notes_repository.dart';
 import '../infrastructure/conversation/firestore_conversation_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
@@ -292,6 +294,13 @@ final class MentoraCompositionRoot {
 
     const liveConsultationRooms = LiveKitRoomProvider();
 
+    // Consultation memory foundation: one memory per reservation holding
+    // durable business facts only — never any engine output (ARC-MEM01).
+    final consultationMemory = ConsultationMemoryApplicationService(
+      session: authenticationSession,
+      repository: FirestoreMemoryRepository(firestore: firebase.firestore),
+    );
+
     // AI Gateway foundation: the single doorway every future intelligence
     // capability must pass through. One simulated provider, no selection
     // logic, no engine, no generated content.
@@ -347,6 +356,7 @@ final class MentoraCompositionRoot {
       consultationBrief: consultationBrief,
       consultationCompletion: consultationCompletion,
       consultationDocuments: consultationDocuments,
+      consultationMemory: consultationMemory,
       consultationPrivateNotes: consultationPrivateNotes,
       conversations: conversations,
       expertBookingOccupancy: expertBookingOccupancy,
