@@ -29,6 +29,7 @@ import '../../screens/expert_profile_screen.dart';
 import '../../screens/waiting_room_screen.dart';
 import '../../domain/booking/booking_overview.dart';
 import '../../screens/booking_dashboard_screen.dart';
+import '../../screens/consultation_brief_screen.dart';
 import '../../screens/consultation_dashboard_screen.dart';
 import '../../screens/booking_detail_screen.dart';
 import '../../screens/reschedule_booking_screen.dart';
@@ -423,6 +424,13 @@ class AppRouter {
     required BookingOverview booking,
   }) {
     return push(context, ConsultationDashboardScreen(booking: booking));
+  }
+
+  static Future<bool?> openConsultationBrief({
+    required BuildContext context,
+    required String bookingId,
+  }) {
+    return push<bool>(context, ConsultationBriefScreen(bookingId: bookingId));
   }
 
   static Future<void> openMyPayments(BuildContext context) {

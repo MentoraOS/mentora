@@ -5,6 +5,7 @@ import '../application/booking/booking_dashboard_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
+import '../application/consultation_brief/consultation_brief_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
@@ -29,6 +30,7 @@ final class MentoraDependencies {
     required this.bookingDashboard,
     required this.bookingNotifications,
     required this.bookingReschedule,
+    required this.consultationBrief,
     required this.expertBookingOccupancy,
     required this.expertAvailability,
     required this.expertCatalog,
@@ -62,6 +64,9 @@ final class MentoraDependencies {
 
   /// Booking-owned reschedule through the C2/C3 temporal path.
   final BookingRescheduleApplicationService bookingReschedule;
+
+  /// The client's consultation brief: a plain persistent snapshot.
+  final ConsultationBriefApplicationService consultationBrief;
 
   final ExpertBookingOccupancyApplicationService expertBookingOccupancy;
   final ExpertAvailabilityApplicationService expertAvailability;

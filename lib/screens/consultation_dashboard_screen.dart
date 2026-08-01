@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
 import '../domain/booking/booking_overview.dart';
+import '../core/routing/app_router.dart';
 import '../theme/mentora_theme.dart';
+import '../widgets/consultation_brief_card.dart';
 import '../widgets/consultation_timeline.dart';
 
 /// Consultation Dashboard: the dedicated space for a confirmed reservation.
@@ -87,6 +89,19 @@ class ConsultationDashboardScreen extends StatelessWidget {
               title: 'Progression',
               icon: Icons.timeline,
               child: ConsultationTimeline(booking: booking),
+            ),
+            const SizedBox(height: 16),
+
+            _DashboardCard(
+              title: 'Brief de consultation',
+              icon: Icons.assignment_outlined,
+              child: ConsultationBriefCard(
+                bookingId: booking.bookingId,
+                onFillIn: () => AppRouter.openConsultationBrief(
+                  context: context,
+                  bookingId: booking.bookingId,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
 

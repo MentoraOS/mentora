@@ -7,6 +7,7 @@ import '../application/booking/booking_dashboard_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
+import '../application/consultation_brief/consultation_brief_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
@@ -23,6 +24,7 @@ import '../infrastructure/booking/firestore_booking_cancellation_repository.dart
 import '../infrastructure/booking/firestore_booking_confirmation_repository.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_booking_overview_repository.dart';
+import '../infrastructure/consultation_brief/firestore_consultation_brief_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
 import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
@@ -210,6 +212,14 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Consultation brief: a plain persistent snapshot keyed by booking.
+    final consultationBrief = ConsultationBriefApplicationService(
+      session: authenticationSession,
+      repository: FirestoreConsultationBriefRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     // Dashboard read projection: live stream of the user's reservations.
     final bookingDashboard = BookingDashboardApplicationService(
       session: authenticationSession,
@@ -226,6 +236,7 @@ final class MentoraCompositionRoot {
       bookingDashboard: bookingDashboard,
       bookingNotifications: bookingNotifications,
       bookingReschedule: bookingReschedule,
+      consultationBrief: consultationBrief,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
       expertCatalog: expertCatalog,

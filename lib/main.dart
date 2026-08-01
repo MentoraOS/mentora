@@ -10,6 +10,7 @@ import 'application/booking/booking_dashboard_application_service.dart';
 import 'application/booking/booking_creation_application_service.dart';
 import 'application/booking/booking_reschedule_application_service.dart';
 import 'application/booking/expert_booking_occupancy_application_service.dart';
+import 'application/consultation_brief/consultation_brief_application_service.dart';
 import 'application/expert_availability/expert_availability_application_service.dart';
 import 'application/expert_catalog/expert_catalog_application_service.dart';
 import 'application/expert_timezone/expert_timezone_application_service.dart';
@@ -72,6 +73,9 @@ void main() async {
         ),
         Provider<ExpertBookingOccupancyApplicationService>.value(
           value: dependencies.expertBookingOccupancy,
+        ),
+        Provider<ConsultationBriefApplicationService>.value(
+          value: dependencies.consultationBrief,
         ),
         Provider<ExpertAvailabilityApplicationService>.value(
           value: dependencies.expertAvailability,
