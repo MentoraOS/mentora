@@ -292,6 +292,15 @@ class _BookingCard extends StatelessWidget {
         ];
       case 'confirmed':
         return [
+          _ActionButton(
+            icon: Icons.meeting_room,
+            label: 'Espace consultation',
+            filled: true,
+            onPressed: () => AppRouter.openConsultationDashboard(
+              context: context,
+              booking: booking,
+            ),
+          ),
           _detailsButton(context),
           _ActionButton(
             icon: Icons.event_repeat,

@@ -27,7 +27,9 @@ import '../../screens/expert_detail_screen.dart';
 import '../../screens/escrow_screen.dart';
 import '../../screens/expert_profile_screen.dart';
 import '../../screens/waiting_room_screen.dart';
+import '../../domain/booking/booking_overview.dart';
 import '../../screens/booking_dashboard_screen.dart';
+import '../../screens/consultation_dashboard_screen.dart';
 import '../../screens/booking_detail_screen.dart';
 import '../../screens/reschedule_booking_screen.dart';
 import '../../screens/booking_screen.dart';
@@ -414,6 +416,13 @@ class AppRouter {
   /// The Booking Dashboard is the reference bookings screen.
   static Future<void> openMyBookings(BuildContext context) {
     return push(context, const BookingDashboardScreen());
+  }
+
+  static Future<void> openConsultationDashboard({
+    required BuildContext context,
+    required BookingOverview booking,
+  }) {
+    return push(context, ConsultationDashboardScreen(booking: booking));
   }
 
   static Future<void> openMyPayments(BuildContext context) {
