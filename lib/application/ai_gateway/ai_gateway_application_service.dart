@@ -3,16 +3,15 @@ import '../../domain/ai_gateway/ai_provider.dart';
 import '../authentication/authentication_session.dart';
 import 'ai_orchestrator.dart';
 import 'ai_provider_registry.dart';
-import 'ai_routing_policy.dart';
 
 /// THE gateway: the only implementation of [AIGateway], and the only
 /// component allowed to talk to an [AIProvider].
 ///
 /// Its public contract never changes for callers; internally every
 /// request flows through the single chain gateway -> AIOrchestrator ->
-/// AIProviderRegistry + AIRoutingPolicy -> provider. All engine
-/// selection is centralized there — and ONLY the gateway knows the
-/// orchestrator exists.
+/// routing strategy -> registry -> provider. All engine selection is
+/// centralized there — ONLY the gateway knows the orchestrator exists,
+/// and only the orchestrator knows the routing internals.
 final class AIGatewayApplicationService implements AIGateway {
   AIGatewayApplicationService({
     required AuthenticationSession session,
@@ -22,7 +21,6 @@ final class AIGatewayApplicationService implements AIGateway {
        _orchestrator = AIOrchestrator(
          defaultProvider: provider,
          registry: AIProviderRegistry.from(taskProviders),
-         policy: const TaskRoutingPolicy(),
        );
 
   final AuthenticationSession _session;
