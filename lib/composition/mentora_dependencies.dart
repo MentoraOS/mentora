@@ -6,6 +6,7 @@ import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/consultation_brief/consultation_brief_application_service.dart';
+import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
@@ -32,6 +33,7 @@ final class MentoraDependencies {
     required this.bookingNotifications,
     required this.bookingReschedule,
     required this.consultationBrief,
+    required this.consultationDocuments,
     required this.consultationPrivateNotes,
     required this.expertBookingOccupancy,
     required this.expertAvailability,
@@ -69,6 +71,9 @@ final class MentoraDependencies {
 
   /// The client's consultation brief: a plain persistent snapshot.
   final ConsultationBriefApplicationService consultationBrief;
+
+  /// Shared consultation documents (participants only).
+  final ConsultationDocumentApplicationService consultationDocuments;
 
   /// Expert-only private consultation notes.
   final ConsultationPrivateNotesApplicationService consultationPrivateNotes;

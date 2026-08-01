@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../application/authentication/default_authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
@@ -8,6 +9,7 @@ import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/consultation_brief/consultation_brief_application_service.dart';
+import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
@@ -26,6 +28,7 @@ import '../infrastructure/booking/firestore_booking_confirmation_repository.dart
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_booking_overview_repository.dart';
 import '../infrastructure/consultation_brief/firestore_consultation_brief_repository.dart';
+import '../infrastructure/consultation_documents/firebase_consultation_document_repository.dart';
 import '../infrastructure/consultation_notes/firestore_consultation_private_notes_repository.dart';
 import '../infrastructure/booking/firestore_booking_reschedule_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
@@ -230,6 +233,15 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Shared consultation documents: upload, list, open — participants only.
+    final consultationDocuments = ConsultationDocumentApplicationService(
+      session: authenticationSession,
+      repository: FirebaseConsultationDocumentRepository(
+        firestore: firebase.firestore,
+        storage: FirebaseStorage.instance,
+      ),
+    );
+
     // Dashboard read projection: live stream of the user's reservations.
     final bookingDashboard = BookingDashboardApplicationService(
       session: authenticationSession,
@@ -247,6 +259,7 @@ final class MentoraCompositionRoot {
       bookingNotifications: bookingNotifications,
       bookingReschedule: bookingReschedule,
       consultationBrief: consultationBrief,
+      consultationDocuments: consultationDocuments,
       consultationPrivateNotes: consultationPrivateNotes,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,

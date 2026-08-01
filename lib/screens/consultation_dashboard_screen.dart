@@ -7,6 +7,7 @@ import '../domain/booking/booking_overview.dart';
 import '../core/routing/app_router.dart';
 import '../theme/mentora_theme.dart';
 import '../widgets/consultation_brief_card.dart';
+import '../widgets/consultation_documents_card.dart';
 import '../widgets/consultation_private_notes_card.dart';
 import '../widgets/consultation_timeline.dart';
 
@@ -143,12 +144,10 @@ class ConsultationDashboardScreen extends StatelessWidget {
               const SizedBox(height: 16),
             ],
 
-            const _DashboardCard(
+            _DashboardCard(
               title: 'Documents partagés',
               icon: Icons.folder_shared,
-              child: _PlaceholderBody(
-                'Le partage de documents arrive bientôt.',
-              ),
+              child: ConsultationDocumentsCard(bookingId: booking.bookingId),
             ),
             const SizedBox(height: 16),
 
