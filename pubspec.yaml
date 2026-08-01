@@ -50,10 +50,12 @@ dependencies:
   collection: ^1.19.0
   livekit_client: ^2.4.0
 
+# TEMPORARY — Remove when Agora migration is completed.
+#
 # livekit_client and file_picker >=8.3.3 need the modern ffi line while
 # the legacy agora_rtc_engine still declares ffi ^1.1.2. package:ffi 2.x
-# is source-compatible with Agora's usage; the override disappears with
-# the Agora migration wave.
+# is source-compatible with Agora's usage; this override exists ONLY to
+# keep Agora alive and must not gain any other entry.
 dependency_overrides:
   ffi: ^2.1.4
 

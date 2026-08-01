@@ -2,16 +2,24 @@ import 'dart:convert';
 
 import 'video_token_provider.dart';
 
-/// Development stand-in for the real token backend.
+/// ════════════════════════════════════════════════════════════════════
+/// DEVELOPMENT ONLY.
 ///
-/// It DERIVES an unsigned JWT-shaped token from the room and identity —
-/// nothing is hard-coded — so the whole pipeline exercises real token
-/// plumbing. A real LiveKit server rejects the fake signature, which is the
-/// intended fail-closed behaviour: no fake success, ever. The production
-/// token service implements [VideoTokenProvider] and replaces this class.
+/// Never usable against a real LiveKit server.
+///
+/// Replace by ProductionVideoTokenProvider.
+/// ════════════════════════════════════════════════════════════════════
+///
+/// This stand-in DERIVES an unsigned, unmistakably-marked JWT-shaped token
+/// from the room and identity — nothing is hard-coded — so the whole token
+/// pipeline is exercised end to end. Its signature segment is the literal
+/// `DEVELOPMENT_ONLY_UNSIGNED`: no real LiveKit server can ever accept it
+/// and no human can ever mistake it for a signed production token. The
+/// intended behaviour against real infrastructure is fail-closed: no fake
+/// success, ever.
 final class SimulatedVideoTokenProvider implements VideoTokenProvider {
   const SimulatedVideoTokenProvider({
-    this.serverUrl = 'wss://fake.livekit.cloud/mentora',
+    this.serverUrl = 'wss://development-only.invalid/mentora',
   });
 
   final String serverUrl;
@@ -39,10 +47,10 @@ final class SimulatedVideoTokenProvider implements VideoTokenProvider {
 
     final header = encode({'alg': 'none', 'typ': 'JWT'});
     final payload = encode({
-      'iss': 'mentora-fake-token-provider',
+      'iss': 'mentora-development-only',
       'sub': identity,
       'video': {'room': roomName, 'roomJoin': true},
     });
-    return '$header.$payload.unsigned';
+    return '$header.$payload.DEVELOPMENT_ONLY_UNSIGNED';
   }
 }

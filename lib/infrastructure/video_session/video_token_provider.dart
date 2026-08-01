@@ -1,8 +1,16 @@
-/// Video access-token boundary — Infrastructure only.
+/// Video access-token boundary — Infrastructure only. PRODUCTION-READY.
 ///
-/// The LiveKit adapter obtains its connection credentials here. The real
-/// token backend (a server minting signed LiveKit JWTs) replaces ONLY this
-/// provider; nothing else in the video layer changes.
+/// The LiveKit adapter obtains its connection credentials here and nowhere
+/// else. This contract is final: the real token backend replaces ONLY the
+/// implementation (SimulatedVideoTokenProvider →
+/// ProductionVideoTokenProvider → LiveKit backend) and no other layer
+/// changes.
+///
+/// The backend answer maps onto [VideoAccessCredentials]: `serverUrl`,
+/// `jwt`, `roomName`, `identity`. `expiration` and `permissions` travel
+/// INSIDE the signed JWT (`exp` and `video` grant claims); the
+/// `participantRole` and `bookingId` are inputs, already encoded in the
+/// room and identity conventions. Nothing else is exchanged.
 abstract interface class VideoTokenProvider {
   Future<VideoAccessCredentials> credentialsFor({
     required String roomName,
