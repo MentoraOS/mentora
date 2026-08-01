@@ -6,17 +6,13 @@
 /// exactly one of them in Infrastructure without touching the video layer.
 ///
 /// Nothing in the current codebase may implement or reference them.
+///
+/// Realized so far (removed from this file, live in domain/transcript):
+/// the consultation audio stream and the transcript provider contracts.
 library;
-
-/// Future access to the consultation's audio streams (translation,
-/// transcription). Defined by its own wave; empty until then.
-abstract interface class ConversationAudioStream {}
 
 /// Future observation of raw video frames. Defined by its own wave.
 abstract interface class VideoFrameObserver {}
-
-/// Future live transcript source. Defined by its own wave.
-abstract interface class LiveTranscriptProvider {}
 
 /// Future consultation recording contract. Defined by its own wave.
 abstract interface class ConsultationRecordingProvider {}

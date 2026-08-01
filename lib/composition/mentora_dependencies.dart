@@ -21,6 +21,7 @@ import '../application/profile/profile_application_service.dart';
 import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
+import '../application/transcript/transcript_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/workspace_state.dart';
 
@@ -57,6 +58,7 @@ final class MentoraDependencies {
     required this.timezoneResolver,
     required this.videoSessions,
     required this.liveConsultationRooms,
+    required this.transcripts,
     required this.workspaceState,
     required this.workspaceMemberRepository,
     required this.workspaceRepository,
@@ -134,6 +136,9 @@ final class MentoraDependencies {
 
   /// Live room handles behind the vendor-neutral room contract.
   final LiveConsultationRoomProvider liveConsultationRooms;
+
+  /// Transcript foundation: opaque audio transport, no AI anywhere yet.
+  final TranscriptApplicationService transcripts;
 
   final WorkspaceState workspaceState;
   final WorkspaceMemberRepository workspaceMemberRepository;

@@ -80,15 +80,16 @@ void main() {
   });
 
   group('Consultation extension hooks — present but inactive', () {
+    // ConversationAudioStream and LiveTranscriptProvider were realized by
+    // the transcript foundation wave (domain/transcript) and left the
+    // hooks file; the remaining three stay empty and unreferenced.
     const names = [
-      'ConversationAudioStream',
       'VideoFrameObserver',
-      'LiveTranscriptProvider',
       'ConsultationRecordingProvider',
       'RealtimeTranslationProvider',
     ];
 
-    test('the five hooks exist as empty dependency-free contracts', () {
+    test('the remaining hooks exist as empty dependency-free contracts', () {
       final source = File(
         'lib/domain/video_session/consultation_extension_hooks.dart',
       ).readAsStringSync();

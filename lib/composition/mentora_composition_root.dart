@@ -24,6 +24,7 @@ import '../application/profile/profile_application_service.dart';
 import '../application/review/review_application_service.dart';
 import '../application/scheduling/selectable_occurrence_application_service.dart';
 import '../application/startup/mentora_startup.dart';
+import '../application/transcript/transcript_application_service.dart';
 import '../application/video_session/video_session_application_service.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
@@ -52,6 +53,7 @@ import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.d
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/notification/simulated_notification_provider.dart';
 import '../infrastructure/payment/simulated_payment_provider.dart';
+import '../infrastructure/transcript/simulated_transcript_provider.dart';
 import '../infrastructure/profile/firestore_profile_repository.dart';
 import '../infrastructure/review/firestore_consultation_review_repository.dart';
 import 'mentora_dependencies.dart';
@@ -288,6 +290,14 @@ final class MentoraCompositionRoot {
 
     const liveConsultationRooms = LiveKitRoomProvider();
 
+    // Transcript foundation: opaque audio transport behind its port. The
+    // simulated provider emits lifecycle events only — no transcription
+    // exists anywhere yet.
+    final transcripts = TranscriptApplicationService(
+      session: authenticationSession,
+      provider: SimulatedTranscriptProvider(),
+    );
+
     // Consultation reviews: one review per completed reservation, plain
     // chronological reads — no ranking, no averages.
     final reviews = ReviewApplicationService(
@@ -342,6 +352,7 @@ final class MentoraCompositionRoot {
       timezoneResolver: timezoneResolver,
       videoSessions: videoSessions,
       liveConsultationRooms: liveConsultationRooms,
+      transcripts: transcripts,
       workspaceState: workspaceState,
       workspaceMemberRepository: workspaceMemberRepository,
       workspaceRepository: workspaceRepository,
