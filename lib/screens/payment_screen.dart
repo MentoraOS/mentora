@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'booking_success_screen.dart';
 import 'package:intl/intl.dart';
+import '../application/booking/booking_confirmation_application_service.dart';
+import '../application/booking/booking_confirmation_failure.dart';
 import 'payment_success_animation.dart';
 import '../core/engines/country/country_engine.dart';
 import '../core/routing/app_router.dart';
@@ -363,19 +366,51 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           builder: (_) => const _PaymentLoadingDialog(),
                         );
 
+                        // Simulated provider outcome. Only this confirmed
+                        // outcome may reach the Booking boundary below.
                         await Future.delayed(const Duration(seconds: 3));
+
+                        // AD-022 decisions 11/12: the reservation is
+                        // confirmed by Booking, never by this screen. A
+                        // failed confirmation never becomes a success page.
+                        var confirmed = false;
+                        try {
+                          if (context.mounted) {
+                            await context
+                                .read<BookingConfirmationApplicationService>()
+                                .confirmPaid(widget.bookingId);
+                            confirmed = true;
+                          }
+                        } on BookingConfirmationFailure {
+                          confirmed = false;
+                        } catch (_) {
+                          confirmed = false;
+                        }
 
                         if (context.mounted) {
                           Navigator.pop(context);
 
-                          AppRouter.replaceWithBookingSuccess(
-                            context: context,
-                            bookingId: widget.bookingId,
-                            expertName: widget.expertName,
-                            selectedDate: widget.selectedDate,
-                            selectedTime: widget.selectedTime,
-                            aiSummary: widget.aiSummary,
-                          );
+                          if (confirmed) {
+                            AppRouter.replaceWithBookingSuccess(
+                              context: context,
+                              bookingId: widget.bookingId,
+                              expertName: widget.expertName,
+                              selectedDate: widget.selectedDate,
+                              selectedTime: widget.selectedTime,
+                              aiSummary: widget.aiSummary,
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'La confirmation de la réservation a '
+                                  'échoué. Le paiement sera '
+                                  'vérifié ; réessayez ou '
+                                  'contactez le support.',
+                                ),
+                              ),
+                            );
+                          }
                         }
 
                         setState(() {

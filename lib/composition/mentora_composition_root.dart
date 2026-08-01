@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 
 import '../application/authentication/default_authentication_session.dart';
+import '../application/booking/booking_confirmation_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
@@ -13,6 +14,7 @@ import '../application/startup/mentora_startup.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
+import '../infrastructure/booking/firestore_booking_confirmation_repository.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
 import '../infrastructure/scheduling/civil_occurrence_interpretation_adapter.dart';
@@ -152,8 +154,18 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // AD-022 decision 12: Booking consumes the confirmed payment outcome
+    // through its own boundary; Payment owns no reservation state.
+    final bookingConfirmation = BookingConfirmationApplicationService(
+      session: authenticationSession,
+      repository: FirestoreBookingConfirmationRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     return MentoraDependencies(
       authenticationSession: authenticationSession,
+      bookingConfirmation: bookingConfirmation,
       bookingCreation: bookingCreation,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
