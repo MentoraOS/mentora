@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
+import '../domain/action_items/action_items_provider.dart';
 import '../domain/assistant/assistant_provider.dart';
 import '../domain/translation/translation_provider.dart';
 import '../domain/video_session/live_consultation_room.dart';
 import '../domain/video_session/video_session_provider.dart';
 import '../theme/mentora_theme.dart';
+import '../widgets/action_items_controller.dart';
+import '../widgets/action_items_overlay.dart';
 import '../widgets/assistant_controller.dart';
 import '../widgets/assistant_overlay.dart';
 import '../widgets/live_subtitle_overlay.dart';
@@ -24,6 +27,7 @@ class LiveConsultationScreen extends StatefulWidget {
     required this.session,
     this.subtitles,
     this.assistant,
+    this.actionItems,
   });
 
   final VideoSessionInfo session;
@@ -39,6 +43,11 @@ class LiveConsultationScreen extends StatefulWidget {
   /// (fail closed) — the client never sees the copilot.
   final AssistantStream? assistant;
 
+  /// The already-produced action proposals; null shows none. STRICTLY
+  /// expert-only, same fail-closed rule — the client never sees the
+  /// review surface.
+  final ActionItemsStream? actionItems;
+
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
 }
@@ -48,6 +57,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   StreamSubscription<void>? _subscription;
   SubtitleController? _subtitles;
   AssistantController? _assistant;
+  ActionItemsController? _actionItems;
   String? _failureMessage;
 
   @override
@@ -56,17 +66,20 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     if (widget.subtitles case final translation?) {
       _subtitles = SubtitleController(translation: translation);
     }
-    if (widget.assistant case final copilot?) {
-      // Fail closed: no expert session, no copilot — the client never
-      // sees this surface.
-      var isExpert = false;
-      try {
-        isExpert = context.read<AuthenticationSession>().isExpert;
-      } catch (_) {
-        isExpert = false;
-      }
-      if (isExpert) {
+    // Fail closed: no expert session means NO expert-only surface — the
+    // client never sees the copilot nor the action review.
+    var isExpert = false;
+    try {
+      isExpert = context.read<AuthenticationSession>().isExpert;
+    } catch (_) {
+      isExpert = false;
+    }
+    if (isExpert) {
+      if (widget.assistant case final copilot?) {
         _assistant = AssistantController(assistant: copilot);
+      }
+      if (widget.actionItems case final proposals?) {
+        _actionItems = ActionItemsController(actionItems: proposals);
       }
     }
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
@@ -121,6 +134,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     _subscription?.cancel();
     _subtitles?.dispose();
     _assistant?.dispose();
+    _actionItems?.dispose();
     final room = _room;
     if (room != null) unawaited(room.dispose());
     super.dispose();
@@ -208,6 +222,13 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                 if (_assistant case final assistant?)
                   Positioned.fill(
                     child: AssistantOverlay(controller: assistant),
+                  ),
+                // Expert-only action review: the expert consults,
+                // accepts, edits locally or rejects — the AI never
+                // decides.
+                if (_actionItems case final actionItems?)
+                  Positioned.fill(
+                    child: ActionItemsOverlay(controller: actionItems),
                   ),
               ],
             ),

@@ -291,6 +291,9 @@ void main() {
         'lib/infrastructure/ai_gateway/openai_action_items_adapter.dart',
         'lib/composition/mentora_composition_root.dart',
         'lib/composition/mentora_dependencies.dart',
+        // The review UI consumes the stream contract only.
+        'lib/widgets/action_items_controller.dart',
+        'lib/screens/live_consultation_screen.dart',
       ];
 
       final offenders = <String>[];
