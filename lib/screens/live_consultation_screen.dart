@@ -3,18 +3,31 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../domain/translation/translation_provider.dart';
 import '../domain/video_session/live_consultation_room.dart';
 import '../domain/video_session/video_session_provider.dart';
 import '../theme/mentora_theme.dart';
+import '../widgets/live_subtitle_overlay.dart';
+import '../widgets/subtitle_controller.dart';
 import '../widgets/video_track_view.dart';
 
 /// The live consultation room: local and remote video, connection state,
 /// microphone and camera toggles, and a clean exit. No chat, no vendor
 /// SDK — everything goes through the Domain room contract.
 class LiveConsultationScreen extends StatefulWidget {
-  const LiveConsultationScreen({super.key, required this.session});
+  const LiveConsultationScreen({
+    super.key,
+    required this.session,
+    this.subtitles,
+  });
 
   final VideoSessionInfo session;
+
+  /// The already-produced translated projection to render as live
+  /// subtitles; null shows none. The pipeline that starts transcription
+  /// and translation wires this in its own orchestration wave — no AI
+  /// logic ever lives in this screen.
+  final TranslationStream? subtitles;
 
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
@@ -23,11 +36,15 @@ class LiveConsultationScreen extends StatefulWidget {
 class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   LiveConsultationRoom? _room;
   StreamSubscription<void>? _subscription;
+  SubtitleController? _subtitles;
   String? _failureMessage;
 
   @override
   void initState() {
     super.initState();
+    if (widget.subtitles case final translation?) {
+      _subtitles = SubtitleController(translation: translation);
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
 
@@ -78,6 +95,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   @override
   void dispose() {
     _subscription?.cancel();
+    _subtitles?.dispose();
     final room = _room;
     if (room != null) unawaited(room.dispose());
     super.dispose();
@@ -154,6 +172,12 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                           ),
                   ),
                 ),
+                // Live subtitles: a discreet projection of the translated
+                // flux, over the video, never blocking it.
+                if (_subtitles case final subtitles?)
+                  Positioned.fill(
+                    child: LiveSubtitleOverlay(controller: subtitles),
+                  ),
               ],
             ),
           ),
