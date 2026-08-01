@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 
 import '../application/authentication/default_authentication_session.dart';
+import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
@@ -16,6 +17,7 @@ import '../application/startup/mentora_startup.dart';
 import '../application/workspace/default_workspace_state.dart';
 import '../domain/workspace/workspace_member_repository.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
+import '../infrastructure/booking/firestore_booking_cancellation_repository.dart';
 import '../infrastructure/booking/firestore_booking_confirmation_repository.dart';
 import '../infrastructure/booking/firestore_booking_creation_repository.dart';
 import '../infrastructure/booking/firestore_expert_booking_occupancy_repository.dart';
@@ -181,8 +183,18 @@ final class MentoraCompositionRoot {
       ),
     );
 
+    // Booking owns cancellation; Payment never decides it. Refund, slot
+    // release and rescheduling remain separate future contracts.
+    final bookingCancellation = BookingCancellationApplicationService(
+      session: authenticationSession,
+      repository: FirestoreBookingCancellationRepository(
+        firestore: firebase.firestore,
+      ),
+    );
+
     return MentoraDependencies(
       authenticationSession: authenticationSession,
+      bookingCancellation: bookingCancellation,
       bookingConfirmation: bookingConfirmation,
       bookingCreation: bookingCreation,
       bookingNotifications: bookingNotifications,

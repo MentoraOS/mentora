@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
+import '../application/booking/booking_cancellation_application_service.dart';
+import '../application/booking/booking_cancellation_failure.dart';
+import '../application/notification/booking_notification_application_service.dart';
 import '../theme/mentora_theme.dart';
 
 class BookingDetailScreen extends StatelessWidget {
@@ -14,13 +17,66 @@ class BookingDetailScreen extends StatelessWidget {
   });
 
   Future<void> _cancelBooking(BuildContext context) async {
-    await FirebaseFirestore.instance
-        .collection('bookings')
-        .doc(bookingId)
-        .update({
-          'status': 'cancelled',
-          'cancelledAt': FieldValue.serverTimestamp(),
-        });
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Annuler la réservation ?'),
+        content: const Text(
+          'Cette action est définitive. La réservation sera '
+          'annulée pour vous et pour l’expert.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Retour'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Confirmer l’annulation'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    // Booking owns the guarded transition; this screen only reports the
+    // client's intent and displays the outcome.
+    try {
+      await context.read<BookingCancellationApplicationService>().cancel(
+        bookingId,
+      );
+    } on BookingCancellationInvalidStateFailure {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cette réservation ne peut plus être annulée.'),
+        ),
+      );
+      return;
+    } on BookingCancellationFailure {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('L’annulation a échoué. Réessayez plus tard.'),
+        ),
+      );
+      return;
+    }
+
+    // Best-effort lifecycle notification; never a condition of the
+    // cancellation. Legacy documents may lack expertId — the service skips
+    // the missing recipient.
+    if (context.mounted) {
+      await context
+          .read<BookingNotificationApplicationService>()
+          .notifyBookingCancelled(
+            bookingId: bookingId,
+            expertId: (booking['expertId'] as String?) ?? '',
+            expertName: (booking['expertName'] as String?) ?? 'Expert',
+            displayDate: (booking['bookingDate'] as String?) ?? '',
+            displayTime: (booking['bookingTime'] as String?) ?? '',
+          );
+    }
 
     if (!context.mounted) return;
 
