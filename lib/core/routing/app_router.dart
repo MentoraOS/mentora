@@ -15,7 +15,6 @@ import '../../screens/expert_wallet_screen.dart';
 import '../../screens/pre_consultation_screen.dart';
 import '../../screens/video_call_screen.dart';
 import '../../screens/edit_profile_screen.dart';
-import '../../screens/my_bookings_screen.dart';
 import '../../screens/my_payments_screen.dart';
 import '../../screens/favorite_experts_screen.dart';
 import '../../screens/notifications_screen.dart';
@@ -28,6 +27,7 @@ import '../../screens/expert_detail_screen.dart';
 import '../../screens/escrow_screen.dart';
 import '../../screens/expert_profile_screen.dart';
 import '../../screens/waiting_room_screen.dart';
+import '../../screens/booking_dashboard_screen.dart';
 import '../../screens/booking_detail_screen.dart';
 import '../../screens/reschedule_booking_screen.dart';
 import '../../screens/booking_screen.dart';
@@ -411,8 +411,9 @@ class AppRouter {
     return push(context, const AppearanceScreen());
   }
 
+  /// The Booking Dashboard is the reference bookings screen.
   static Future<void> openMyBookings(BuildContext context) {
-    return push(context, const MyBookingsScreen());
+    return push(context, const BookingDashboardScreen());
   }
 
   static Future<void> openMyPayments(BuildContext context) {

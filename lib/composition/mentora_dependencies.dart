@@ -1,6 +1,7 @@
 import '../application/authentication/authentication_session.dart';
 import '../application/booking/booking_cancellation_application_service.dart';
 import '../application/booking/booking_confirmation_application_service.dart';
+import '../application/booking/booking_dashboard_application_service.dart';
 import '../application/booking/booking_creation_application_service.dart';
 import '../application/booking/booking_reschedule_application_service.dart';
 import '../application/booking/expert_booking_occupancy_application_service.dart';
@@ -25,6 +26,7 @@ final class MentoraDependencies {
     required this.bookingCancellation,
     required this.bookingConfirmation,
     required this.bookingCreation,
+    required this.bookingDashboard,
     required this.bookingNotifications,
     required this.bookingReschedule,
     required this.expertBookingOccupancy,
@@ -51,6 +53,9 @@ final class MentoraDependencies {
   final BookingConfirmationApplicationService bookingConfirmation;
 
   final BookingCreationApplicationService bookingCreation;
+
+  /// Live read projection of the user's reservations for the dashboard.
+  final BookingDashboardApplicationService bookingDashboard;
 
   /// Best-effort booking lifecycle notifications; never a workflow condition.
   final BookingNotificationApplicationService bookingNotifications;

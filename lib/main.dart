@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'application/authentication/authentication_session.dart';
 import 'application/booking/booking_cancellation_application_service.dart';
 import 'application/booking/booking_confirmation_application_service.dart';
+import 'application/booking/booking_dashboard_application_service.dart';
 import 'application/booking/booking_creation_application_service.dart';
 import 'application/booking/booking_reschedule_application_service.dart';
 import 'application/booking/expert_booking_occupancy_application_service.dart';
@@ -59,6 +60,9 @@ void main() async {
         ),
         Provider<BookingCreationApplicationService>.value(
           value: dependencies.bookingCreation,
+        ),
+        Provider<BookingDashboardApplicationService>.value(
+          value: dependencies.bookingDashboard,
         ),
         Provider<BookingNotificationApplicationService>.value(
           value: dependencies.bookingNotifications,
