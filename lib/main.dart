@@ -14,6 +14,7 @@ import 'application/consultation_brief/consultation_brief_application_service.da
 import 'application/consultation_documents/consultation_document_application_service.dart';
 import 'application/consultation_notes/consultation_private_notes_application_service.dart';
 import 'application/expert_availability/expert_availability_application_service.dart';
+import 'application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import 'application/expert_catalog/expert_catalog_application_service.dart';
 import 'application/expert_timezone/expert_timezone_application_service.dart';
 import 'application/favorites/favorite_experts_application_service.dart';
@@ -88,6 +89,9 @@ void main() async {
         ),
         Provider<ExpertAvailabilityApplicationService>.value(
           value: dependencies.expertAvailability,
+        ),
+        Provider<ExpertAvailabilityExceptionApplicationService>.value(
+          value: dependencies.availabilityExceptions,
         ),
         Provider<ExpertCatalogApplicationService>.value(
           value: dependencies.expertCatalog,

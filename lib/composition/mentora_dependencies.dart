@@ -9,6 +9,7 @@ import '../application/consultation_brief/consultation_brief_application_service
 import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
+import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
@@ -38,6 +39,7 @@ final class MentoraDependencies {
     required this.consultationPrivateNotes,
     required this.expertBookingOccupancy,
     required this.expertAvailability,
+    required this.availabilityExceptions,
     required this.expertCatalog,
     required this.expertTimezone,
     required this.favoriteExperts,
@@ -82,6 +84,10 @@ final class MentoraDependencies {
 
   final ExpertBookingOccupancyApplicationService expertBookingOccupancy;
   final ExpertAvailabilityApplicationService expertAvailability;
+
+  /// Expert unavailability windows (blocked days, holidays, absences).
+  final ExpertAvailabilityExceptionApplicationService availabilityExceptions;
+
   final ExpertCatalogApplicationService expertCatalog;
 
   /// AD-022 Clarification A: expert-side explicit timezone declaration.

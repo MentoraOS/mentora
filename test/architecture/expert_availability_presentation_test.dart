@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/expert_availability/expert_availability_application_service.dart';
+import 'package:mentora/application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import 'package:mentora/application/expert_timezone/expert_timezone_application_service.dart';
 import 'package:mentora/domain/expert_availability/expert_availability.dart';
 import 'package:mentora/domain/expert_availability/expert_availability_repository.dart';
+import 'package:mentora/domain/expert_availability_exception/expert_availability_exception.dart';
 import 'package:mentora/domain/expert_timezone/expert_timezone_declaration_repository.dart';
 import 'package:mentora/domain/session/session_model.dart';
 import 'package:mentora/screens/expert_agenda_screen.dart';
@@ -104,13 +106,56 @@ Widget _app(_AgendaRepository repository) {
     repository: _TimezoneRepository(),
   );
 
+  final exceptionService = ExpertAvailabilityExceptionApplicationService(
+    session: _ExpertSession(),
+    repository: _ExceptionRepository(),
+  );
+
   return MultiProvider(
     providers: [
       Provider<ExpertAvailabilityApplicationService>.value(value: service),
       Provider<ExpertTimezoneApplicationService>.value(value: timezoneService),
+      Provider<ExpertAvailabilityExceptionApplicationService>.value(
+        value: exceptionService,
+      ),
     ],
     child: const MaterialApp(home: ExpertAgendaScreen()),
   );
+}
+
+final class _ExceptionRepository
+    implements ExpertAvailabilityExceptionRepository {
+  final List<ExpertAvailabilityException> stored = [
+    ExpertAvailabilityException(
+      id: 'x1',
+      expertId: 'expert_1',
+      startDate: '2026-08-10',
+      endDate: '2026-08-14',
+      reason: 'Congé',
+    ),
+  ];
+  final List<(String, String)> deleted = [];
+
+  @override
+  Future<void> create({
+    required String expertId,
+    required String startDate,
+    required String endDate,
+    required String reason,
+  }) async {}
+
+  @override
+  Future<List<ExpertAvailabilityException>> listByExpertId(
+    String expertId,
+  ) async {
+    return List.of(stored);
+  }
+
+  @override
+  Future<void> delete({required String id, required String expertId}) async {
+    deleted.add((id, expertId));
+    stored.removeWhere((exception) => exception.id == id);
+  }
 }
 
 final class _TimezoneRepository implements ExpertTimezoneDeclarationRepository {

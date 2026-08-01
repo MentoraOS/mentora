@@ -1,4 +1,5 @@
 import '../../domain/expert_catalog/consultation_offer.dart';
+import '../../domain/expert_availability_exception/expert_availability_exception.dart';
 import '../../domain/expert_catalog/expert_catalog_entry.dart';
 import '../expert_catalog/expert_catalog_application_service.dart';
 import 'civil_occurrence_materialization.dart';
@@ -22,11 +23,19 @@ final class SelectableOccurrenceApplicationService {
   const SelectableOccurrenceApplicationService({
     required ExpertCatalogApplicationService expertCatalog,
     required CivilOccurrenceMaterialization materialization,
+    ExpertAvailabilityExceptionRepository? availabilityExceptions,
   }) : _expertCatalog = expertCatalog,
-       _materialization = materialization;
+       _materialization = materialization,
+       _availabilityExceptions = availabilityExceptions;
 
   final ExpertCatalogApplicationService _expertCatalog;
   final CivilOccurrenceMaterialization _materialization;
+
+  /// Expert unavailability windows. Optional and additive: when absent, no
+  /// exception filtering applies (Clarification C decision 9 kept blocked
+  /// periods a first-class future input; this is that additive input,
+  /// applied as a civil-date filter without touching the frozen generator).
+  final ExpertAvailabilityExceptionRepository? _availabilityExceptions;
 
   /// Materializes the expert's selectable starts for one civil month.
   ///
@@ -45,13 +54,15 @@ final class SelectableOccurrenceApplicationService {
       offer: offer,
     );
 
-    return _materialization.materializeMonth(
+    final occurrences = _materialization.materializeMonth(
       persistedAvailability: expert.availability,
       expertTimezone: expert.expertTimezone!,
       durationMinutes: offer.durationMinutes,
       year: year,
       month: month,
     );
+
+    return _withoutBlockedDates(expertId, occurrences);
   }
 
   /// Revalidates a client-submitted structured selection against
@@ -132,11 +143,36 @@ final class SelectableOccurrenceApplicationService {
       throw const SelectableOccurrenceNotOfferedFailure();
     }
 
-    if (!candidates.contains(selected)) {
+    final offered = await _withoutBlockedDates(expertId, candidates);
+    if (!offered.contains(selected)) {
       throw const SelectableOccurrenceNotOfferedFailure();
     }
 
     return (selection: selected, expertTimezone: expert.expertTimezone!);
+  }
+
+  /// Removes occurrences whose civil date falls inside one of the expert's
+  /// unavailability windows. Whole civil days only; string comparison on the
+  /// strict date grammar, no clock and no timezone involved.
+  Future<List<CivilSelection>> _withoutBlockedDates(
+    String expertId,
+    List<CivilSelection> occurrences,
+  ) async {
+    final repository = _availabilityExceptions;
+    if (repository == null || occurrences.isEmpty) return occurrences;
+
+    final exceptions = await repository.listByExpertId(expertId);
+    if (exceptions.isEmpty) return occurrences;
+
+    String two(int value) => value.toString().padLeft(2, '0');
+    return List.unmodifiable(
+      occurrences.where((occurrence) {
+        final date =
+            '${occurrence.year}-${two(occurrence.month)}-'
+            '${two(occurrence.day)}';
+        return !exceptions.any((exception) => exception.blocksDate(date));
+      }),
+    );
   }
 
   Future<ExpertCatalogEntry> _requireAuthoritativeInputs({

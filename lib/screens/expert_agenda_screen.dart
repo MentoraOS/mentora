@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability/expert_availability_failure.dart';
+import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
+import '../application/expert_availability_exception/expert_availability_exception_failure.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
+import '../domain/expert_availability_exception/expert_availability_exception.dart';
 import '../application/expert_timezone/expert_timezone_failure.dart';
 import '../domain/expert_availability/expert_availability.dart';
 import '../theme/mentora_theme.dart';
@@ -262,6 +265,10 @@ class _ExpertAgendaScreenState extends State<ExpertAgendaScreen> {
 
             const SizedBox(height: 24),
 
+            const _UnavailabilitySection(),
+
+            const SizedBox(height: 24),
+
             if (loading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 48),
@@ -423,6 +430,319 @@ class _TimezoneCard extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Expert unavailability windows: add, list, delete with confirmation.
+/// Exceptions live in their own collection; the recurring availability and
+/// the expert document are untouched.
+class _UnavailabilitySection extends StatefulWidget {
+  const _UnavailabilitySection();
+
+  @override
+  State<_UnavailabilitySection> createState() => _UnavailabilitySectionState();
+}
+
+enum _ExceptionsState { loading, loaded, failed }
+
+class _UnavailabilitySectionState extends State<_UnavailabilitySection> {
+  List<ExpertAvailabilityException> _exceptions = const [];
+  _ExceptionsState _state = _ExceptionsState.loading;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    setState(() => _state = _ExceptionsState.loading);
+    try {
+      final exceptions = await context
+          .read<ExpertAvailabilityExceptionApplicationService>()
+          .listMine();
+      if (!mounted) return;
+      setState(() {
+        _exceptions = exceptions;
+        _state = _ExceptionsState.loaded;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _state = _ExceptionsState.failed);
+    }
+  }
+
+  Future<void> _add() async {
+    // Display-only initial dates from the device calendar page.
+    final today = DateTime.now();
+    var start = today;
+    var end = today;
+    final reasonController = TextEditingController();
+
+    String iso(DateTime day) {
+      String two(int value) => value.toString().padLeft(2, '0');
+      return '${day.year}-${two(day.month)}-${two(day.day)}';
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: const Text('Ajouter une indisponibilité'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextButton.icon(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: dialogContext,
+                    initialDate: start,
+                    firstDate: DateTime(today.year - 1),
+                    lastDate: DateTime(today.year + 2),
+                  );
+                  if (picked != null) {
+                    setDialogState(() {
+                      start = picked;
+                      if (end.isBefore(start)) end = start;
+                    });
+                  }
+                },
+                icon: const Icon(Icons.calendar_today),
+                label: Text('Du ${iso(start)}'),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: dialogContext,
+                    initialDate: end,
+                    firstDate: DateTime(today.year - 1),
+                    lastDate: DateTime(today.year + 2),
+                  );
+                  if (picked != null) {
+                    setDialogState(() => end = picked);
+                  }
+                },
+                icon: const Icon(Icons.calendar_month),
+                label: Text('Au ${iso(end)}'),
+              ),
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(
+                  labelText: 'Motif (congé, absence...)',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Ajouter'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _busy = true);
+    var message = 'Impossible d’ajouter l’indisponibilité.';
+    var success = false;
+    try {
+      await context
+          .read<ExpertAvailabilityExceptionApplicationService>()
+          .create(
+            startDate: iso(start),
+            endDate: iso(end),
+            reason: reasonController.text,
+          );
+      success = true;
+    } on ExpertAvailabilityExceptionInvalidFailure {
+      message = 'Dates ou motif invalides.';
+    } catch (_) {
+      // Keep the generic message.
+    }
+
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (success) {
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Indisponibilité ajoutée')));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _delete(ExpertAvailabilityException exception) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Supprimer cette indisponibilité ?'),
+        content: Text(
+          'Du ${exception.startDate} au ${exception.endDate} — '
+          '${exception.reason}. Les créneaux de cette période '
+          'redeviendront réservables.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Retour'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _busy = true);
+    var success = false;
+    try {
+      await context
+          .read<ExpertAvailabilityExceptionApplicationService>()
+          .delete(exception.id);
+      success = true;
+    } catch (_) {
+      success = false;
+    }
+
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (success) {
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Indisponibilité supprimée')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Impossible de supprimer. Réessayez.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Indisponibilités',
+            style: TextStyle(
+              color: MentoraColors.gold,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Congés et absences : aucun créneau ne sera '
+            'réservable sur ces périodes.',
+            style: TextStyle(color: Colors.white70),
+          ),
+          const SizedBox(height: 12),
+          switch (_state) {
+            _ExceptionsState.loading => const LinearProgressIndicator(
+              color: MentoraColors.gold,
+              backgroundColor: Colors.white12,
+            ),
+            _ExceptionsState.failed => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Impossible de charger les indisponibilités.',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+                TextButton.icon(
+                  onPressed: _load,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Recharger'),
+                ),
+              ],
+            ),
+            _ExceptionsState.loaded => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_exceptions.isEmpty)
+                  const Text(
+                    'Aucune indisponibilité.',
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                ..._exceptions.map(
+                  (exception) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.event_busy,
+                          color: Colors.orangeAccent,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                exception.startDate == exception.endDate
+                                    ? exception.startDate
+                                    : '${exception.startDate} → '
+                                          '${exception.endDate}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                exception.reason,
+                                style: const TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _busy ? null : () => _delete(exception),
+                          child: const Text('Supprimer'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _add,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Ajouter une indisponibilité'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: MentoraColors.gold,
+                    side: const BorderSide(color: MentoraColors.gold),
+                  ),
+                ),
+              ],
+            ),
+          },
         ],
       ),
     );

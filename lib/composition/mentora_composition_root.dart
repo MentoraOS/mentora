@@ -12,6 +12,7 @@ import '../application/consultation_brief/consultation_brief_application_service
 import '../application/consultation_documents/consultation_document_application_service.dart';
 import '../application/consultation_notes/consultation_private_notes_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
+import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
@@ -39,6 +40,7 @@ import '../infrastructure/scheduling/launch_market_timezone_resolver.dart';
 import '../infrastructure/video_session/livekit_cloud_adapter.dart';
 import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
+import '../infrastructure/expert_availability_exception/firestore_expert_availability_exception_repository.dart';
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
 import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.dart';
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
@@ -124,6 +126,19 @@ final class MentoraCompositionRoot {
       repository: expertCatalogRepository,
     );
 
+    // Expert unavailability windows: dedicated collection, applied as an
+    // additive civil-date filter by the booking funnel.
+    final availabilityExceptionRepository =
+        FirestoreExpertAvailabilityExceptionRepository(
+          firestore: firebase.firestore,
+        );
+
+    final availabilityExceptions =
+        ExpertAvailabilityExceptionApplicationService(
+          session: authenticationSession,
+          repository: availabilityExceptionRepository,
+        );
+
     // AD-022 Clarification A: expert-side explicit timezone declaration,
     // persisted on the Catalog document the funnel already reads.
     final expertTimezone = ExpertTimezoneApplicationService(
@@ -156,6 +171,7 @@ final class MentoraCompositionRoot {
     final selectableOccurrences = SelectableOccurrenceApplicationService(
       expertCatalog: expertCatalog,
       materialization: const CivilOccurrenceMaterializationAdapter(),
+      availabilityExceptions: availabilityExceptionRepository,
     );
 
     // Scheduling-owned timezone interpretation. The concrete resolver is
@@ -217,6 +233,7 @@ final class MentoraCompositionRoot {
       interpretation: const CivilOccurrenceInterpretationAdapter(
         resolver: timezoneResolver,
       ),
+      availabilityExceptions: availabilityExceptionRepository,
     );
 
     // Consultation brief: a plain persistent snapshot keyed by booking.
@@ -273,6 +290,7 @@ final class MentoraCompositionRoot {
       consultationPrivateNotes: consultationPrivateNotes,
       expertBookingOccupancy: expertBookingOccupancy,
       expertAvailability: expertAvailability,
+      availabilityExceptions: availabilityExceptions,
       expertCatalog: expertCatalog,
       expertTimezone: expertTimezone,
       favoriteExperts: favoriteExperts,

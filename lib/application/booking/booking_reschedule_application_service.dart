@@ -1,4 +1,5 @@
 import '../../domain/booking/booking_reschedule_repository.dart';
+import '../../domain/expert_availability_exception/expert_availability_exception.dart';
 import '../../domain/expert_catalog/expert_catalog_entry.dart';
 import '../authentication/authentication_session.dart';
 import '../expert_catalog/expert_catalog_application_service.dart';
@@ -29,17 +30,22 @@ final class BookingRescheduleApplicationService {
     required ExpertCatalogApplicationService expertCatalog,
     required CivilOccurrenceMaterialization materialization,
     required CivilOccurrenceInterpretation interpretation,
+    ExpertAvailabilityExceptionRepository? availabilityExceptions,
   }) : _session = session,
        _repository = repository,
        _expertCatalog = expertCatalog,
        _materialization = materialization,
-       _interpretation = interpretation;
+       _interpretation = interpretation,
+       _availabilityExceptions = availabilityExceptions;
 
   final AuthenticationSession _session;
   final BookingRescheduleRepository _repository;
   final ExpertCatalogApplicationService _expertCatalog;
   final CivilOccurrenceMaterialization _materialization;
   final CivilOccurrenceInterpretation _interpretation;
+
+  /// Optional expert unavailability filter; absent means no filtering.
+  final ExpertAvailabilityExceptionRepository? _availabilityExceptions;
 
   /// Materializes the expert's selectable starts for the reschedule calendar,
   /// using the reservation's snapshotted duration.
@@ -51,13 +57,15 @@ final class BookingRescheduleApplicationService {
   }) async {
     final expert = await _requireExpert(expertId);
 
-    return _materialization.materializeMonth(
+    final occurrences = _materialization.materializeMonth(
       persistedAvailability: expert.availability,
       expertTimezone: expert.expertTimezone!,
       durationMinutes: durationMinutes,
       year: year,
       month: month,
     );
+
+    return _withoutBlockedDates(expertId, occurrences);
   }
 
   Future<void> reschedule({
@@ -102,7 +110,8 @@ final class BookingRescheduleApplicationService {
     } on ArgumentError {
       throw const SelectableOccurrenceNotOfferedFailure();
     }
-    if (!candidates.contains(selected)) {
+    final offered = await _withoutBlockedDates(expertId, candidates);
+    if (!offered.contains(selected)) {
       throw const SelectableOccurrenceNotOfferedFailure();
     }
 
@@ -139,6 +148,29 @@ final class BookingRescheduleApplicationService {
     } catch (error) {
       throw BookingRescheduleRepositoryFailure(cause: error);
     }
+  }
+
+  /// Removes occurrences whose civil date falls inside one of the expert's
+  /// unavailability windows (whole civil days, string comparison only).
+  Future<List<CivilSelection>> _withoutBlockedDates(
+    String expertId,
+    List<CivilSelection> occurrences,
+  ) async {
+    final repository = _availabilityExceptions;
+    if (repository == null || occurrences.isEmpty) return occurrences;
+
+    final exceptions = await repository.listByExpertId(expertId);
+    if (exceptions.isEmpty) return occurrences;
+
+    String two(int value) => value.toString().padLeft(2, '0');
+    return List.unmodifiable(
+      occurrences.where((occurrence) {
+        final date =
+            '${occurrence.year}-${two(occurrence.month)}-'
+            '${two(occurrence.day)}';
+        return !exceptions.any((exception) => exception.blocksDate(date));
+      }),
+    );
   }
 
   Future<ExpertCatalogEntry> _requireExpert(String expertId) async {
