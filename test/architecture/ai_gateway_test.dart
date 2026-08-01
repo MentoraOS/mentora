@@ -128,6 +128,10 @@ void main() {
         'lib/domain/ai_gateway/ai_gateway.dart',
         'lib/domain/ai_gateway/ai_provider.dart',
         'lib/application/ai_gateway/ai_gateway_application_service.dart',
+        // The gateway's internal orchestration chain (gateway-only).
+        'lib/application/ai_gateway/ai_orchestrator.dart',
+        'lib/application/ai_gateway/ai_provider_registry.dart',
+        'lib/application/ai_gateway/ai_routing_policy.dart',
         'lib/infrastructure/ai_gateway/simulated_ai_provider.dart',
         // The engine adapters: the ONLY places knowing a real vendor.
         'lib/infrastructure/ai_gateway/openai_ai_provider.dart',

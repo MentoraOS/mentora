@@ -1,30 +1,32 @@
 import '../../domain/ai_gateway/ai_gateway.dart';
 import '../../domain/ai_gateway/ai_provider.dart';
 import '../authentication/authentication_session.dart';
+import 'ai_orchestrator.dart';
+import 'ai_provider_registry.dart';
+import 'ai_routing_policy.dart';
 
 /// THE gateway: the only implementation of [AIGateway], and the only
 /// component allowed to talk to an [AIProvider].
 ///
-/// Routing is BY TASK: each registered [AITask] maps to the engine
-/// serving it; a request without a task goes to the default provider.
-/// The future best-engine-per-task selection refines this map HERE —
-/// callers depend on [AIGateway] and never notice.
+/// Its public contract never changes for callers; internally every
+/// request flows through the single chain gateway -> AIOrchestrator ->
+/// AIProviderRegistry + AIRoutingPolicy -> provider. All engine
+/// selection is centralized there — and ONLY the gateway knows the
+/// orchestrator exists.
 final class AIGatewayApplicationService implements AIGateway {
-  const AIGatewayApplicationService({
+  AIGatewayApplicationService({
     required AuthenticationSession session,
     required AIProvider provider,
     Map<AITask, AIProvider> taskProviders = const {},
   }) : _session = session,
-       _provider = provider,
-       _taskProviders = taskProviders;
+       _orchestrator = AIOrchestrator(
+         defaultProvider: provider,
+         registry: AIProviderRegistry.from(taskProviders),
+         policy: const TaskRoutingPolicy(),
+       );
 
   final AuthenticationSession _session;
-
-  /// The default engine for task-less requests.
-  final AIProvider _provider;
-
-  /// One engine per routed task.
-  final Map<AITask, AIProvider> _taskProviders;
+  final AIOrchestrator _orchestrator;
 
   @override
   Future<AIResponse> execute(AIRequest request) async {
@@ -36,13 +38,8 @@ final class AIGatewayApplicationService implements AIGateway {
       throw const AIInvalidRequestFailure();
     }
 
-    final provider = switch (request.task) {
-      null => _provider,
-      final task => _taskProviders[task] ?? _provider,
-    };
-
     try {
-      return await provider.execute(request);
+      return await _orchestrator.execute(request);
     } on AIFailure {
       rethrow;
     } catch (error) {
@@ -50,10 +47,10 @@ final class AIGatewayApplicationService implements AIGateway {
     }
   }
 
-  /// Whether the provider behind the gateway can currently serve.
+  /// Whether the engine behind the gateway can currently serve.
   Future<bool> health() async {
     try {
-      return await _provider.health();
+      return await _orchestrator.health();
     } catch (_) {
       // Fail closed: an unreachable provider is an unhealthy provider.
       return false;
