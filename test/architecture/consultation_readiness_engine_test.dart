@@ -267,6 +267,7 @@ void main() {
             'camera_readiness_checker.dart',
         'lib/application/pre_consultation/microphone/'
             'microphone_readiness_checker.dart',
+        'lib/application/pre_consultation/ai/ai_readiness_checker.dart',
       ];
 
       final offenders = <String>[];
