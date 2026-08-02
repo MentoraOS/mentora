@@ -1,7 +1,10 @@
 import '../../domain/ai_gateway/ai_provider.dart';
+import 'ai_cost_observer.dart';
+import 'ai_cost_record.dart';
 import 'ai_execution_trace.dart';
 import 'ai_observability.dart';
 import 'ai_provider_registry.dart';
+import 'ai_usage_record.dart';
 import 'routing_context.dart';
 import 'routing_strategy.dart';
 
@@ -22,15 +25,18 @@ final class AIOrchestrator {
     required AIProviderRegistry registry,
     RoutingStrategy strategy = const DefaultRoutingStrategy(),
     AIObservability? observability,
+    AICostObserver? costObserver,
   }) : _defaultProvider = defaultProvider,
        _registry = registry,
        _strategy = strategy,
-       _observability = observability ?? AIObservability();
+       _observability = observability ?? AIObservability(),
+       _costObserver = costObserver ?? AICostObserver();
 
   final AIProvider _defaultProvider;
   final AIProviderRegistry _registry;
   final RoutingStrategy _strategy;
   final AIObservability _observability;
+  final AICostObserver _costObserver;
 
   Future<AIResponse> execute(AIRequest request) async {
     final decision = _strategy.decide(
@@ -62,6 +68,7 @@ final class AIOrchestrator {
           finishedAt: DateTime.now(),
         ),
       );
+      _emitCostAndUsage(request, provider, success: true);
       return response;
     } catch (error) {
       _observability.observe(
@@ -70,8 +77,38 @@ final class AIOrchestrator {
           finishedAt: DateTime.now(),
         ),
       );
+      _emitCostAndUsage(request, provider, success: false);
       rethrow;
     }
+  }
+
+  /// Emits the usage and cost records with the information AVAILABLE
+  /// here — an unknown value stays null, never invented: the model, the
+  /// tokens, the cost and the currency are the engine's to report, in
+  /// their own waves.
+  void _emitCostAndUsage(
+    AIRequest request,
+    AIProvider provider, {
+    required bool success,
+  }) {
+    final now = DateTime.now();
+    _costObserver.observeUsage(
+      AIUsageRecord(
+        requestId: request.requestId,
+        task: request.task,
+        provider: provider.providerType.name,
+        model: null,
+        success: success,
+        createdAt: now,
+      ),
+    );
+    _costObserver.observeCost(
+      AICostRecord(
+        requestId: request.requestId,
+        provider: provider.providerType.name,
+        createdAt: now,
+      ),
+    );
   }
 
   /// Whether the default provider can currently serve.
