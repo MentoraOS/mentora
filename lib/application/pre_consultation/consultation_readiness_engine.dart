@@ -1,6 +1,8 @@
 import 'camera/camera_readiness_checker.dart';
 import 'camera/camera_readiness_provider.dart';
 import 'consultation_readiness_registry.dart';
+import 'microphone/microphone_readiness_checker.dart';
+import 'microphone/microphone_readiness_provider.dart';
 import 'network/network_readiness_checker.dart';
 import 'network/network_readiness_provider.dart';
 import 'permissions/permissions_readiness_checker.dart';
@@ -31,10 +33,10 @@ final class ConsultationReadinessEngine {
        _composition = composition;
 
   /// The standard engine: every existing foundation checker registered,
-  /// in order. Today: the network, permissions and camera checkers over
-  /// their simulated providers — which answer fail closed until the
-  /// real per-target sources exist. The engine's own logic never
-  /// changes: it simply runs the registered checkers.
+  /// in order. Today: the network, permissions, camera and microphone
+  /// checkers over their simulated providers — which answer fail closed
+  /// until the real per-target sources exist. The engine's own logic
+  /// never changes: it simply runs the registered checkers.
   factory ConsultationReadinessEngine.standard() {
     final registry = ConsultationReadinessRegistry()
       ..register(
@@ -50,6 +52,11 @@ final class ConsultationReadinessEngine {
       ..register(
         const CameraReadinessChecker(
           provider: SimulatedCameraReadinessProvider(),
+        ),
+      )
+      ..register(
+        const MicrophoneReadinessChecker(
+          provider: SimulatedMicrophoneReadinessProvider(),
         ),
       );
     return ConsultationReadinessEngine(registry: registry);
