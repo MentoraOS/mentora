@@ -1,6 +1,8 @@
 import 'consultation_readiness_registry.dart';
 import 'network/network_readiness_checker.dart';
 import 'network/network_readiness_provider.dart';
+import 'permissions/permissions_readiness_checker.dart';
+import 'permissions/permissions_readiness_provider.dart';
 import 'pre_consultation_composition.dart';
 import 'pre_consultation_readiness.dart';
 
@@ -27,15 +29,20 @@ final class ConsultationReadinessEngine {
        _composition = composition;
 
   /// The standard engine: every existing foundation checker registered,
-  /// in order. Today: the network checker over its simulated provider —
-  /// which answers fail closed until the real per-target sources exist.
-  /// The engine's own logic never changes: it simply runs one more
-  /// registered checker.
+  /// in order. Today: the network and permissions checkers over their
+  /// simulated providers — which answer fail closed until the real
+  /// per-target sources exist. The engine's own logic never changes: it
+  /// simply runs the registered checkers.
   factory ConsultationReadinessEngine.standard() {
     final registry = ConsultationReadinessRegistry()
       ..register(
         const NetworkReadinessChecker(
           provider: SimulatedNetworkReadinessProvider(),
+        ),
+      )
+      ..register(
+        const PermissionsReadinessChecker(
+          provider: SimulatedPermissionsReadinessProvider(),
         ),
       );
     return ConsultationReadinessEngine(registry: registry);
