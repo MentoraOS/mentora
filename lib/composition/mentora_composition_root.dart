@@ -22,6 +22,7 @@ import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
+import '../application/expert_recommendation/recommendation_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/notification/booking_notification_application_service.dart';
@@ -41,6 +42,7 @@ import '../infrastructure/ai_gateway/gemini_adapter.dart';
 import '../infrastructure/ai_gateway/openai_ai_provider.dart';
 import '../infrastructure/ai_gateway/openai_action_items_adapter.dart';
 import '../infrastructure/ai_gateway/openai_assistant_adapter.dart';
+import '../infrastructure/ai_gateway/openai_recommendation_adapter.dart';
 import '../infrastructure/ai_gateway/simulated_ai_provider.dart';
 import '../infrastructure/authentication/firebase_authentication_service.dart';
 import '../infrastructure/booking/firestore_booking_cancellation_repository.dart';
@@ -66,6 +68,7 @@ import '../infrastructure/firebase/firebase_dependencies.dart';
 import '../infrastructure/expert_availability/firestore_expert_availability_repository.dart';
 import '../infrastructure/expert_availability_exception/firestore_expert_availability_exception_repository.dart';
 import '../infrastructure/expert_catalog/firestore_expert_catalog_repository.dart';
+import '../infrastructure/expert_recommendation/ai_recommendation_provider.dart';
 import '../infrastructure/expert_timezone/firestore_expert_timezone_repository.dart';
 import '../infrastructure/favorites/firestore_favorite_experts_repository.dart';
 import '../infrastructure/notification/simulated_notification_provider.dart';
@@ -402,6 +405,19 @@ final class MentoraCompositionRoot {
             ),
           ),
         ),
+        AITask.recommendation: OpenAIRecommendationAdapter(
+          configuration: OpenAIConfiguration(
+            apiKey: String.fromEnvironment('MENTORA_OPENAI_API_KEY'),
+            endpoint: String.fromEnvironment(
+              'MENTORA_OPENAI_ENDPOINT',
+              defaultValue: 'https://api.openai.com/v1/chat/completions',
+            ),
+            model: String.fromEnvironment(
+              'MENTORA_OPENAI_RECOMMENDATION_MODEL',
+              defaultValue: 'gpt-4o-mini',
+            ),
+          ),
+        ),
       },
     );
 
@@ -448,6 +464,15 @@ final class MentoraCompositionRoot {
       session: authenticationSession,
       memory: consultationMemory,
       provider: AIActionItemsProvider(gateway: aiGateway),
+    );
+
+    // Intelligent expert recommendations: proposals only, fully
+    // decoupled from the search engine — which stays the source of
+    // truth. Routed through the gateway to the engine registered for
+    // the recommendation task.
+    final expertRecommendations = RecommendationApplicationService(
+      session: authenticationSession,
+      provider: AIRecommendationProvider(gateway: aiGateway),
     );
 
     // Recording lifecycle: Mentora-owned, double consent mandatory. The
@@ -508,6 +533,7 @@ final class MentoraCompositionRoot {
       availabilityExceptions: availabilityExceptions,
       expertCatalog: expertCatalog,
       expertTimezone: expertTimezone,
+      expertRecommendations: expertRecommendations,
       favoriteExperts: favoriteExperts,
       paymentCollection: paymentCollection,
       profile: profile,

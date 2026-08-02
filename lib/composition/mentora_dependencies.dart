@@ -18,6 +18,7 @@ import '../application/conversation/conversation_application_service.dart';
 import '../application/expert_availability/expert_availability_application_service.dart';
 import '../application/expert_availability_exception/expert_availability_exception_application_service.dart';
 import '../application/expert_catalog/expert_catalog_application_service.dart';
+import '../application/expert_recommendation/recommendation_application_service.dart';
 import '../application/expert_timezone/expert_timezone_application_service.dart';
 import '../application/favorites/favorite_experts_application_service.dart';
 import '../application/notification/booking_notification_application_service.dart';
@@ -59,6 +60,7 @@ final class MentoraDependencies {
     required this.availabilityExceptions,
     required this.expertCatalog,
     required this.expertTimezone,
+    required this.expertRecommendations,
     required this.favoriteExperts,
     required this.paymentCollection,
     required this.profile,
@@ -131,6 +133,9 @@ final class MentoraDependencies {
 
   /// AD-022 Clarification A: expert-side explicit timezone declaration.
   final ExpertTimezoneApplicationService expertTimezone;
+
+  /// Intelligent expert recommendations — decoupled from the search.
+  final RecommendationApplicationService expertRecommendations;
 
   final FavoriteExpertsApplicationService favoriteExperts;
 
