@@ -187,7 +187,9 @@ void main() {
         'lib/screens/live_consultation_screen.dart',
       ).readAsStringSync();
 
-      expect(source, contains('recordingConsent = false'));
+      // Consent is offered when (and only when) a composed consultation
+      // exists; plain video calls show nothing.
+      expect(source, contains('widget.consultation != null'));
       expect(source, contains('RecordingConsentOverlay'));
     });
   });

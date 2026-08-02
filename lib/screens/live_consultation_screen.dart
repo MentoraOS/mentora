@@ -4,11 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
-import '../application/consultation_session/consultation_ai_session_orchestrator.dart';
-import '../application/recording/recording_orchestrator.dart';
-import '../domain/action_items/action_items_provider.dart';
-import '../domain/assistant/assistant_provider.dart';
-import '../domain/translation/translation_provider.dart';
+import '../application/consultation_session/consultation_session.dart';
 import '../domain/video_session/live_consultation_room.dart';
 import '../domain/video_session/video_session_provider.dart';
 import '../theme/mentora_theme.dart';
@@ -30,46 +26,17 @@ class LiveConsultationScreen extends StatefulWidget {
   const LiveConsultationScreen({
     super.key,
     required this.session,
-    this.subtitles,
-    this.assistant,
-    this.actionItems,
-    this.recordingConsent = false,
-    this.recordingOrchestrator,
-    this.aiSession,
+    this.consultation,
   });
 
   final VideoSessionInfo session;
 
-  /// The already-produced translated projection to render as live
-  /// subtitles; null shows none. The pipeline that starts transcription
-  /// and translation wires this in its own orchestration wave — no AI
-  /// logic ever lives in this screen.
-  final TranslationStream? subtitles;
-
-  /// The already-produced copilot flux; null shows none. STRICTLY
-  /// expert-only: without an expert session the overlay never appears
-  /// (fail closed) — the client never sees the copilot.
-  final AssistantStream? assistant;
-
-  /// The already-produced action proposals; null shows none. STRICTLY
-  /// expert-only, same fail-closed rule — the client never sees the
-  /// review surface.
-  final ActionItemsStream? actionItems;
-
-  /// Whether the recording consent surface is offered. Consent stays a
-  /// free, local choice in this wave; the real recording start and the
-  /// cross-device synchronization arrive with their own waves.
-  final bool recordingConsent;
-
-  /// The per-consultation recording coordinator; null records nothing.
-  /// The screen only CONNECTS the consent controller to it — every
-  /// business rule stays in the recording service behind it.
-  final RecordingOrchestrator? recordingOrchestrator;
-
-  /// The per-consultation AI session coordinator; null orchestrates
-  /// nothing. The screen ONLY calls start() at join and stop() at
-  /// leave — zero logic here.
-  final ConsultationAISessionOrchestrator? aiSession;
+  /// The ONE fully assembled consultation, built exclusively by
+  /// ConsultationSessionComposition; null keeps the plain video call.
+  /// The screen only READS references from it, calls the AI session's
+  /// start() at join and stop() at leave, and connects consent to the
+  /// recording coordinator — zero business logic here.
+  final ConsultationSession? consultation;
 
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
@@ -84,9 +51,11 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   RecordingConsentController? _recordingConsent;
   String? _failureMessage;
 
+  bool _isExpert = false;
+
   void _pushConsents() {
     final consent = _recordingConsent;
-    final orchestrator = widget.recordingOrchestrator;
+    final orchestrator = widget.consultation?.recordingOrchestrator;
     if (consent == null || orchestrator == null) return;
     unawaited(
       orchestrator.onConsents(
@@ -99,18 +68,6 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.subtitles case final translation?) {
-      _subtitles = SubtitleController(translation: translation);
-    }
-    if (widget.recordingConsent) {
-      final consent = RecordingConsentController();
-      _recordingConsent = consent;
-      // Pure connection: the consents flow to the coordinator, which
-      // waits for the double agreement and lets the service enforce it.
-      if (widget.recordingOrchestrator != null) {
-        consent.addListener(_pushConsents);
-      }
-    }
     // Fail closed: no expert session means NO expert-only surface — the
     // client never sees the copilot nor the action review.
     var isExpert = false;
@@ -119,15 +76,33 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     } catch (_) {
       isExpert = false;
     }
-    if (isExpert) {
-      if (widget.assistant case final copilot?) {
+    _isExpert = isExpert;
+    if (widget.consultation != null) {
+      // Consent is offered from the very start; its decisions flow to
+      // the recording coordinator, which waits for the double agreement
+      // and lets the recording service enforce it.
+      final consent = RecordingConsentController();
+      _recordingConsent = consent;
+      consent.addListener(_pushConsents);
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _start());
+  }
+
+  /// Reads the live handles from the started AI session — a pure
+  /// projection binding, no business logic.
+  void _bindAiSurfaces(ConsultationSession consultation) {
+    final orchestrator = consultation.aiSessionOrchestrator;
+    if (orchestrator.translation case final translation?) {
+      _subtitles = SubtitleController(translation: translation);
+    }
+    if (_isExpert) {
+      if (orchestrator.assistant case final copilot?) {
         _assistant = AssistantController(assistant: copilot);
       }
-      if (widget.actionItems case final proposals?) {
+      if (orchestrator.actionItems case final proposals?) {
         _actionItems = ActionItemsController(actionItems: proposals);
       }
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
 
   Future<void> _start() async {
@@ -138,9 +113,16 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
       if (mounted) setState(() {});
     });
     setState(() => _room = room);
-    // The AI session starts at join; its failures are relayed on its
-    // own stream — the screen adds no logic.
-    unawaited(widget.aiSession?.start());
+    // The AI session starts at join; once its handles exist the
+    // overlays bind to them. Failures are relayed on the session's own
+    // stream — the screen adds no logic.
+    if (widget.consultation case final consultation?) {
+      unawaited(
+        consultation.aiSessionOrchestrator.start().then((_) {
+          if (mounted) setState(() => _bindAiSurfaces(consultation));
+        }),
+      );
+    }
     await _connect(room);
   }
 
@@ -167,7 +149,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
 
   Future<void> _leave() async {
     // The AI session stops at leave (summary last); leaving never waits.
-    unawaited(widget.aiSession?.stop());
+    unawaited(widget.consultation?.aiSessionOrchestrator.stop());
     final room = _room;
     if (room != null) {
       try {
@@ -290,7 +272,8 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                   ),
                 // The REC indicator: extremely discreet, top center,
                 // following only the relayed recording lifecycle.
-                if (widget.recordingOrchestrator case final orchestrator?)
+                if (widget.consultation?.recordingOrchestrator
+                    case final orchestrator?)
                   Positioned(
                     top: 8,
                     left: 0,

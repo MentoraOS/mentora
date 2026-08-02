@@ -199,7 +199,7 @@ void main() {
         'lib/screens/live_consultation_screen.dart',
       ).readAsStringSync();
 
-      expect(source, contains('RecordingOrchestrator?'));
+      expect(source, contains('recordingOrchestrator'));
       expect(source, contains('onConsents'));
       expect(source, contains('RecordingIndicator'));
       // No business rule duplicated: the screen never starts a recording

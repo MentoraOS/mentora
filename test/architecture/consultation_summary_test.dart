@@ -312,9 +312,13 @@ void main() {
         // The single authorized UI consumer (via the application door).
         'lib/widgets/consultation_summary_card.dart',
         'lib/main.dart',
-        // The session coordinator triggers the final summary.
+        // The session coordinator triggers the final summary; the bundle
+        // and its composition carry the service reference.
         'lib/application/consultation_session/'
             'consultation_ai_session_orchestrator.dart',
+        'lib/application/consultation_session/consultation_session.dart',
+        'lib/application/consultation_session/'
+            'consultation_session_composition.dart',
       ];
 
       final offenders = <String>[];

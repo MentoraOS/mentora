@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -6,8 +5,9 @@ import 'package:mentora/application/action_items/consultation_action_items_appli
 import 'package:mentora/application/assistant/consultation_assistant_application_service.dart';
 import 'package:mentora/application/authentication/authentication_session.dart';
 import 'package:mentora/application/consultation_memory/consultation_memory_application_service.dart';
-import 'package:mentora/application/consultation_session/consultation_ai_session_orchestrator.dart';
+import 'package:mentora/application/consultation_session/consultation_session_composition.dart';
 import 'package:mentora/application/consultation_summary/consultation_summary_application_service.dart';
+import 'package:mentora/application/recording/consultation_recording_application_service.dart';
 import 'package:mentora/application/transcript/realtime_transcript_application_service.dart';
 import 'package:mentora/application/translation/realtime_translation_application_service.dart';
 import 'package:mentora/domain/action_items/action_item.dart';
@@ -19,141 +19,95 @@ import 'package:mentora/domain/consultation_memory/memory_repository.dart';
 import 'package:mentora/domain/consultation_summary/ai_summary_provider.dart';
 import 'package:mentora/domain/consultation_summary/consultation_summary.dart';
 import 'package:mentora/domain/consultation_summary/summary_repository.dart';
+import 'package:mentora/domain/recording/consultation_recording.dart';
+import 'package:mentora/domain/recording/recording_provider.dart';
 import 'package:mentora/domain/transcript/consultation_audio_stream.dart';
 import 'package:mentora/domain/transcript/transcript_chunk.dart';
 import 'package:mentora/domain/transcript/transcript_provider.dart';
 import 'package:mentora/domain/translation/translated_transcript_chunk.dart';
 import 'package:mentora/domain/translation/translation_provider.dart';
+import 'package:mentora/domain/video_session/video_session_provider.dart';
 
 void main() {
-  group('ConsultationAISessionOrchestrator — order and coordination', () {
-    test('starts in the exact order: transcript, translation, assistant, '
-        'action items', () async {
-      final harness = _Harness();
-      final orchestrator = harness.build(withLanguages: true);
+  group('ConsultationSession — an immutable bundle, nothing more', () {
+    test('carries exactly the nine planned references, all final, with '
+        'no state and no business method', () {
+      final source = File(
+        'lib/application/consultation_session/consultation_session.dart',
+      ).readAsStringSync();
 
-      await orchestrator.start();
-
-      expect(harness.log, [
-        'transcript.start',
-        'translation.start',
-        'assistant.start',
-        'actionItems.start',
+      final fields = RegExp(r'final \w+\??' r' \w+;')
+          .allMatches(source)
+          .map((match) => match.group(0))
+          .toList();
+      expect(fields, [
+        'final String bookingId;',
+        'final VideoSessionInfo liveSession;',
+        'final RealtimeTranscriptApplicationService transcriptService;',
+        'final RealtimeTranslationApplicationService translationService;',
+        'final ConsultationAssistantApplicationService assistantService;',
+        'final ConsultationActionItemsApplicationService actionItemsService;',
+        'final RecordingOrchestrator recordingOrchestrator;',
+        'final ConsultationSummaryApplicationService summaryService;',
+        'final ConsultationAISessionOrchestrator aiSessionOrchestrator;',
       ]);
-      expect(orchestrator.transcript, isNotNull);
-      expect(orchestrator.translation, isNotNull);
-      expect(orchestrator.assistant, isNotNull);
-      expect(orchestrator.actionItems, isNotNull);
-    });
-
-    test('without configured languages, translation never starts', () async {
-      final harness = _Harness();
-      final orchestrator = harness.build(withLanguages: false);
-
-      await orchestrator.start();
-
-      expect(harness.log, isNot(contains('translation.start')));
-      expect(orchestrator.translation, isNull);
-    });
-
-    test('stops in REVERSE order and the summary is ALWAYS last', () async {
-      final harness = _Harness();
-      final orchestrator = harness.build(withLanguages: true);
-      await orchestrator.start();
-      harness.log.clear();
-
-      await orchestrator.stop();
-
-      expect(harness.log, [
-        'actionItems.stop',
-        'assistant.stop',
-        'translation.stop',
-        'transcript.stop',
-        'summary.generate',
-      ]);
-    });
-
-    test('a failed translation stops NOTHING else — fail closed locally, '
-        'relayed, never masked', () async {
-      final harness = _Harness(translationError: StateError('engine down'));
-      final orchestrator = harness.build(withLanguages: true);
-      final relayed = <Object>[];
-      final subscription = orchestrator.failures.listen(relayed.add);
-
-      await orchestrator.start();
-      await orchestrator.stop();
-      await Future<void>.delayed(Duration.zero);
-      await subscription.cancel();
-
-      // Transcript, assistant, action items and the summary all ran.
-      expect(harness.log, [
-        'transcript.start',
-        'assistant.start',
-        'actionItems.start',
-        'actionItems.stop',
-        'assistant.stop',
-        'transcript.stop',
-        'summary.generate',
-      ]);
-      expect(relayed, hasLength(1));
-    });
-
-    test('even a failed transcript still ends with the summary', () async {
-      final harness = _Harness(transcriptError: StateError('audio down'));
-      final orchestrator = harness.build(withLanguages: true);
-      final relayed = <Object>[];
-      final subscription = orchestrator.failures.listen(relayed.add);
-
-      await orchestrator.start();
-      await orchestrator.stop();
-      await Future<void>.delayed(Duration.zero);
-      await subscription.cancel();
-
-      expect(harness.log.last, 'summary.generate');
-      // Translation depends on the transcript handle and was skipped.
-      expect(harness.log, isNot(contains('translation.start')));
-      expect(relayed, hasLength(1));
-    });
-
-    test('start and stop are one-shot — repeated calls are inert', () async {
-      final harness = _Harness();
-      final orchestrator = harness.build(withLanguages: false);
-
-      await orchestrator.start();
-      await orchestrator.start();
-      await orchestrator.stop();
-      await orchestrator.stop();
-
-      expect(
-        harness.log.where((entry) => entry == 'transcript.start'),
-        hasLength(1),
-      );
-      expect(
-        harness.log.where((entry) => entry == 'summary.generate'),
-        hasLength(1),
-      );
+      // No state, no logic: only the const constructor, no methods.
+      expect(source, isNot(contains('void ')));
+      expect(source, isNot(contains('Future<')));
+      expect(source, isNot(contains('=> ')));
+      expect(source, contains('const ConsultationSession({'));
     });
   });
 
-  group('Governance — a coordinator, nothing more', () {
-    test('the coordinator knows only the application contracts', () {
+  group('ConsultationSessionComposition — build, assemble, return', () {
+    test('one composition builds a complete consultation', () async {
+      final composition = _composition();
+
+      final consultation = composition.compose(
+        bookingId: 'b1',
+        liveSession: _liveSession(),
+        audio: _AudioStream(),
+        sourceLanguage: 'fr',
+        targetLanguage: 'en',
+      );
+
+      expect(consultation.bookingId, 'b1');
+      expect(consultation.liveSession.sessionId, 'mentora_consultation_b1');
+      expect(consultation.transcriptService, isNotNull);
+      expect(consultation.translationService, isNotNull);
+      expect(consultation.assistantService, isNotNull);
+      expect(consultation.actionItemsService, isNotNull);
+      expect(consultation.recordingOrchestrator, isNotNull);
+      expect(consultation.summaryService, isNotNull);
+      expect(consultation.aiSessionOrchestrator, isNotNull);
+
+      // The assembled coordinator actually coordinates the assembled
+      // services (start-to-summary through the real contracts).
+      await consultation.aiSessionOrchestrator.start();
+      await consultation.aiSessionOrchestrator.stop();
+    });
+
+    test('the composition never starts anything by itself', () async {
+      final log = <String>[];
+      _composition(log: log).compose(
+        bookingId: 'b1',
+        liveSession: _liveSession(),
+        audio: _AudioStream(),
+      );
+
+      // Building and assembling triggered no provider at all.
+      expect(log, isEmpty);
+    });
+
+    test('the composition knows the application contracts only', () {
       final source = File(
         'lib/application/consultation_session/'
-        'consultation_ai_session_orchestrator.dart',
+        'consultation_session_composition.dart',
       ).readAsStringSync();
 
-      for (final contract in const [
-        'RealtimeTranscriptApplicationService',
-        'RealtimeTranslationApplicationService',
-        'ConsultationAssistantApplicationService',
-        'ConsultationActionItemsApplicationService',
-        'RecordingOrchestrator',
-        'ConsultationSummaryApplicationService',
-      ]) {
-        expect(source, contains(contract));
-      }
       for (final forbidden in const [
         'AIGateway',
+        'AIProvider',
         'openai',
         'OpenAI',
         'Deepgram',
@@ -164,107 +118,108 @@ void main() {
         'LiveKit',
         'Firestore',
         'HttpClient',
-        'Timer',
-        'AIProvider',
+        'infrastructure',
       ]) {
         expect(
           source,
           isNot(contains(forbidden)),
-          reason: 'the coordinator must not know $forbidden',
+          reason: 'the composition must not know $forbidden',
         );
       }
+      // It never starts, stops, validates or computes.
+      expect(source, isNot(contains('.start(')));
+      expect(source, isNot(contains('.stop(')));
     });
 
-    test('only the live screen knows the coordinator', () {
-      const allowedSurface = [
-        'lib/application/consultation_session/'
-            'consultation_ai_session_orchestrator.dart',
-        // The session bundle and its single composition hold the
-        // coordinator; the screen reads it through the bundle.
+    test('ONLY the composition constructs a ConsultationSession', () {
+      const allowedConstruction = [
         'lib/application/consultation_session/consultation_session.dart',
         'lib/application/consultation_session/'
             'consultation_session_composition.dart',
-        'lib/screens/live_consultation_screen.dart',
       ];
 
       final offenders = <String>[];
       for (final entity in Directory('lib').listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         final normalized = entity.path.replaceAll('\\', '/');
-        if (entity
-                .readAsStringSync()
-                .contains('ConsultationAISessionOrchestrator') &&
-            !allowedSurface.contains(normalized)) {
+        if (entity.readAsStringSync().contains('ConsultationSession(') &&
+            !allowedConstruction.contains(normalized)) {
           offenders.add(normalized);
         }
       }
       expect(offenders, isEmpty);
     });
 
-    test('the live screen only calls start at join and stop at leave', () {
+    test('the live screen receives ONE ConsultationSession instead of a '
+        'multitude', () {
       final source = File(
         'lib/screens/live_consultation_screen.dart',
       ).readAsStringSync();
 
-      expect(source, contains('aiSessionOrchestrator.start()'));
-      expect(source, contains('aiSessionOrchestrator.stop()'));
-      // The screen never touches the coordinator's failure relay.
-      expect(source, isNot(contains('failures')));
+      expect(source, contains('final ConsultationSession? consultation;'));
+      // The former multitude of per-surface parameters is gone.
+      expect(source, isNot(contains('final TranslationStream?')));
+      expect(source, isNot(contains('final AssistantStream?')));
+      expect(source, isNot(contains('final ActionItemsStream?')));
+      expect(source, isNot(contains('final RecordingOrchestrator?')));
+      expect(
+        source,
+        isNot(contains('final ConsultationAISessionOrchestrator?')),
+      );
     });
   });
 }
 
-/// Builds the coordinator over the REAL application services, each on a
-/// fake provider that records into one shared ordered log.
-final class _Harness {
-  _Harness({this.transcriptError, this.translationError});
+VideoSessionInfo _liveSession() {
+  return const VideoSessionInfo(
+    sessionId: 'mentora_consultation_b1',
+    participantIdentity: 'b1_client_client_1',
+    role: VideoParticipantRole.client,
+    serverUrl: 'wss://development-only.invalid/mentora',
+    accessToken: 'token',
+  );
+}
 
-  final Object? transcriptError;
-  final Object? translationError;
-  final List<String> log = [];
-
-  ConsultationAISessionOrchestrator build({required bool withLanguages}) {
-    final session = _Session('client_1');
-    return ConsultationAISessionOrchestrator(
-      bookingId: 'b1',
-      audio: _AudioStream(),
-      sourceLanguage: withLanguages ? 'fr' : null,
-      targetLanguage: withLanguages ? 'en' : null,
-      transcripts: RealtimeTranscriptApplicationService(
-        session: session,
-        provider: _TranscriptProvider(log, error: transcriptError),
-      ),
-      translations: RealtimeTranslationApplicationService(
-        session: session,
-        provider: _TranslationProvider(log, error: translationError),
-      ),
-      assistant: ConsultationAssistantApplicationService(
-        session: session,
-        memory: _memoryService(session),
-        provider: _AssistantProvider(log),
-      ),
-      actionItems: ConsultationActionItemsApplicationService(
-        session: session,
-        memory: _memoryService(session),
-        provider: _ActionItemsProvider(log),
-      ),
-      summaries: ConsultationSummaryApplicationService(
-        session: session,
-        memory: _memoryService(session),
-        provider: _SummaryProvider(log),
-        repository: _SummaryRepository(),
-      ),
-    );
-  }
-
-  ConsultationMemoryApplicationService _memoryService(
-    AuthenticationSession session,
-  ) {
+ConsultationSessionComposition _composition({List<String>? log}) {
+  final session = _Session('client_1');
+  final events = log ?? <String>[];
+  ConsultationMemoryApplicationService memory() {
     return ConsultationMemoryApplicationService(
       session: session,
       repository: _MemoryRepository(),
     );
   }
+
+  return ConsultationSessionComposition(
+    transcripts: RealtimeTranscriptApplicationService(
+      session: session,
+      provider: _TranscriptProvider(events),
+    ),
+    translations: RealtimeTranslationApplicationService(
+      session: session,
+      provider: _TranslationProvider(events),
+    ),
+    assistant: ConsultationAssistantApplicationService(
+      session: session,
+      memory: memory(),
+      provider: _AssistantProvider(events),
+    ),
+    actionItems: ConsultationActionItemsApplicationService(
+      session: session,
+      memory: memory(),
+      provider: _ActionItemsProvider(events),
+    ),
+    recording: ConsultationRecordingApplicationService(
+      session: session,
+      provider: _RecordingProviderFake(events),
+    ),
+    summaries: ConsultationSummaryApplicationService(
+      session: session,
+      memory: memory(),
+      provider: _SummaryProvider(events),
+      repository: _SummaryRepository(),
+    ),
+  );
 }
 
 final class _AudioStream implements ConsultationAudioStream {
@@ -273,26 +228,22 @@ final class _AudioStream implements ConsultationAudioStream {
 }
 
 final class _TranscriptProvider implements TranscriptProvider {
-  _TranscriptProvider(this.log, {this.error});
+  _TranscriptProvider(this.log);
 
   final List<String> log;
-  final Object? error;
 
   @override
   Future<TranscriptStream> start({
     required String sessionId,
     required ConsultationAudioStream audio,
   }) async {
-    if (error case final cause?) throw cause;
     log.add('transcript.start');
-    return _TranscriptStream(log, sessionId);
+    return _TranscriptStream(sessionId);
   }
 }
 
 final class _TranscriptStream implements TranscriptStream {
-  _TranscriptStream(this.log, this.sessionId);
-
-  final List<String> log;
+  _TranscriptStream(this.sessionId);
 
   @override
   final String sessionId;
@@ -305,7 +256,6 @@ final class _TranscriptStream implements TranscriptStream {
 
   @override
   Future<TranscriptResult> stop() async {
-    log.add('transcript.stop');
     return TranscriptResult(
       sessionId: sessionId,
       status: TranscriptStatus.stopped,
@@ -314,10 +264,9 @@ final class _TranscriptStream implements TranscriptStream {
 }
 
 final class _TranslationProvider implements TranslationProvider {
-  _TranslationProvider(this.log, {this.error});
+  _TranslationProvider(this.log);
 
   final List<String> log;
-  final Object? error;
 
   @override
   Future<TranslationStream> start({
@@ -325,17 +274,12 @@ final class _TranslationProvider implements TranslationProvider {
     required String sourceLanguage,
     required String targetLanguage,
   }) async {
-    if (error case final cause?) throw cause;
     log.add('translation.start');
-    return _TranslationStream(log);
+    return _TranslationStream();
   }
 }
 
 final class _TranslationStream implements TranslationStream {
-  _TranslationStream(this.log);
-
-  final List<String> log;
-
   @override
   TranslationStatus get status => TranslationStatus.translating;
 
@@ -344,7 +288,6 @@ final class _TranslationStream implements TranslationStream {
 
   @override
   Future<TranslationResult> stop() async {
-    log.add('translation.stop');
     return const TranslationResult(status: TranslationStatus.stopped);
   }
 }
@@ -360,14 +303,13 @@ final class _AssistantProvider implements AssistantProvider {
     required ConsultationMemory memory,
   }) async {
     log.add('assistant.start');
-    return _AssistantStream(log, sessionId);
+    return _AssistantStream(sessionId);
   }
 }
 
 final class _AssistantStream implements AssistantStream {
-  _AssistantStream(this.log, this.sessionId);
+  _AssistantStream(this.sessionId);
 
-  final List<String> log;
   final String sessionId;
 
   @override
@@ -381,7 +323,6 @@ final class _AssistantStream implements AssistantStream {
 
   @override
   Future<AssistantResult> stop() async {
-    log.add('assistant.stop');
     return AssistantResult(
       sessionId: sessionId,
       status: AssistantStatus.stopped,
@@ -400,14 +341,13 @@ final class _ActionItemsProvider implements ActionItemsProvider {
     required ConsultationMemory memory,
   }) async {
     log.add('actionItems.start');
-    return _ActionItemsStream(log, sessionId);
+    return _ActionItemsStream(sessionId);
   }
 }
 
 final class _ActionItemsStream implements ActionItemsStream {
-  _ActionItemsStream(this.log, this.sessionId);
+  _ActionItemsStream(this.sessionId);
 
-  final List<String> log;
   final String sessionId;
 
   @override
@@ -421,11 +361,44 @@ final class _ActionItemsStream implements ActionItemsStream {
 
   @override
   Future<ActionItemsResult> stop() async {
-    log.add('actionItems.stop');
     return ActionItemsResult(
       sessionId: sessionId,
       status: ActionItemsStatus.stopped,
     );
+  }
+}
+
+final class _RecordingProviderFake implements RecordingProvider {
+  _RecordingProviderFake(this.log);
+
+  final List<String> log;
+
+  @override
+  Future<RecordingSession> start({required String bookingId}) async {
+    log.add('recording.start');
+    return _RecordingSessionFake(bookingId);
+  }
+}
+
+final class _RecordingSessionFake implements RecordingSession {
+  _RecordingSessionFake(this.bookingId);
+
+  final String bookingId;
+
+  @override
+  ConsultationRecording get recording => ConsultationRecording(
+    bookingId: bookingId,
+    recordingId: 'rec_$bookingId',
+    status: RecordingStatus.recording,
+    createdAt: null,
+  );
+
+  @override
+  Stream<ConsultationRecording> get updates => const Stream.empty();
+
+  @override
+  Future<RecordingResult> stop() async {
+    return RecordingResult(recording: recording);
   }
 }
 

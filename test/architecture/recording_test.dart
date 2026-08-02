@@ -234,6 +234,9 @@ void main() {
         'lib/application/recording/recording_orchestrator.dart',
         'lib/widgets/recording_indicator.dart',
         'lib/screens/live_consultation_screen.dart',
+        // The single consultation composition builds the coordinator.
+        'lib/application/consultation_session/'
+            'consultation_session_composition.dart',
       ];
 
       final offenders = <String>[];
