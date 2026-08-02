@@ -259,6 +259,8 @@ void main() {
         'lib/application/pre_consultation/'
             'consultation_readiness_registry.dart',
         'lib/application/pre_consultation/pre_consultation_coordinator.dart',
+        'lib/application/pre_consultation/network/'
+            'network_readiness_checker.dart',
       ];
 
       final offenders = <String>[];

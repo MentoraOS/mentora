@@ -1,5 +1,4 @@
 import 'consultation_readiness_engine.dart';
-import 'consultation_readiness_registry.dart';
 import 'pre_consultation_readiness.dart';
 
 /// Coordinates ONLY the preparation of one consultation — it prepares,
@@ -16,11 +15,7 @@ final class PreConsultationCoordinator {
     required String bookingId,
     ConsultationReadinessEngine? engine,
   }) : _bookingId = bookingId,
-       _engine =
-           engine ??
-           ConsultationReadinessEngine(
-             registry: ConsultationReadinessRegistry(),
-           );
+       _engine = engine ?? ConsultationReadinessEngine.standard();
 
   final String _bookingId;
   final ConsultationReadinessEngine _engine;
