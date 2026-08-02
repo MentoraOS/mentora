@@ -11,6 +11,8 @@ import 'permissions/permissions_readiness_checker.dart';
 import 'permissions/permissions_readiness_provider.dart';
 import 'pre_consultation_composition.dart';
 import 'pre_consultation_readiness.dart';
+import 'recording/recording_readiness_checker.dart';
+import 'recording/recording_readiness_provider.dart';
 
 /// The readiness engine — the brain of the preparation, and NOTHING but
 /// an orchestrator.
@@ -35,10 +37,11 @@ final class ConsultationReadinessEngine {
        _composition = composition;
 
   /// The standard engine: every existing foundation checker registered,
-  /// in order. Today: the network, permissions, camera, microphone and
-  /// AI readiness checkers over their simulated providers — which
-  /// answer fail closed until the real sources exist. The engine's own
-  /// logic never changes: it simply runs the registered checkers.
+  /// in order. Today: the network, permissions, camera, microphone, AI
+  /// and recording readiness checkers over their simulated providers —
+  /// which answer fail closed until the real sources exist. The
+  /// engine's own logic never changes: it simply runs the registered
+  /// checkers.
   factory ConsultationReadinessEngine.standard() {
     final registry = ConsultationReadinessRegistry()
       ..register(
@@ -63,6 +66,11 @@ final class ConsultationReadinessEngine {
       )
       ..register(
         const AIReadinessChecker(provider: SimulatedAIReadinessProvider()),
+      )
+      ..register(
+        const RecordingReadinessChecker(
+          provider: SimulatedRecordingReadinessProvider(),
+        ),
       );
     return ConsultationReadinessEngine(registry: registry);
   }
