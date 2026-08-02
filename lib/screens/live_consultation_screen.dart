@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
 import '../application/consultation_session/consultation_session.dart';
+import '../application/pre_consultation/pre_consultation_coordinator.dart';
 import '../widgets/consultation_experience.dart';
 import '../domain/video_session/live_consultation_room.dart';
 import '../domain/video_session/video_session_provider.dart';
@@ -29,6 +30,7 @@ class LiveConsultationScreen extends StatefulWidget {
     required this.session,
     this.consultation,
     this.experience,
+    this.preConsultation,
   });
 
   final VideoSessionInfo session;
@@ -46,6 +48,11 @@ class LiveConsultationScreen extends StatefulWidget {
   /// experience's components; their release belongs to the experience
   /// coordinator — never to the screen.
   final ConsultationExperience? experience;
+
+  /// The optional preparation coordinator: the screen ONLY calls
+  /// prepare() before entering and dispose() on the way out — nothing
+  /// else.
+  final PreConsultationCoordinator? preConsultation;
 
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
@@ -112,6 +119,9 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
       _recordingConsent = consent;
       consent.addListener(_pushConsents);
     }
+    // Preparation happens BEFORE entering the room; the screen only
+    // asks and never decides.
+    widget.preConsultation?.prepare();
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
 
@@ -193,6 +203,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   @override
   void dispose() {
     _subscription?.cancel();
+    widget.preConsultation?.dispose();
     _recordingConsent?.removeListener(_pushConsents);
     if (_ownsControllers) {
       _subtitles?.dispose();
