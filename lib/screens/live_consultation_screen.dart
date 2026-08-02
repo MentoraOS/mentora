@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
 import '../application/consultation_session/consultation_session.dart';
+import '../widgets/consultation_experience.dart';
 import '../domain/video_session/live_consultation_room.dart';
 import '../domain/video_session/video_session_provider.dart';
 import '../theme/mentora_theme.dart';
@@ -27,6 +28,7 @@ class LiveConsultationScreen extends StatefulWidget {
     super.key,
     required this.session,
     this.consultation,
+    this.experience,
   });
 
   final VideoSessionInfo session;
@@ -37,6 +39,13 @@ class LiveConsultationScreen extends StatefulWidget {
   /// start() at join and stop() at leave, and connects consent to the
   /// recording coordinator — zero business logic here.
   final ConsultationSession? consultation;
+
+  /// The ONE assembled experience, built exclusively by the experience
+  /// composition; null lets the screen assemble
+  /// its own surfaces from [consultation]. The screen only READS the
+  /// experience's components; their release belongs to the experience
+  /// coordinator — never to the screen.
+  final ConsultationExperience? experience;
 
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
@@ -53,9 +62,16 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
 
   bool _isExpert = false;
 
+  /// When the experience platform provides the controllers, it also
+  /// owns their release; the screen disposes only what it built itself.
+  bool _ownsControllers = true;
+
+  ConsultationSession? get _consultation =>
+      widget.experience?.consultationSession ?? widget.consultation;
+
   void _pushConsents() {
     final consent = _recordingConsent;
-    final orchestrator = widget.consultation?.recordingOrchestrator;
+    final orchestrator = _consultation?.recordingOrchestrator;
     if (consent == null || orchestrator == null) return;
     unawaited(
       orchestrator.onConsents(
@@ -77,7 +93,18 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
       isExpert = false;
     }
     _isExpert = isExpert;
-    if (widget.consultation != null) {
+    if (widget.experience case final experience?) {
+      // The experience platform prepared the components: the screen
+      // only reads them.
+      _ownsControllers = false;
+      _recordingConsent = experience.recordingConsentController
+        ..addListener(_pushConsents);
+      _subtitles = experience.subtitlesController;
+      if (_isExpert) {
+        _assistant = experience.assistantController;
+        _actionItems = experience.actionItemsController;
+      }
+    } else if (_consultation != null) {
       // Consent is offered from the very start; its decisions flow to
       // the recording coordinator, which waits for the double agreement
       // and lets the recording service enforce it.
@@ -89,8 +116,10 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   }
 
   /// Reads the live handles from the started AI session — a pure
-  /// projection binding, no business logic.
+  /// projection binding, no business logic. When the experience
+  /// platform provided the controllers, nothing is rebuilt here.
   void _bindAiSurfaces(ConsultationSession consultation) {
+    if (!_ownsControllers) return;
     final orchestrator = consultation.aiSessionOrchestrator;
     if (orchestrator.translation case final translation?) {
       _subtitles = SubtitleController(translation: translation);
@@ -116,7 +145,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
     // The AI session starts at join; once its handles exist the
     // overlays bind to them. Failures are relayed on the session's own
     // stream — the screen adds no logic.
-    if (widget.consultation case final consultation?) {
+    if (_consultation case final consultation?) {
       unawaited(
         consultation.aiSessionOrchestrator.start().then((_) {
           if (mounted) setState(() => _bindAiSurfaces(consultation));
@@ -149,7 +178,7 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
 
   Future<void> _leave() async {
     // The AI session stops at leave (summary last); leaving never waits.
-    unawaited(widget.consultation?.aiSessionOrchestrator.stop());
+    unawaited(_consultation?.aiSessionOrchestrator.stop());
     final room = _room;
     if (room != null) {
       try {
@@ -164,11 +193,13 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   @override
   void dispose() {
     _subscription?.cancel();
-    _subtitles?.dispose();
-    _assistant?.dispose();
-    _actionItems?.dispose();
     _recordingConsent?.removeListener(_pushConsents);
-    _recordingConsent?.dispose();
+    if (_ownsControllers) {
+      _subtitles?.dispose();
+      _assistant?.dispose();
+      _actionItems?.dispose();
+      _recordingConsent?.dispose();
+    }
     final room = _room;
     if (room != null) unawaited(room.dispose());
     super.dispose();
@@ -272,7 +303,14 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
                   ),
                 // The REC indicator: extremely discreet, top center,
                 // following only the relayed recording lifecycle.
-                if (widget.consultation?.recordingOrchestrator
+                if (widget.experience case final experience?)
+                  Positioned(
+                    top: 8,
+                    left: 0,
+                    right: 0,
+                    child: Center(child: experience.recordingIndicator),
+                  )
+                else if (_consultation?.recordingOrchestrator
                     case final orchestrator?)
                   Positioned(
                     top: 8,

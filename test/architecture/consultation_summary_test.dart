@@ -319,6 +319,8 @@ void main() {
         'lib/application/consultation_session/consultation_session.dart',
         'lib/application/consultation_session/'
             'consultation_session_composition.dart',
+        // The experience bundle carries the summary reference.
+        'lib/widgets/consultation_experience.dart',
       ];
 
       final offenders = <String>[];

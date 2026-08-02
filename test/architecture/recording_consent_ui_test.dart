@@ -188,8 +188,8 @@ void main() {
       ).readAsStringSync();
 
       // Consent is offered when (and only when) a composed consultation
-      // exists; plain video calls show nothing.
-      expect(source, contains('widget.consultation != null'));
+      // or experience exists; plain video calls show nothing.
+      expect(source, contains('_consultation != null'));
       expect(source, contains('RecordingConsentOverlay'));
     });
   });
