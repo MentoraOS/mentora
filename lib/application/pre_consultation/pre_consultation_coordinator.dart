@@ -1,44 +1,47 @@
-import 'pre_consultation_composition.dart';
+import 'consultation_readiness_engine.dart';
+import 'consultation_readiness_registry.dart';
 import 'pre_consultation_readiness.dart';
 
 /// Coordinates ONLY the preparation of one consultation — it prepares,
 /// it never decides.
 ///
-/// Exactly two responsibilities: [prepare] assembles the current
-/// readiness through the single composition, [dispose] releases it.
-/// Today no verification exists yet, so every flag composes fail closed
-/// to FALSE; the future preparation components (network, camera,
-/// microphone, permissions, AI, consents, checklist, onboarding) report
-/// their facts here through their own waves — this coordinator only
-/// coordinates them, with zero business, AI, network or video logic.
+/// Exactly two responsibilities: [prepare] delegates ENTIRELY to the
+/// readiness engine (which runs the registered checkers, aggregates
+/// their verdicts and builds a fresh readiness — all facts FALSE while
+/// no checker exists, fail closed), [dispose] releases. A released
+/// coordinator prepares nothing — fail closed. Zero business, AI,
+/// network or video logic lives here.
 final class PreConsultationCoordinator {
   PreConsultationCoordinator({
     required String bookingId,
-    PreConsultationComposition composition =
-        const PreConsultationComposition(),
+    ConsultationReadinessEngine? engine,
   }) : _bookingId = bookingId,
-       _composition = composition;
+       _engine =
+           engine ??
+           ConsultationReadinessEngine(
+             registry: ConsultationReadinessRegistry(),
+           );
 
   final String _bookingId;
-  final PreConsultationComposition _composition;
+  final ConsultationReadinessEngine _engine;
 
   PreConsultationReadiness? _readiness;
   bool _disposed = false;
 
-  /// The assembled preparation state; null before [prepare] or after
-  /// [dispose].
+  /// The last assembled preparation state; null before [prepare] or
+  /// after [dispose].
   PreConsultationReadiness? get readiness => _readiness;
 
-  /// Assembles the preparation state. A released coordinator prepares
-  /// nothing — fail closed.
-  PreConsultationReadiness prepare() {
+  /// Delegates the preparation to the engine — nothing else. Every call
+  /// is a fresh engine run and a fresh readiness instance. A released
+  /// coordinator prepares nothing — fail closed.
+  Future<PreConsultationReadiness> prepare() async {
     if (_disposed) {
       throw StateError('This preparation coordinator was released.');
     }
-    return _readiness ??= _composition.compose(
-      bookingId: _bookingId,
-      createdAt: DateTime.now(),
-    );
+    final readiness = await _engine.prepare(bookingId: _bookingId);
+    _readiness = readiness;
+    return readiness;
   }
 
   /// Releases the preparation cleanly.

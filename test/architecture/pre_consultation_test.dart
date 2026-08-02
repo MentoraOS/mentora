@@ -104,11 +104,12 @@ void main() {
   });
 
   group('PreConsultationCoordinator — prepare and dispose only', () {
-    test('prepare assembles once, fail closed to all-false readiness', () {
+    test('prepare delegates to the engine, fail closed to all-false '
+        'readiness', () async {
       final coordinator = PreConsultationCoordinator(bookingId: 'b1');
 
       expect(coordinator.readiness, isNull);
-      final readiness = coordinator.prepare();
+      final readiness = await coordinator.prepare();
 
       expect(readiness.bookingId, 'b1');
       expect(readiness.networkReady, isFalse);
@@ -117,19 +118,17 @@ void main() {
       expect(readiness.permissionsReady, isFalse);
       expect(readiness.aiReady, isFalse);
       expect(readiness.recordingReady, isFalse);
-      // Idempotent preparation: the same assembled state.
-      expect(coordinator.prepare(), same(readiness));
       expect(coordinator.readiness, same(readiness));
     });
 
-    test('a released coordinator prepares nothing — fail closed', () {
+    test('a released coordinator prepares nothing — fail closed', () async {
       final coordinator = PreConsultationCoordinator(bookingId: 'b1');
-      coordinator.prepare();
+      await coordinator.prepare();
 
       coordinator.dispose();
 
       expect(coordinator.readiness, isNull);
-      expect(() => coordinator.prepare(), throwsStateError);
+      await expectLater(coordinator.prepare(), throwsStateError);
     });
 
     test('the coordinator exposes exactly prepare and dispose', () {
@@ -151,6 +150,8 @@ void main() {
         'lib/application/pre_consultation/pre_consultation_readiness.dart',
         'lib/application/pre_consultation/pre_consultation_composition.dart',
         'lib/application/pre_consultation/pre_consultation_coordinator.dart',
+        // The readiness engine assembles through the composition.
+        'lib/application/pre_consultation/consultation_readiness_engine.dart',
         'lib/screens/live_consultation_screen.dart',
       ];
 
