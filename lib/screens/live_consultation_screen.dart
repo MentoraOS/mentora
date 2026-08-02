@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../application/authentication/authentication_session.dart';
+import '../application/consultation_session/consultation_ai_session_orchestrator.dart';
 import '../application/recording/recording_orchestrator.dart';
 import '../domain/action_items/action_items_provider.dart';
 import '../domain/assistant/assistant_provider.dart';
@@ -34,6 +35,7 @@ class LiveConsultationScreen extends StatefulWidget {
     this.actionItems,
     this.recordingConsent = false,
     this.recordingOrchestrator,
+    this.aiSession,
   });
 
   final VideoSessionInfo session;
@@ -63,6 +65,11 @@ class LiveConsultationScreen extends StatefulWidget {
   /// The screen only CONNECTS the consent controller to it — every
   /// business rule stays in the recording service behind it.
   final RecordingOrchestrator? recordingOrchestrator;
+
+  /// The per-consultation AI session coordinator; null orchestrates
+  /// nothing. The screen ONLY calls start() at join and stop() at
+  /// leave — zero logic here.
+  final ConsultationAISessionOrchestrator? aiSession;
 
   @override
   State<LiveConsultationScreen> createState() => _LiveConsultationScreenState();
@@ -131,6 +138,9 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
       if (mounted) setState(() {});
     });
     setState(() => _room = room);
+    // The AI session starts at join; its failures are relayed on its
+    // own stream — the screen adds no logic.
+    unawaited(widget.aiSession?.start());
     await _connect(room);
   }
 
@@ -156,6 +166,8 @@ class _LiveConsultationScreenState extends State<LiveConsultationScreen> {
   }
 
   Future<void> _leave() async {
+    // The AI session stops at leave (summary last); leaving never waits.
+    unawaited(widget.aiSession?.stop());
     final room = _room;
     if (room != null) {
       try {

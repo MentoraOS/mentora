@@ -312,6 +312,9 @@ void main() {
         // The single authorized UI consumer (via the application door).
         'lib/widgets/consultation_summary_card.dart',
         'lib/main.dart',
+        // The session coordinator triggers the final summary.
+        'lib/application/consultation_session/'
+            'consultation_ai_session_orchestrator.dart',
       ];
 
       final offenders = <String>[];

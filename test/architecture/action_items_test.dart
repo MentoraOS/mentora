@@ -294,6 +294,9 @@ void main() {
         // The review UI consumes the stream contract only.
         'lib/widgets/action_items_controller.dart',
         'lib/screens/live_consultation_screen.dart',
+        // The session coordinator holds the live handle.
+        'lib/application/consultation_session/'
+            'consultation_ai_session_orchestrator.dart',
       ];
 
       final offenders = <String>[];
