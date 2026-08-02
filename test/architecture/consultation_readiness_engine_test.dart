@@ -263,6 +263,8 @@ void main() {
             'network_readiness_checker.dart',
         'lib/application/pre_consultation/permissions/'
             'permissions_readiness_checker.dart',
+        'lib/application/pre_consultation/camera/'
+            'camera_readiness_checker.dart',
       ];
 
       final offenders = <String>[];
