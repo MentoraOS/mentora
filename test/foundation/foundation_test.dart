@@ -86,9 +86,9 @@ void main() {
 
     test('duplicate registration is refused', () {
       final services = FoundationServices();
-      services.register<ThemeEngine>(() => const ThemeEngine());
+      services.register<MotionEngine>(() => const MotionEngine());
       expect(
-        () => services.register<ThemeEngine>(() => const ThemeEngine()),
+        () => services.register<MotionEngine>(() => const MotionEngine()),
         throwsStateError,
       );
     });
@@ -236,7 +236,14 @@ void main() {
   });
 
   group('ThemeEngine — themes are value sets under stable names', () {
-    const engine = ThemeEngine();
+    late ThemeEngine engine;
+
+    setUpAll(() async {
+      final services = await AppBootstrap(
+        logger: _MemoryLogger(),
+      ).initialize();
+      engine = services.get<ThemeEngine>();
+    });
 
     test('mode resolution maps the preference exactly', () {
       expect(
