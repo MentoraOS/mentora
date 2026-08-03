@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/material.dart' show ThemeMode, Brightness;
+import 'package:flutter/material.dart'
+    show ThemeMode, Brightness, AppLifecycleState;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mentora/foundation/bootstrap/app_bootstrap.dart';
 import 'package:mentora/foundation/bootstrap/startup_pipeline.dart';
+import 'package:mentora/foundation/core/lifecycle/application_lifecycle.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/core/environment/environment_configuration.dart';
 import 'package:mentora/foundation/core/logging/foundation_logger.dart';
@@ -29,6 +31,17 @@ final class _MemoryLogger implements FoundationLogger {
     StackTrace? stackTrace,
   }) {
     lines.add('${level.name}:$message');
+  }
+}
+
+final class _PhaseRecorder implements ApplicationLifecycleListener {
+  final List<MentoraLifecyclePhase> phases;
+
+  _PhaseRecorder(this.phases);
+
+  @override
+  void onLifecycleChanged(MentoraLifecyclePhase phase) {
+    phases.add(phase);
   }
 }
 
@@ -141,6 +154,51 @@ void main() {
       expect(services.contains<InternationalEngine>(), isTrue);
       expect(services.contains<LocalizationEngine>(), isTrue);
       expect(services.contains<EnvironmentConfiguration>(), isTrue);
+    });
+
+    test('the pipeline runs the official stages in order, validation '
+        'last', () async {
+      final logger = _MemoryLogger();
+      await AppBootstrap(logger: logger).initialize();
+
+      final completed = logger.lines
+          .where((line) => line.contains('Startup step completed'))
+          .toList();
+      expect(completed, [
+        'info:Startup step completed: initialisation',
+        'info:Startup step completed: services',
+        'info:Startup step completed: validation',
+      ]);
+    });
+
+    test('validation is fail closed: an incomplete container never '
+        'starts', () async {
+      final services = FoundationServices();
+      // No registration at all: the validation stage must refuse.
+      await expectLater(
+        const ValidationBootstrapStep().run(services),
+        throwsStateError,
+      );
+    });
+  });
+
+  group('ApplicationLifecycle — the official phases', () {
+    test('framework states map onto the five official phases', () {
+      final lifecycle = ApplicationLifecycle();
+      final phases = <MentoraLifecyclePhase>[];
+      lifecycle.addListener(_PhaseRecorder(phases));
+
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.paused);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.detached);
+
+      expect(phases, [
+        MentoraLifecyclePhase.foreground,
+        MentoraLifecyclePhase.background,
+        MentoraLifecyclePhase.resume,
+        MentoraLifecyclePhase.terminate,
+      ]);
     });
   });
 

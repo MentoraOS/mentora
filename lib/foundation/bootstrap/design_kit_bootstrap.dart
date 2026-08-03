@@ -9,12 +9,13 @@ import '../localization/localization_engine.dart';
 import 'startup_pipeline.dart';
 
 /// Registers every Design Kit engine into the official container —
-/// the single assembly point of the Kit (its composition root).
+/// the single assembly point of the Kit (official stage: Chargement
+/// des services).
 final class DesignKitBootstrapStep implements StartupStep {
   const DesignKitBootstrapStep();
 
   @override
-  String get name => 'design-kit';
+  String get name => 'services';
 
   @override
   Future<void> run(FoundationServices services) async {
@@ -26,4 +27,17 @@ final class DesignKitBootstrapStep implements StartupStep {
     services.register<InternationalEngine>(() => const InternationalEngine());
     services.register<LocalizationEngine>(() => const LocalizationEngine());
   }
+}
+
+/// Resolves every Design Kit engine — used by the Validation stage to
+/// prove the container serves its contract before anything starts.
+void validateDesignKit(FoundationServices services) {
+  services
+    ..get<AppearanceEngine>()
+    ..get<ThemeEngine>()
+    ..get<MotionEngine>()
+    ..get<AccessibilityEngine>()
+    ..get<ResponsiveEngine>()
+    ..get<InternationalEngine>()
+    ..get<LocalizationEngine>();
 }
