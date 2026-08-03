@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/tokens/design_tokens.dart';
 import '../localization/mentora_strings.dart';
@@ -13,8 +14,13 @@ import '../localization/mentora_strings.dart';
 /// carries the official root movement.
 final class NavigationShell extends StatefulWidget {
   final AppearanceEngine appearance;
+  final AccessibilityEngine accessibility;
 
-  const NavigationShell({super.key, required this.appearance});
+  const NavigationShell({
+    super.key,
+    required this.appearance,
+    required this.accessibility,
+  });
 
   @override
   State<NavigationShell> createState() => _NavigationShellState();
@@ -54,38 +60,48 @@ final class _NavigationShellState extends State<NavigationShell> {
           spacing: _spacing,
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home),
-            label: strings.tabHome,
+      // Fixed-height chrome renders under the bounded chrome scale:
+      // labels stay readable, the layout never overflows, and the
+      // information stays complete through the icons (AFI-04).
+      bottomNavigationBar: MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.linear(
+            widget.accessibility.chromeTextScaleFor(widget.appearance.state),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.event_note_outlined),
-            selectedIcon: const Icon(Icons.event_note),
-            label: strings.tabConsultation,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.insights_outlined),
-            selectedIcon: const Icon(Icons.insights),
-            label: strings.tabBusiness,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.notifications_outlined),
-            selectedIcon: const Icon(Icons.notifications),
-            label: strings.tabNotifications,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
-            label: strings.tabAccount,
-          ),
-        ],
+        ),
+        child: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) {
+            setState(() => _selectedIndex = index);
+          },
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: strings.tabHome,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.event_note_outlined),
+              selectedIcon: const Icon(Icons.event_note),
+              label: strings.tabConsultation,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.insights_outlined),
+              selectedIcon: const Icon(Icons.insights),
+              label: strings.tabBusiness,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.notifications_outlined),
+              selectedIcon: const Icon(Icons.notifications),
+              label: strings.tabNotifications,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: strings.tabAccount,
+            ),
+          ],
+        ),
       ),
     );
   }

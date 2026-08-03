@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
@@ -34,7 +35,12 @@ final class MentoraFoundationApp extends StatelessWidget {
           theme: themeEngine.lightTheme(state),
           darkTheme: themeEngine.darkTheme(state),
           supportedLocales: LocalizationEngine.supportedLocales,
-          localizationsDelegates: const [MentoraStringsDelegate()],
+          localizationsDelegates: const [
+            MentoraStringsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           localeResolutionCallback: (systemLocale, supported) {
             return localization.resolve(systemLocale: systemLocale);
           },
@@ -49,7 +55,10 @@ final class MentoraFoundationApp extends StatelessWidget {
               child: child ?? const SizedBox.shrink(),
             );
           },
-          home: NavigationShell(appearance: appearance),
+          home: NavigationShell(
+            appearance: appearance,
+            accessibility: accessibility,
+          ),
         );
       },
     );

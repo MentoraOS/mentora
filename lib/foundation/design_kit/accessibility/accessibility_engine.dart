@@ -24,6 +24,16 @@ final class AccessibilityEngine {
     return factor.clamp(minimumFontScale, maximumFontScale);
   }
 
+  /// The text scale for fixed-height chrome (the root navigation):
+  /// the content scale, bounded by the chrome token — chrome labels
+  /// are redundant with their icons (AFI-04), so bounding them never
+  /// removes information, while unbounded scale would break the
+  /// fixed-height layout for everyone.
+  double chromeTextScaleFor(AppearanceState state) {
+    final contentScale = textScaleFor(state);
+    return contentScale.clamp(minimumFontScale, maximumChromeFontScale);
+  }
+
   /// The minimal reachable target — every interactive surface must
   /// honor it (Interaction Space).
   double get minimumTapTarget => interactionTokens.cibleAtteignable;
