@@ -34,9 +34,9 @@ Une valeur pourra évoluer. Le Token restera.
 
 ---
 
-## 3. Les dix piliers
+## 3. Les onze piliers
 
-Dix piliers. Tout Token appartient à exactement un pilier.
+Onze piliers. Tout Token appartient à exactement un pilier. *(Le onzième — Appearance Tokens — a été ajouté par révision explicite post-audit P11.8A, avant l'ouverture de P11.9.)*
 
 ### 3.1 Identity Tokens
 
@@ -137,6 +137,16 @@ Dix piliers. Tout Token appartient à exactement un pilier.
 | **Frontières** | Ce pilier n'a aucun Token en propre : il est la porte d'entrée réglementée des autres. |
 | **Ce qu'il produit** | le protocole d'extension de la nomenclature. |
 | **Ce qu'il ne possède jamais** | un Token en réserve ; une signification spéculative ; un raccourci (une valeur d'abord, un sens ensuite — jamais). |
+
+### 3.11 Appearance Tokens
+
+| | |
+|---|---|
+| **Mission** | Nommer les préférences d'apparence de l'expert — le pont entre l'Experience Personalization (Global Experience Foundation §3.13, §5) et sa matérialisation. |
+| **Responsabilités** | Produire les Tokens des sept préférences officielles : **Theme** (Light/Dark/System — des jeux de valeurs sous les mêmes noms sémantiques, DTV-03), **Accent** (Mentora Emerald officiel ; les accents futurs = des jeux de valeurs des rôles identitaires, jamais un Design System modifié), **Density** (Compact/Standard/Comfortable — déclinaisons des lois du Spacing), **Contrast** (Standard/High — variantes CSA-04), **Motion** (Full/Reduced/None — l'expression s'atténue, l'intention demeure), **Font Scale** (Small→Extra Large — TSA-06 opposable), **Reading Comfort** (extensions futures sans modification d'architecture). **Purement sémantiques — aucune valeur technique ici** ; la nomenclature effective relève du registre (C-01 de l'audit). |
+| **Frontières** | Les règles appartiennent à la Global Experience Foundation (GEA-01→03, GE-16→19) ; le stockage à l'Account Platform ; **une préférence est toujours un jeu de valeurs sous des noms stables — jamais une signification nouvelle** (GE-18, GEA-01). |
+| **Ce qu'il produit** | la nomenclature préférence → jeux de valeurs. |
+| **Ce qu'il ne possède jamais** | une préférence nouvelle (révision GE d'abord) ; une vérité métier (GE-19) ; une logique de bascule. |
 
 ---
 
@@ -292,7 +302,7 @@ Les Tokens survivent au monde entier **sans jamais changer de nom** :
 | DTX-01 | **Flutter, Web, Desktop, Android, iOS, Wearables, Voice, Mixed Reality utiliseront exactement les mêmes Tokens. Seule leur matérialisation changera.** |
 | DTX-02 | Une nouvelle technologie est une Implementation de plus (§6) — la nomenclature l'ignore (DTN-06). |
 | DTX-03 | Une nouvelle modalité (Voice : les significations s'énoncent ; Mixed Reality : elles s'espacent) consomme les mêmes Tokens sémantiques — la signification survit à la forme (les niveaux Narrative et Semantic amont le garantissent). |
-| DTX-04 | Les dix piliers (§3), les six niveaux (§6) et la convention de nommage (§7) sont l'invariant décennal ; aucune extension ne peut affaiblir la confiance (§8) ni l'International By Design (§10). |
+| DTX-04 | Les onze piliers (§3), les six niveaux (§6) et la convention de nommage (§7) sont l'invariant décennal *(révisé post-audit P11.8A : +Appearance Tokens)* ; aucune extension ne peut affaiblir la confiance (§8) ni l'International By Design (§10). |
 
 ---
 
@@ -307,6 +317,7 @@ Les Tokens survivent au monde entier **sans jamais changer de nom** :
 | DTD-03 | **Il ne renommera aucun Token.** |
 | DTD-04 | **Il matérialisera uniquement le contrat** : chaque Token de la nomenclature, fidèlement, dans sa technologie — un écart est un défaut de l'implémentation, jamais du contrat (CLC-03 généralisé). |
 | DTD-05 | Toute implémentation future (Web, Desktop, autres) entre sous les mêmes règles DTD-01 → DTD-04. |
+| DTD-06 | *(révision post-audit P11.8A)* **Toute préférence utilisateur sera implémentée exclusivement à travers les Appearance Tokens (§3.11). Aucune logique d'implémentation ne contournera le Design System.** |
 
 ---
 

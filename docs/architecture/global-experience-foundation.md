@@ -53,9 +53,9 @@ Un expert au Mali, au Sénégal, au Nigeria, au Maroc, en France, au Royaume-Uni
 
 ---
 
-## 3. Les douze piliers
+## 3. Les treize piliers
 
-Douze piliers. Toute règle d'internationalisation appartient à exactement un pilier.
+Treize piliers. Toute règle d'internationalisation appartient à exactement un pilier. *(Le treizième — Experience Personalization — a été ajouté par révision explicite post-audit P11.8A, avant l'ouverture de P11.9.)*
 
 ### 3.1 International by Design
 
@@ -63,7 +63,7 @@ Douze piliers. Toute règle d'internationalisation appartient à exactement un p
 |---|---|
 | **Mission** | Faire que l'international soit la conception — jamais l'adaptation. |
 | **Responsabilités** | Tenir l'invariant fondateur : Mentora n'est jamais conçu pour un pays ; **un pays est une configuration, jamais une architecture** ; toute conception se vérifie contre plusieurs pays dès sa naissance. |
-| **Frontières** | Ce pilier est le juge de paix des onze autres — il n'a pas de territoire propre : il a droit de regard sur tout (le pendant international de l'Inclusion). |
+| **Frontières** | Ce pilier est le juge de paix des douze autres — il n'a pas de territoire propre : il a droit de regard sur tout (le pendant international de l'Inclusion). |
 | **Ce qu'il garantit** | aucune refonte ne sera jamais nécessaire pour « passer international » : Mentora l'est de naissance. |
 | **Ce qu'il ne possède jamais** | un pays de référence ; un cas « domestique ». |
 
@@ -177,6 +177,20 @@ Douze piliers. Toute règle d'internationalisation appartient à exactement un p
 | **Ce qu'il garantit** | le centième pays coûte ce qu'a coûté le deuxième : une configuration. |
 | **Ce qu'il ne possède jamais** | un pays « spécial » ; une dérogation architecturale. |
 
+### 3.13 Experience Personalization
+
+| | |
+|---|---|
+| **Mission** | Définir toutes les préférences personnelles qui modifient **uniquement la présentation** de l'expérience — sans jamais modifier la logique métier. |
+| **Responsabilités** | Posséder le registre des préférences personnelles : les six langues (application, professionnelle, consultations, résumés IA, recommandations IA, notifications — §3.2), les quatre devises (Business, affichage, règlement, locale — §3.3), le fuseau horaire, le calendrier, les formats numériques, le format des dates, le format des heures, le premier jour de semaine, **l'apparence et les préférences visuelles** (sous-domaine Appearance, §5). |
+| **Frontières** | Ce pilier définit les règles ; l'Account Platform stocke les préférences (aucune modification de frontière) ; le Design System les matérialise (Appearance Tokens). Il ne possède jamais : les plateformes métier, les paiements, les consultations, la réputation, les recommandations IA. |
+| **Ce qu'il garantit** | chaque expert vit Mentora dans sa langue, sa devise, son heure, son apparence — et retrouve exactement la même logique métier que tous les autres. |
+| **Ce qu'il ne possède jamais** | une vérité métier (GE-19) ; une préférence qui en modifie implicitement une autre (GE-16). |
+
+**Principe officiel** :
+
+> **« L'expérience appartient à l'expert. Le métier appartient à Mentora. »**
+
 ---
 
 ## 4. Les règles
@@ -198,12 +212,38 @@ Douze piliers. Toute règle d'internationalisation appartient à exactement un p
 | GE-13 | Les six notions de langue (§3.2) et les quatre notions de monnaie (§3.3) sont indépendantes — toute fusion est une violation. |
 | GE-14 | Jamais d'heure locale stockée ; l'heure locale est un affichage (§3.5). |
 | GE-15 | Un manque international découvert dans un document aval remonte en révision — jamais comblé par un cas particulier (DSM-03 étendu). |
+| GE-16 | **Toutes les préférences personnelles sont indépendantes les unes des autres. Aucune préférence n'en modifie implicitement une autre.** |
+| GE-17 | **Changer la langue ne change jamais : la devise, le calendrier, le fuseau, l'apparence.** |
+| GE-18 | **Changer le thème ne change jamais : les couleurs sémantiques, les niveaux de protection, les responsabilités, les plateformes.** |
+| GE-19 | **La personnalisation ne possède jamais une vérité métier. Elle ne modifie que la représentation.** |
 
-Ces règles sont **perpétuelles** ; la liste s'enrichit par révision de ce document.
+Ces règles sont **perpétuelles** ; la liste s'enrichit par révision de ce document *(GE-16 → GE-19 ajoutées par la révision post-audit P11.8A)*.
 
 ---
 
-## 5. Mobile First
+## 5. Le sous-domaine Appearance
+
+Sous-domaine officiel du pilier Experience Personalization. **Propriété : l'Account Platform le stocke (aucune modification de frontière — il vit sous Professional Preferences) ; cette fondation en définit les règles ; le Design System le matérialise (Appearance Tokens, P11.8 §3.11).**
+
+| Préférence | Valeurs officielles | Règle |
+|---|---|---|
+| **Theme Mode** | Light, Dark, System | des jeux de valeurs de Tokens — jamais un changement de signification (GE-18, CSX du Color System) |
+| **Accent Color** | **Mentora Emerald — la couleur officielle de Mentora** ; plusieurs accents futurs prévus | un accent est un jeu de valeurs des rôles identitaires — le Design System ne se modifie pas pour un accent nouveau |
+| **Density** | Compact, Standard, Comfortable | des déclinaisons des lois du Spacing — la densité maximale d'attention (≤ 6) et les espaces d'accessibilité restent opposables |
+| **Font Scale** | Small, Standard, Large, Extra Large | l'adaptabilité sans casse de hiérarchie (TSA-06) — opposable |
+| **Motion Preference** | Full, Reduced, None | les intentions du mouvement demeurent ; seule leur expression s'atténue — l'information portée par le mouvement reste disponible autrement (AFI-04) |
+| **Contrast** | Standard, High Contrast | des variantes de valeurs sous CSA-04 — jamais un mode à part (AFV-01) |
+| **Reading Comfort** | extension future : Focus Reading, Dyslexia Friendly, Low Vision | prévu **sans modification d'architecture** : des jeux de valeurs supplémentaires sous les mêmes rôles |
+
+| Règle | Énoncé |
+|---|---|
+| GEA-01 | Toute préférence d'apparence est un **jeu de valeurs de Tokens** — jamais une signification nouvelle, jamais une logique. |
+| GEA-02 | Les préférences d'apparence respectent GE-16 (indépendantes) et GE-18 (le thème ne change jamais le sens). |
+| GEA-03 | Une nouvelle préférence d'apparence s'ajoute par révision de cette fondation, puis reçoit ses Tokens — jamais l'inverse (l'ordre Future Tokens). |
+
+---
+
+## 6. Mobile First
 
 | Règle | Énoncé |
 |---|---|
@@ -213,7 +253,7 @@ Ces règles sont **perpétuelles** ; la liste s'enrichit par révision de ce doc
 
 ---
 
-## 6. Gouvernance
+## 7. Gouvernance
 
 | Règle | Énoncé |
 |---|---|
@@ -224,7 +264,7 @@ Ces règles sont **perpétuelles** ; la liste s'enrichit par révision de ce doc
 
 ---
 
-## 7. Extensibilité — pensé pour dix ans
+## 8. Extensibilité — pensé pour dix ans
 
 | Extension | Comment elle s'insère |
 |---|---|
@@ -237,13 +277,13 @@ Ces règles sont **perpétuelles** ; la liste s'enrichit par révision de ce doc
 
 | Règle | Énoncé |
 |---|---|
-| GEX-01 | Les douze piliers (§3) et les règles GE (§4) sont l'invariant décennal. |
+| GEX-01 | Les treize piliers (§3) et les règles GE (§4) sont l'invariant décennal *(révisé post-audit P11.8A : +Experience Personalization, +GE-16→19)*. |
 | GEX-02 | **Aucune extension géographique, monétaire, linguistique ou réglementaire ne modifie l'architecture.** |
 | GEX-03 | Aucune extension ne peut affaiblir la neutralité culturelle (§3.8) ni les données canoniques (§3.10). |
 
 ---
 
-## 8. Gouvernance du document
+## 9. Gouvernance du document
 
 - Ce document est la **fondation transversale opposable** de l'internationalisation de Mentora — au même niveau d'exigence que P9, P10 et P11.
 - Toute vague d'implémentation cite le pilier et les règles (GEV/GE/GEMF/GEG/GEX) qu'elle réalise ou respecte.

@@ -54,7 +54,7 @@ Onze domaines fonctionnels. Chaque information d'environnement appartient à exa
 | | |
 |---|---|
 | **Mission** | Adapter Mentora à la façon de travailler de l'expert. |
-| **Responsabilités** | Représenter les préférences professionnelles : langue de travail, langues de traduction par défaut, préférences d'assistance IA (activée, discrète, silencieuse), formats. |
+| **Responsabilités** | Représenter les préférences professionnelles : langue de travail, langues de traduction par défaut, préférences d'assistance IA (activée, discrète, silencieuse), formats. Le domaine porte également le **sous-domaine Appearance** *(révision post-audit P11.8A — aucune modification de frontière : les 11 domaines demeurent)* : thème, couleur d'accent, densité, taille du texte, animations, contraste, confort de lecture — **les règles sont définies par la Global Experience Foundation (pilier Experience Personalization, §5) ; l'Account Platform stocke ; le Design System matérialise (Appearance Tokens).** |
 | **Frontières** | Une préférence configure l'expérience ; elle ne modifie jamais une donnée métier (PE-08). Les préférences d'assistance ne pilotent pas l'IA : elles disent quand elle peut parler — l'AI Platform reste propriétaire de ses capacités. |
 | **Propriétaire** | Account Platform. |
 | **Informations publiées** | Préférences incomplètes. |
@@ -336,7 +336,29 @@ Ces principes sont **perpétuels** : aucune extension (§11) ne peut les affaibl
 
 ---
 
-## 12. Gouvernance du document
+## 12. L'organisation officielle des Paramètres
+
+*(Section ajoutée par révision explicite post-audit P11.8A. C'est une organisation de présentation — elle ne crée ni domaine ni frontière : chaque entrée reste possédée par son domaine du §3 et gouvernée par ses fondations.)*
+
+**Compte** → Profil · Sécurité · Confidentialité · Langue & Région · Disponibilités · Notifications · IA Mentora · Apparence · Abonnement · Support
+
+**Apparence** (sous-domaine Appearance — règles : Global Experience Foundation §5) :
+→ Thème · Couleur d'accent · Densité · Taille du texte · Animations · Contraste · Confort de lecture
+
+**Langue & Région** (notions : Global Experience Foundation §3.2–§3.7) :
+→ Langue de l'application · Langue professionnelle · Langue des consultations · Langue des résumés IA · Langue des recommandations IA · Langue des notifications
+→ Pays / Région · Devise Business · Devise d'affichage · Devise de règlement · Devise locale
+→ Fuseau horaire · Calendrier · Format des dates · Format des heures · Format des nombres
+
+| Règle | Énoncé |
+|---|---|
+| ACO-01 | Cette organisation est une présentation : les propriétés restent aux domaines (§3) et les règles aux fondations citées. |
+| ACO-02 | Toutes les préférences sont indépendantes (GE-16) ; aucune n'en modifie implicitement une autre (GE-17, GE-18). |
+| ACO-03 | Toute nouvelle entrée de Paramètres se rattache à un domaine existant et à sa fondation de règles — sinon, révision documentaire. |
+
+---
+
+## 13. Gouvernance du document
 
 - Ce document est la **référence officielle** de la Account Platform. Aucun développement la concernant en dehors.
 - Toute vague d'implémentation cite le domaine, le moment et les règles (ACV/ACP/ACN/ACS/ACM/ACPU/ACMF/PE/ACG/ACEX) qu'elle réalise.
