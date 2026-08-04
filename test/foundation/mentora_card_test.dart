@@ -16,6 +16,7 @@ import 'package:mentora/foundation/design_kit/registry/semantic_roles.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
+import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.dart';
 import 'package:mentora/foundation/design_kit/tokens/card_tokens.dart';
 
 Future<FoundationServices> _services() async {
@@ -39,6 +40,7 @@ Future<FoundationServices> _pump(
         typography: services.get<TypographyTokenEngine>(),
         spacing: services.get<SpacingTokenEngine>(),
         surfaces: services.get<SurfaceTokenEngine>(),
+        elevation: services.get<ElevationTokenEngine<ElevationExpression>>(),
         motion: services.get<MotionEngine>(),
         accessibility: services.get<AccessibilityEngine>(),
         appearance: appearance,
@@ -126,11 +128,7 @@ void main() {
       expect(decoration.boxShadow, isNotNull);
       expect(decoration.boxShadow!.single.blurRadius, cardShadow.blurRadius);
     });
-    await check(MentoraCardVariant.interactive, (
-      colors,
-      surfaces,
-      decoration,
-    ) {
+    await check(MentoraCardVariant.interactive, (colors, surfaces, decoration) {
       expect(decoration.color, surface(surfaces, SurfaceRole.primarySurface));
       expect(decoration.border?.top.color, role(colors, ColorRole.outline));
     });
@@ -139,10 +137,7 @@ void main() {
       expect(decoration.border?.top.color, role(colors, ColorRole.selection));
     });
     await check(MentoraCardVariant.protected, (colors, surfaces, decoration) {
-      expect(
-        decoration.color,
-        surface(surfaces, SurfaceRole.protectedSurface),
-      );
+      expect(decoration.color, surface(surfaces, SurfaceRole.protectedSurface));
       expect(decoration.border?.top.color, role(colors, ColorRole.attention));
     });
   });
@@ -196,9 +191,7 @@ void main() {
       spacings[density] = resolved.left;
       expect(
         resolved.left,
-        anyOf(
-          SpacingRelation.values.map(engine.spaceOf).map(equals).toList(),
-        ),
+        anyOf(SpacingRelation.values.map(engine.spaceOf).map(equals).toList()),
         reason: 'the padding is always a relation served by the engine',
       );
     }
@@ -279,9 +272,10 @@ void main() {
     expect(find.text('contenu'), findsOneWidget);
     expect(
       _decoration(tester).color,
-      services
-          .get<SurfaceTokenEngine>()
-          .surfaceOf(SurfaceRole.secondarySurface, ThemeVariantId.light),
+      services.get<SurfaceTokenEngine>().surfaceOf(
+        SurfaceRole.secondarySurface,
+        ThemeVariantId.light,
+      ),
     );
 
     await tester.tap(find.byType(MentoraCard));
@@ -309,9 +303,10 @@ void main() {
 
     expect(
       _decoration(tester).color,
-      services
-          .get<SurfaceTokenEngine>()
-          .surfaceOf(SurfaceRole.secondarySurface, ThemeVariantId.light),
+      services.get<SurfaceTokenEngine>().surfaceOf(
+        SurfaceRole.secondarySurface,
+        ThemeVariantId.light,
+      ),
     );
     // The container never substitutes a spinner for the content it
     // was given: the application owns what is displayed.
@@ -342,9 +337,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       _decoration(tester).border?.top.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.critical, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.critical,
+        ThemeVariantId.light,
+      ),
     );
 
     await tester.tap(find.byType(MentoraCard));
@@ -355,9 +351,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       _decoration(tester).border?.top.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.outline, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.outline,
+        ThemeVariantId.light,
+      ),
     );
   });
 
@@ -377,9 +374,10 @@ void main() {
     );
     expect(
       _container(tester).duration,
-      services
-          .get<MotionEngine>()
-          .durationFor(MotionIntention.accompagner, appearance),
+      services.get<MotionEngine>().durationFor(
+        MotionIntention.accompagner,
+        appearance,
+      ),
     );
   });
 
@@ -419,9 +417,10 @@ void main() {
     final border = _decoration(tester).border?.top;
     expect(
       border?.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.focus, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.focus,
+        ThemeVariantId.light,
+      ),
     );
     expect(border?.width, cardFocusRingWidth);
 

@@ -15,6 +15,7 @@ import 'package:mentora/foundation/design_kit/registry/semantic_roles.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
+import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.dart';
 import 'package:mentora/foundation/localization/localization_engine.dart';
 
 Future<FoundationServices> _services() async {
@@ -46,6 +47,8 @@ Future<FoundationServices> _pump(
             typography: services.get<TypographyTokenEngine>(),
             spacing: services.get<SpacingTokenEngine>(),
             surfaces: services.get<SurfaceTokenEngine>(),
+            elevation: services
+                .get<ElevationTokenEngine<ElevationExpression>>(),
             motion: services.get<MotionEngine>(),
             accessibility: services.get<AccessibilityEngine>(),
             appearance: appearance,
@@ -66,10 +69,7 @@ Future<FoundationServices> _pump(
 
 Text _rendered(WidgetTester tester) {
   return tester.widget<Text>(
-    find.descendant(
-      of: find.byType(MentoraText),
-      matching: find.byType(Text),
-    ),
+    find.descendant(of: find.byType(MentoraText), matching: find.byType(Text)),
   );
 }
 
@@ -81,9 +81,10 @@ void main() {
       const MentoraText('Consultation', role: MentoraTextRole.title),
     );
 
-    final expected = services
-        .get<TypographyTokenEngine>()
-        .styleOf(TypographyRole.pageTitle, ThemeVariantId.light);
+    final expected = services.get<TypographyTokenEngine>().styleOf(
+      TypographyRole.pageTitle,
+      ThemeVariantId.light,
+    );
     final style = _rendered(tester).style!;
     expect(style.fontSize, expected.fontSize);
     expect(style.fontWeight, expected.fontWeight);
@@ -136,9 +137,10 @@ void main() {
 
     expect(
       _rendered(tester).style?.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.critical, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.critical,
+        ThemeVariantId.light,
+      ),
     );
   });
 
@@ -250,10 +252,7 @@ void main() {
         semanticsLabel: 'onze heures',
       ),
     );
-    expect(
-      tester.getSemantics(find.byType(MentoraText)).label,
-      'onze heures',
-    );
+    expect(tester.getSemantics(find.byType(MentoraText)).label, 'onze heures');
 
     await _pump(
       tester,

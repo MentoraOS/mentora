@@ -5,10 +5,13 @@ import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/dialog/mentora_dialog_host.dart';
+import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/token_engines.dart';
 import '../design_kit/theme/theme_engine.dart';
 import '../design_kit/theme/theme_resolver.dart';
+import '../design_kit/tokens/surface_elevation_tokens.dart';
 import '../localization/localization_engine.dart';
 import '../localization/mentora_strings.dart';
 import '../navigation/navigation_shell.dart';
@@ -69,11 +72,18 @@ final class MentoraFoundationApp extends StatelessWidget {
                 typography: services.get<TypographyTokenEngine>(),
                 spacing: services.get<SpacingTokenEngine>(),
                 surfaces: services.get<SurfaceTokenEngine>(),
+                elevation: services
+                    .get<ElevationTokenEngine<ElevationExpression>>(),
                 motion: services.get<MotionEngine>(),
                 accessibility: accessibility,
                 appearance: state,
                 variant: variant,
-                child: child ?? const SizedBox.shrink(),
+                // The dialog layer lives above the application and
+                // below nothing: installed once, never pushed.
+                child: MentoraDialogHost(
+                  service: services.get<MentoraDialogService>(),
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             );
           },

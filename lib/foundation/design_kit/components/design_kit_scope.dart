@@ -5,6 +5,7 @@ import '../appearance/appearance_engine.dart';
 import '../motion/motion_engine.dart';
 import '../registry/token_engines.dart';
 import '../theme/theme_variant.dart';
+import '../tokens/surface_elevation_tokens.dart';
 
 /// The official consumption channel of the Core Components.
 ///
@@ -18,6 +19,7 @@ final class DesignKitScope extends InheritedWidget {
   final TypographyTokenEngine typography;
   final SpacingTokenEngine spacing;
   final SurfaceTokenEngine surfaces;
+  final ElevationTokenEngine<ElevationExpression> elevation;
   final MotionEngine motion;
   final AccessibilityEngine accessibility;
   final AppearanceState appearance;
@@ -29,6 +31,7 @@ final class DesignKitScope extends InheritedWidget {
     required this.typography,
     required this.spacing,
     required this.surfaces,
+    required this.elevation,
     required this.motion,
     required this.accessibility,
     required this.appearance,
@@ -52,6 +55,7 @@ final class DesignKitScope extends InheritedWidget {
       typography: parent.typography,
       spacing: parent.spacing,
       surfaces: parent.surfaces,
+      elevation: parent.elevation,
       motion: parent.motion,
       accessibility: parent.accessibility,
       appearance: appearance ?? parent.appearance,
@@ -61,8 +65,7 @@ final class DesignKitScope extends InheritedWidget {
   }
 
   static DesignKitScope of(BuildContext context) {
-    final scope = context
-        .dependOnInheritedWidgetOfExactType<DesignKitScope>();
+    final scope = context.dependOnInheritedWidgetOfExactType<DesignKitScope>();
     if (scope == null) {
       throw StateError(
         'DesignKitScope is absent: a Mentora component never builds '

@@ -16,6 +16,7 @@ import 'package:mentora/foundation/design_kit/registry/semantic_roles.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
+import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.dart';
 import 'package:mentora/foundation/design_kit/tokens/button_tokens.dart';
 import 'package:mentora/foundation/design_kit/tokens/color_internals.dart';
 
@@ -40,6 +41,7 @@ Future<FoundationServices> _pump(
         typography: services.get<TypographyTokenEngine>(),
         spacing: services.get<SpacingTokenEngine>(),
         surfaces: services.get<SurfaceTokenEngine>(),
+        elevation: services.get<ElevationTokenEngine<ElevationExpression>>(),
         motion: services.get<MotionEngine>(),
         accessibility: services.get<AccessibilityEngine>(),
         appearance: appearance,
@@ -66,10 +68,7 @@ BoxDecoration _decoration(WidgetTester tester) {
 
 Text _label(WidgetTester tester, String text) {
   return tester.widget<Text>(
-    find.descendant(
-      of: find.byType(MentoraButton),
-      matching: find.text(text),
-    ),
+    find.descendant(of: find.byType(MentoraButton), matching: find.text(text)),
   );
 }
 
@@ -81,9 +80,10 @@ void main() {
       MentoraButton(label: 'Continuer', onPressed: () {}),
     );
 
-    final expected = services
-        .get<TypographyTokenEngine>()
-        .styleOf(buttonTypographyRole, ThemeVariantId.light);
+    final expected = services.get<TypographyTokenEngine>().styleOf(
+      buttonTypographyRole,
+      ThemeVariantId.light,
+    );
     final label = _label(tester, 'Continuer');
     expect(label.maxLines, 1);
     expect(label.overflow, TextOverflow.ellipsis);
@@ -114,8 +114,7 @@ void main() {
       'else', (tester) async {
     Future<void> check(
       MentoraButtonVariant variant,
-      void Function(ColorTokenEngine colors, BoxDecoration decoration)
-      verify,
+      void Function(ColorTokenEngine colors, BoxDecoration decoration) verify,
     ) async {
       final services = await _pump(
         tester,
@@ -133,10 +132,7 @@ void main() {
     });
     await check(MentoraButtonVariant.outlined, (colors, decoration) {
       expect(decoration.color, isNull);
-      expect(
-        decoration.border?.top.color,
-        role(colors, ColorRole.outline),
-      );
+      expect(decoration.border?.top.color, role(colors, ColorRole.outline));
     });
     await check(MentoraButtonVariant.text, (colors, decoration) {
       expect(decoration.color, isNull);
@@ -235,11 +231,7 @@ void main() {
     addTearDown(controller.dispose);
     final services = await _pump(
       tester,
-      MentoraButton(
-        label: 'Envoyer',
-        onPressed: () {},
-        controller: controller,
-      ),
+      MentoraButton(label: 'Envoyer', onPressed: () {}, controller: controller),
     );
     final colors = services.get<ColorTokenEngine>();
     Color role(ColorRole r) => colors.colorOf(r, ThemeVariantId.light);
@@ -279,9 +271,10 @@ void main() {
     );
     expect(
       container().duration,
-      services
-          .get<MotionEngine>()
-          .durationFor(MotionIntention.confirmer, appearance),
+      services.get<MotionEngine>().durationFor(
+        MotionIntention.confirmer,
+        appearance,
+      ),
     );
   });
 
@@ -295,9 +288,7 @@ void main() {
       );
       expect(
         _decoration(tester).color,
-        services
-            .get<ColorTokenEngine>()
-            .colorOf(ColorRole.primary, variant),
+        services.get<ColorTokenEngine>().colorOf(ColorRole.primary, variant),
       );
     }
   });
@@ -316,9 +307,10 @@ void main() {
     final border = _decoration(tester).border?.top;
     expect(
       border?.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.focus, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.focus,
+        ThemeVariantId.light,
+      ),
     );
     expect(border?.width, buttonFocusRingWidth);
 

@@ -1,6 +1,7 @@
 import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/international/international_engine.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
@@ -92,6 +93,7 @@ final class DesignKitBootstrapStep implements StartupStep {
     services.register<ResponsiveEngine>(() => const ResponsiveEngine());
     services.register<InternationalEngine>(() => const InternationalEngine());
     services.register<LocalizationEngine>(() => const LocalizationEngine());
+    services.register<MentoraDialogService>(MentoraDialogService.new);
   }
 }
 
@@ -108,6 +110,7 @@ void validateDesignKit(FoundationServices services) {
     ..get<ResponsiveEngine>()
     ..get<InternationalEngine>()
     ..get<LocalizationEngine>()
+    ..get<MentoraDialogService>()
     ..get<ColorTokenEngine>()
     ..get<TypographyTokenEngine>()
     ..get<SpacingTokenEngine>()

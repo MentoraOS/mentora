@@ -88,6 +88,51 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String dialogGalleryTitle =
+    'Dialogs — Variants (8), States (8), Service & Queue';
+const String dialogDocHeading = 'MentoraDialog — official contract';
+const List<String> dialogDocArchitecture = [
+  'No route, no showDialog: the host renders the layer above the app',
+  'The service holds one exchange at a time — every meaning is exclusive',
+  'The elevation MEANING decides: an aparté steps back, a decision answers',
+  'The request verifies its contracts at the door of the service',
+  'Title, message, consequence and acts are Mentora components',
+];
+const List<String> dialogDocResponsibilities = [
+  'It never surprises: it explains, reassures, protects and confirms',
+  'It never forces: a dialog that asks offers at least two ways out',
+  'It never manipulates: one recommendation at most, dangers stay explicit',
+  'It never hides a consequence: a critical dialog states what it costs',
+  'Enter performs the recommendation — never a dangerous act',
+  'The focus is trapped while it lasts, and restored where it was',
+];
+const List<String> dialogDocForbidden = [
+  'AlertDialog, Dialog, SimpleDialog in a screen',
+  'showDialog or showAdaptiveDialog anywhere',
+  'A dialog created outside the official service',
+  'A coded color, size, radius or duration',
+  'A local animation, or reading the ambient Theme',
+];
+const List<String> dialogDocTokens = [
+  'Dialog: maximum width, radius, border, scrim, icon, entry offset',
+  'Color: information, success, warning, critical, attention, immersion',
+  'Surface: the protected surface that carries the exchange',
+  'Elevation: the aparté and decision meanings — never a height',
+  'Spacing: focus space, hierarchical breathing, linked proximity',
+];
+const List<String> dialogDocEngines = [
+  'Color, Surface, Spacing & Elevation Token Engines',
+  'Motion Engine — preserve the context, attract when critical',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Accessibility Engine — focus, keyboard and screen readers',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> dialogDocScans = [
+  'No Material dialog and no showDialog in the foundation',
+  'No overlay built outside the official service',
+  'No coded duration, radius, padding or color',
+  'No ambient Theme read inside a Core Component',
+];
 const List<String> inputDocScans = [
   'No raw field widget outside the Input component',
   'No InputDecoration anywhere in the foundation',

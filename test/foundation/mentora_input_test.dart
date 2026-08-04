@@ -16,6 +16,7 @@ import 'package:mentora/foundation/design_kit/registry/semantic_roles.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
+import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.dart';
 import 'package:mentora/foundation/design_kit/tokens/input_tokens.dart';
 import 'package:mentora/foundation/localization/localization_engine.dart';
 
@@ -56,6 +57,7 @@ Future<FoundationServices> _pump(
         typography: services.get<TypographyTokenEngine>(),
         spacing: services.get<SpacingTokenEngine>(),
         surfaces: services.get<SurfaceTokenEngine>(),
+        elevation: services.get<ElevationTokenEngine<ElevationExpression>>(),
         motion: services.get<MotionEngine>(),
         accessibility: services.get<AccessibilityEngine>(),
         appearance: appearance,
@@ -118,10 +120,7 @@ void main() {
         surfaces.surfaceOf(r, ThemeVariantId.light);
 
     await check(MentoraInputVariant.filled, (colors, surfaces, decoration) {
-      expect(
-        decoration.color,
-        surface(surfaces, SurfaceRole.secondarySurface),
-      );
+      expect(decoration.color, surface(surfaces, SurfaceRole.secondarySurface));
       expect(decoration.border, isNull);
     });
     await check(MentoraInputVariant.outlined, (colors, surfaces, decoration) {
@@ -131,11 +130,7 @@ void main() {
         role(colors, ColorRole.outline),
       );
     });
-    await check(MentoraInputVariant.underlined, (
-      colors,
-      surfaces,
-      decoration,
-    ) {
+    await check(MentoraInputVariant.underlined, (colors, surfaces, decoration) {
       expect(decoration.color, isNull);
       final border = decoration.border! as Border;
       // A base alone: the underline delimits, the sides never do.
@@ -144,10 +139,7 @@ void main() {
       expect(decoration.borderRadius, isNull);
     });
     await check(MentoraInputVariant.search, (colors, surfaces, decoration) {
-      expect(
-        decoration.color,
-        surface(surfaces, SurfaceRole.secondarySurface),
-      );
+      expect(decoration.color, surface(surfaces, SurfaceRole.secondarySurface));
       expect(
         decoration.borderRadius,
         BorderRadius.circular(inputSearchCornerRadius),
@@ -177,14 +169,12 @@ void main() {
     // …while the availability moves it to the resting surface.
     expect(
       _decoration(tester).color,
-      services
-          .get<SurfaceTokenEngine>()
-          .surfaceOf(SurfaceRole.secondarySurface, ThemeVariantId.light),
+      services.get<SurfaceTokenEngine>().surfaceOf(
+        SurfaceRole.secondarySurface,
+        ThemeVariantId.light,
+      ),
     );
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).readOnly,
-      isTrue,
-    );
+    expect(tester.widget<TextField>(find.byType(TextField)).readOnly, isTrue);
   });
 
   testWidgets('read-only is not unavailable: the value stays fully '
@@ -202,9 +192,10 @@ void main() {
     expect(find.byType(Opacity), findsNothing);
     expect(
       tester.widget<TextField>(find.byType(TextField)).style?.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.foreground, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.foreground,
+        ThemeVariantId.light,
+      ),
     );
   });
 
@@ -230,9 +221,10 @@ void main() {
     expect(find.text('indisponible'), findsOneWidget);
     expect(
       tester.widget<TextField>(find.byType(TextField)).style?.color,
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.unavailable, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.unavailable,
+        ThemeVariantId.light,
+      ),
     );
   });
 
@@ -245,9 +237,10 @@ void main() {
 
     expect(
       _borderColor(tester),
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.focus, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.focus,
+        ThemeVariantId.light,
+      ),
     );
     expect(
       (_decoration(tester).border! as Border).bottom.width,
@@ -281,14 +274,12 @@ void main() {
         placeholder: 'votre nom',
       ),
     );
-    final critical = services
-        .get<ColorTokenEngine>()
-        .colorOf(ColorRole.critical, ThemeVariantId.light);
-
-    await tester.enterText(
-      find.byType(TextField),
-      _RefusesOneValue.refused,
+    final critical = services.get<ColorTokenEngine>().colorOf(
+      ColorRole.critical,
+      ThemeVariantId.light,
     );
+
+    await tester.enterText(find.byType(TextField), _RefusesOneValue.refused);
     await tester.pumpAndSettle();
 
     // The field is focused after typing, and still shows the refusal.
@@ -297,9 +288,7 @@ void main() {
   });
 
   testWidgets('the published verdict wins over the local one — an '
-      'announced decision is never overwritten by a keystroke', (
-    tester,
-  ) async {
+      'announced decision is never overwritten by a keystroke', (tester) async {
     final controller = MentoraInputController();
     addTearDown(controller.dispose);
     final services = await _pump(
@@ -320,9 +309,10 @@ void main() {
     expect(find.text('déjà utilisé'), findsOneWidget);
     expect(
       _borderColor(tester),
-      services
-          .get<ColorTokenEngine>()
-          .colorOf(ColorRole.critical, ThemeVariantId.light),
+      services.get<ColorTokenEngine>().colorOf(
+        ColorRole.critical,
+        ThemeVariantId.light,
+      ),
     );
   });
 
@@ -334,9 +324,8 @@ void main() {
       tester,
       MentoraInput(label: 'nom', controller: controller),
     );
-    Color role(ColorRole r) => services
-        .get<ColorTokenEngine>()
-        .colorOf(r, ThemeVariantId.light);
+    Color role(ColorRole r) =>
+        services.get<ColorTokenEngine>().colorOf(r, ThemeVariantId.light);
 
     controller.beginLoading();
     await tester.pump();
@@ -403,9 +392,7 @@ void main() {
   });
 
   testWidgets('every duration comes from the Motion Engine: writing is '
-      'accompanied, a refusal attracts, None silences both', (
-    tester,
-  ) async {
+      'accompanied, a refusal attracts, None silences both', (tester) async {
     const appearance = AppearanceState();
     final services = await _pump(tester, const MentoraInput(label: 'nom'));
     final motion = services.get<MotionEngine>();
@@ -418,10 +405,7 @@ void main() {
       tester,
       const MentoraInput(label: 'nom', validator: _RefusesOneValue()),
     );
-    await tester.enterText(
-      find.byType(TextField),
-      _RefusesOneValue.refused,
-    );
+    await tester.enterText(find.byType(TextField), _RefusesOneValue.refused);
     await tester.pumpAndSettle();
     expect(
       _chrome(tester).duration,
@@ -534,10 +518,7 @@ void main() {
   test('the Kit carries validation states, never a rule', () {
     // The port exists; the Kit implements none of it.
     expect(MentoraValidation.pristine.state, MentoraValidationState.pristine);
-    expect(
-      const MentoraValidation.invalid(message: 'x').isInvalid,
-      isTrue,
-    );
+    expect(const MentoraValidation.invalid(message: 'x').isInvalid, isTrue);
     expect(const MentoraValidation.valid().message, isNull);
   });
 
@@ -581,9 +562,7 @@ void main() {
       final forbidden = <String, RegExp>{
         'InputDecoration': RegExp(r'(?<![A-Za-z])InputDecoration\('),
         'OutlineInputBorder': RegExp(r'(?<![A-Za-z])OutlineInputBorder\('),
-        'UnderlineInputBorder': RegExp(
-          r'(?<![A-Za-z])UnderlineInputBorder\(',
-        ),
+        'UnderlineInputBorder': RegExp(r'(?<![A-Za-z])UnderlineInputBorder\('),
         'InputBorder.none': RegExp(r'InputBorder\.none'),
       };
       for (final file in dartFilesOf('lib/foundation')) {

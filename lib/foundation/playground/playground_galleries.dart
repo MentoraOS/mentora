@@ -5,6 +5,10 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/dialog/mentora_dialog.dart';
+import '../design_kit/components/dialog/mentora_dialog_request.dart';
+import '../design_kit/components/dialog/mentora_dialog_service.dart';
+import '../design_kit/components/dialog/mentora_dialog_style.dart';
 import '../design_kit/components/input/mentora_input.dart';
 import '../design_kit/components/input/mentora_input_style.dart';
 import '../design_kit/components/input/mentora_input_validator.dart';
@@ -44,11 +48,7 @@ final class ColorGallery extends StatelessWidget {
   final ColorTokenEngine colors;
   final ThemeVariantId variant;
 
-  const ColorGallery({
-    super.key,
-    required this.colors,
-    required this.variant,
-  });
+  const ColorGallery({super.key, required this.colors, required this.variant});
 
   @override
   Widget build(BuildContext context) {
@@ -765,6 +765,198 @@ final class _DocumentationSection extends StatelessWidget {
             role: MentoraTextRole.caption,
           ),
       ],
+    );
+  }
+}
+
+/// The official Dialogs catalogue — every variant and every state of
+/// the REAL component, shown in place (the exchanges of the laboratory
+/// never take the screen hostage), plus the live service and its
+/// living documentation.
+final class DialogGallery extends StatefulWidget {
+  /// The official service of the laboratory — the same one the host
+  /// listens to: the catalogue duplicates nothing.
+  final MentoraDialogService service;
+
+  const DialogGallery({super.key, required this.service});
+
+  @override
+  State<DialogGallery> createState() => _DialogGalleryState();
+}
+
+final class _DialogGalleryState extends State<DialogGallery> {
+  @override
+  void initState() {
+    super.initState();
+    widget.service.addListener(_onExchangeChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.service.removeListener(_onExchangeChanged);
+    super.dispose();
+  }
+
+  void _onExchangeChanged() {
+    if (mounted) setState(() {});
+  }
+
+  /// Every catalogued demand honors the contracts of the request: a
+  /// critical exchange states its consequence, an exchange that asks
+  /// offers two ways out.
+  static MentoraDialogRequest demandOf(MentoraDialogVariant variant) {
+    final asks =
+        variant == MentoraDialogVariant.confirmation ||
+        variant == MentoraDialogVariant.decision ||
+        variant == MentoraDialogVariant.critical;
+    return MentoraDialogRequest(
+      variant: variant,
+      title: variant.name,
+      message: 'What this exchange holds.',
+      consequence: variant == MentoraDialogVariant.critical
+          ? 'What it will cost.'
+          : null,
+      actions: asks
+          ? const [
+              MentoraDialogAction(id: 'step-back', label: 'step back'),
+              MentoraDialogAction(
+                id: 'proceed',
+                label: 'proceed',
+                intent: MentoraDialogActionIntent.recommended,
+              ),
+            ]
+          : const [
+              MentoraDialogAction(
+                id: 'understood',
+                label: 'understood',
+                intent: MentoraDialogActionIntent.recommended,
+              ),
+            ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GallerySection(
+      title: dialogGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Every variant, in place: the catalogue shows the layer
+          // itself, not a promise of it.
+          for (final variant in MentoraDialogVariant.values)
+            MentoraDialog(
+              key: Key('dialog-variant-${variant.name}'),
+              request: demandOf(variant),
+              state: MentoraDialogState.opened,
+              onAction: (_) {},
+            ),
+          // Every state, on the confirmation exchange.
+          for (final state in MentoraDialogState.values)
+            MentoraDialog(
+              key: Key('dialog-state-${state.name}'),
+              request: demandOf(MentoraDialogVariant.confirmation),
+              state: state,
+              onAction: (_) {},
+            ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              DesignKitScope.of(context),
+              variant: variant,
+              child: MentoraDialog(
+                key: Key('dialog-theme-${variant.name}'),
+                request: demandOf(MentoraDialogVariant.information),
+                state: MentoraDialogState.opened,
+                onAction: (_) {},
+              ),
+            ),
+          // Both reading directions.
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraDialog(
+                key: Key('dialog-direction-${direction.name}'),
+                request: demandOf(MentoraDialogVariant.information),
+                state: MentoraDialogState.opened,
+                onAction: (_) {},
+              ),
+            ),
+          // The live service: the layer opens above the laboratory,
+          // traps the focus, answers the keyboard, and queues.
+          MentoraButton(
+            key: const Key('dialog-open'),
+            label: 'open',
+            onPressed: () => widget.service.queue(
+              demandOf(MentoraDialogVariant.confirmation),
+            ),
+          ),
+          MentoraButton(
+            key: const Key('dialog-queue'),
+            label: 'queue',
+            onPressed: () => widget.service.queue(
+              demandOf(MentoraDialogVariant.information),
+            ),
+          ),
+          MentoraText(
+            'open: ${widget.service.isBusy} — '
+            'pending: ${widget.service.pendingCount}',
+            key: const Key('dialog-service-state'),
+            role: MentoraTextRole.caption,
+          ),
+          const _DialogDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Dialog's living documentation — built only with Mentora
+/// components.
+final class _DialogDocumentation extends StatelessWidget {
+  const _DialogDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('dialog-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(dialogDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: dialogDocArchitecture,
+            keyPrefix: 'dialog-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: dialogDocResponsibilities,
+            keyPrefix: 'dialog-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: dialogDocTokens,
+            keyPrefix: 'dialog-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: dialogDocEngines,
+            keyPrefix: 'dialog-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: dialogDocForbidden,
+            keyPrefix: 'dialog-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: dialogDocScans,
+            keyPrefix: 'dialog-doc-scan',
+          ),
+        ],
+      ),
     );
   }
 }

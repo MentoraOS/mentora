@@ -5,6 +5,8 @@ import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/dialog/mentora_dialog_host.dart';
+import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/components/text/mentora_text.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/international/international_engine.dart';
@@ -89,11 +91,16 @@ final class _PlaygroundAppState extends State<PlaygroundApp> {
                 typography: widget.services.get<TypographyTokenEngine>(),
                 spacing: widget.services.get<SpacingTokenEngine>(),
                 surfaces: widget.services.get<SurfaceTokenEngine>(),
+                elevation: widget.services
+                    .get<ElevationTokenEngine<ElevationExpression>>(),
                 motion: widget.services.get<MotionEngine>(),
                 accessibility: accessibility,
                 appearance: state,
                 variant: variant,
-                child: child ?? const SizedBox.shrink(),
+                child: MentoraDialogHost(
+                  service: widget.services.get<MentoraDialogService>(),
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             );
           },
@@ -187,6 +194,9 @@ final class _PlaygroundShell extends StatelessWidget {
               const ButtonGallery(),
               const CardGallery(),
               const InputGallery(),
+              DialogGallery(
+                service: services.get<MentoraDialogService>(),
+              ),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
           ),
@@ -216,7 +226,10 @@ final class _Controls extends StatelessWidget {
             for (final preference in ThemePreference.values)
               ButtonSegment(
                 value: preference,
-                label: MentoraText(preference.name, role: MentoraTextRole.caption),
+                label: MentoraText(
+                  preference.name,
+                  role: MentoraTextRole.caption,
+                ),
               ),
           ],
           selected: {state.theme},
@@ -229,7 +242,10 @@ final class _Controls extends StatelessWidget {
             for (final preference in ContrastPreference.values)
               ButtonSegment(
                 value: preference,
-                label: MentoraText(preference.name, role: MentoraTextRole.caption),
+                label: MentoraText(
+                  preference.name,
+                  role: MentoraTextRole.caption,
+                ),
               ),
           ],
           selected: {state.contrast},
@@ -242,7 +258,10 @@ final class _Controls extends StatelessWidget {
             for (final preference in FontScalePreference.values)
               ButtonSegment(
                 value: preference,
-                label: MentoraText(preference.name, role: MentoraTextRole.caption),
+                label: MentoraText(
+                  preference.name,
+                  role: MentoraTextRole.caption,
+                ),
               ),
           ],
           selected: {state.fontScale},
@@ -255,7 +274,10 @@ final class _Controls extends StatelessWidget {
             for (final preference in MotionPreference.values)
               ButtonSegment(
                 value: preference,
-                label: MentoraText(preference.name, role: MentoraTextRole.caption),
+                label: MentoraText(
+                  preference.name,
+                  role: MentoraTextRole.caption,
+                ),
               ),
           ],
           selected: {state.motion},
@@ -268,7 +290,10 @@ final class _Controls extends StatelessWidget {
             for (final preference in ReadingComfortPreference.values)
               ButtonSegment(
                 value: preference,
-                label: MentoraText(preference.name, role: MentoraTextRole.caption),
+                label: MentoraText(
+                  preference.name,
+                  role: MentoraTextRole.caption,
+                ),
               ),
           ],
           selected: {state.readingComfort},
