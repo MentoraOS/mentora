@@ -36,6 +36,30 @@ final class DesignKitScope extends InheritedWidget {
     required super.child,
   });
 
+  /// Derives a scope from an installed one, overriding only the
+  /// appearance or the resolved variant. Reserved for surfaces that
+  /// legitimately present another variant than the running one — the
+  /// living documentation of the Design System. The engines are never
+  /// substituted: the same bound Tokens serve every derivation.
+  factory DesignKitScope.deriving(
+    DesignKitScope parent, {
+    ThemeVariantId? variant,
+    AppearanceState? appearance,
+    required Widget child,
+  }) {
+    return DesignKitScope(
+      colors: parent.colors,
+      typography: parent.typography,
+      spacing: parent.spacing,
+      surfaces: parent.surfaces,
+      motion: parent.motion,
+      accessibility: parent.accessibility,
+      appearance: appearance ?? parent.appearance,
+      variant: variant ?? parent.variant,
+      child: child,
+    );
+  }
+
   static DesignKitScope of(BuildContext context) {
     final scope = context
         .dependOnInheritedWidgetOfExactType<DesignKitScope>();

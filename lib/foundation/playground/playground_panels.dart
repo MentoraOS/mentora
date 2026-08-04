@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
+import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/text/mentora_text.dart';
+import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
+import '../design_kit/registry/semantic_roles.dart';
 import '../design_kit/registry/token_provider.dart';
 import '../design_kit/registry/token_registry.dart';
 import '../design_kit/registry/token_validator.dart';
@@ -22,7 +26,6 @@ final class TokenCoveragePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final percent = report.expectedTotal == 0
         ? 0
         : (report.boundTotal * 100 ~/ report.expectedTotal);
@@ -32,16 +35,16 @@ final class TokenCoveragePanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final entry in report.perDomain.entries)
-            Text(
+            MentoraText(
               '${entry.key} : ${entry.value.bound} / ${entry.value.expected}',
               key: Key('coverage-${entry.key}'),
-              style: textTheme.bodySmall,
+              role: MentoraTextRole.caption,
             ),
-          Text(
+          MentoraText(
             '$coverageLabel : ${report.boundTotal} / ${report.expectedTotal}'
             ' — $percent %',
             key: const Key('coverage-total'),
-            style: textTheme.titleSmall,
+            role: MentoraTextRole.label,
           ),
         ],
       ),
@@ -64,36 +67,35 @@ final class BindingIntegrityPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return GallerySection(
       title: integrityPanelTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          MentoraText(
             '$hardcodedLabel : ${report.hardcodedValues}',
             key: const Key('integrity-hardcoded'),
-            style: textTheme.bodySmall,
+            role: MentoraTextRole.caption,
           ),
-          Text(
+          MentoraText(
             '$deprecatedLabel : ${report.deprecatedTokens.length}',
             key: const Key('integrity-deprecated'),
-            style: textTheme.bodySmall,
+            role: MentoraTextRole.caption,
           ),
-          Text(
+          MentoraText(
             '$orphanLabel : ${report.orphanTokens.length}',
             key: const Key('integrity-orphans'),
-            style: textTheme.bodySmall,
+            role: MentoraTextRole.caption,
           ),
-          Text(
+          MentoraText(
             '$unknownLabel : $unknownTokens',
             key: const Key('integrity-unknown'),
-            style: textTheme.bodySmall,
+            role: MentoraTextRole.caption,
           ),
-          Text(
+          MentoraText(
             '$missingLabel : $missingBindings',
             key: const Key('integrity-missing'),
-            style: textTheme.bodySmall,
+            role: MentoraTextRole.caption,
           ),
         ],
       ),
@@ -115,9 +117,7 @@ final class ThemeInspectorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = themeEngine.themeForVariant(variant);
-    final textTheme = Theme.of(context).textTheme;
-    final scheme = theme.colorScheme;
+    final scheme = themeEngine.themeForVariant(variant).colorScheme;
     final swatches = <String, Color>{
       'primary': scheme.primary,
       'secondary': scheme.secondary,
@@ -130,10 +130,10 @@ final class ThemeInspectorPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          MentoraText(
             variant.name,
             key: const Key('inspector-variant'),
-            style: textTheme.titleSmall,
+            role: MentoraTextRole.label,
           ),
           Wrap(
             children: [
@@ -147,7 +147,7 @@ final class ThemeInspectorPanel extends StatelessWidget {
                       height: kMinInteractiveDimension,
                       color: entry.value,
                     ),
-                    Text(entry.key, style: textTheme.labelSmall),
+                    MentoraText(entry.key, role: MentoraTextRole.caption),
                   ],
                 ),
             ],
@@ -172,7 +172,6 @@ final class RuntimeVerificationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     String verdict;
     var healthy = true;
     try {
@@ -194,12 +193,11 @@ final class RuntimeVerificationPanel extends StatelessWidget {
     }
     return GallerySection(
       title: runtimePanelTitle,
-      child: Text(
+      child: MentoraText(
         verdict,
         key: const Key('runtime-verdict'),
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: healthy ? null : theme.colorScheme.error,
-        ),
+        role: MentoraTextRole.status,
+        color: healthy ? null : ColorRole.critical,
       ),
     );
   }
@@ -223,7 +221,7 @@ final class MotionPreviewPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final scope = DesignKitScope.of(context);
     final expanded = replayTick.isEven;
     return GallerySection(
       title: motionGalleryTitle,
@@ -240,11 +238,13 @@ final class MotionPreviewPanel extends StatelessWidget {
                   width: expanded
                       ? kMinInteractiveDimension * 2
                       : kMinInteractiveDimension,
-                  height: theme.textTheme.labelSmall?.fontSize ??
-                      kMinInteractiveDimension / 4,
-                  color: theme.colorScheme.secondary,
+                  height: scope.spacing.spaceOf(SpacingRelation.proximiteLiee),
+                  color: scope.colors.colorOf(
+                    ColorRole.secondary,
+                    scope.variant,
+                  ),
                 ),
-                Text(intention.name, style: theme.textTheme.labelSmall),
+                MentoraText(intention.name, role: MentoraTextRole.caption),
               ],
             ),
           MentoraButton(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/components/text/mentora_text.dart';
+import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/tokens/design_tokens.dart';
 import '../localization/mentora_strings.dart';
@@ -124,18 +126,23 @@ final class _FoundationSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = MentoraStrings.of(context);
-    final textTheme = Theme.of(context).textTheme;
 
     return Padding(
       padding: EdgeInsets.all(spacing.separationDistincte),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: textTheme.titleLarge),
+          MentoraText(title, role: MentoraTextRole.title),
           SizedBox(height: spacing.cadenceVerticale),
-          Text(strings.nothingNeedsAttention, style: textTheme.bodyMedium),
+          MentoraText(
+            strings.nothingNeedsAttention,
+            role: MentoraTextRole.body,
+          ),
           SizedBox(height: spacing.respirationIntention),
-          Text(strings.foundationReadyBody, style: textTheme.bodySmall),
+          MentoraText(
+            strings.foundationReadyBody,
+            role: MentoraTextRole.caption,
+          ),
         ],
       ),
     );

@@ -4,6 +4,10 @@ import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
+import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/text/mentora_text.dart';
+import '../design_kit/components/text/mentora_text_role.dart';
+import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/registry/semantic_roles.dart';
 import '../design_kit/registry/token_engines.dart';
 import '../design_kit/responsive/responsive_engine.dart';
@@ -20,13 +24,13 @@ final class GallerySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final scope = DesignKitScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: textTheme.titleMedium),
+        MentoraText(title, role: MentoraTextRole.subtitle),
         child,
-        Divider(color: Theme.of(context).dividerColor),
+        Divider(color: scope.colors.colorOf(ColorRole.divider, scope.variant)),
       ],
     );
   }
@@ -45,7 +49,6 @@ final class ColorGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return GallerySection(
       title: colorGalleryTitle,
       child: Wrap(
@@ -62,7 +65,7 @@ final class ColorGallery extends StatelessWidget {
                     height: kMinInteractiveDimension,
                     color: colors.colorOf(role, variant),
                   ),
-                  Text(role.name, style: textTheme.labelSmall),
+                  MentoraText(role.name, role: MentoraTextRole.caption),
                 ],
               ),
             ),
@@ -72,32 +75,150 @@ final class ColorGallery extends StatelessWidget {
   }
 }
 
-/// The 27 typography roles — the role name rendered in its own style.
-final class TypographyGallery extends StatelessWidget {
-  final TypographyTokenEngine typography;
-  final ThemeVariantId variant;
-
-  const TypographyGallery({
-    super.key,
-    required this.typography,
-    required this.variant,
-  });
+/// The official Typography catalogue — the 27 admitted roles, the four
+/// theme variants, the font scales, the reading comfort and both
+/// reading directions, rendered by the REAL component. It closes with
+/// the component's own documentation, written with itself.
+final class TextGallery extends StatelessWidget {
+  const TextGallery({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+    final sample = textGalleryTitle.split('—').first.trim();
+
+    Widget heading(String label) =>
+        MentoraText(label, role: MentoraTextRole.label);
+
     return GallerySection(
-      title: typographyGalleryTitle,
+      title: textGalleryTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // The 27 admitted roles, each rendered in its own role.
           for (final role in TypographyRole.values)
-            Text(
+            MentoraText(
               role.name,
               key: Key('typography-sample-${role.name}'),
-              style: typography.styleOf(role, variant),
+              role: MentoraTextRole.of(role),
             ),
+          // The ten official behaviors — named doors onto the roles.
+          for (final entry in MentoraTextRole.officialBehaviors.entries)
+            MentoraText(
+              entry.key,
+              key: Key('text-behavior-${entry.key}'),
+              role: entry.value,
+            ),
+          // The four theme variants, including both high contrasts.
+          heading(themeInspectorTitle),
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: MentoraText(
+                variant.name,
+                key: Key('text-variant-${variant.name}'),
+                role: MentoraTextRole.body,
+              ),
+            ),
+          // The font scales — applied by the application's scaler, the
+          // single authority, exactly as in production.
+          for (final scale in FontScalePreference.values)
+            Builder(
+              builder: (context) {
+                final state = scope.appearance.copyWith(fontScale: scale);
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(
+                      scope.accessibility.textScaleFor(state),
+                    ),
+                  ),
+                  child: DesignKitScope.deriving(
+                    scope,
+                    appearance: state,
+                    child: MentoraText(
+                      scale.name,
+                      key: Key('text-scale-${scale.name}'),
+                      role: MentoraTextRole.body,
+                    ),
+                  ),
+                );
+              },
+            ),
+          // The reading comfort, served as it is admitted.
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: MentoraText(
+                comfort.name,
+                key: Key('text-comfort-${comfort.name}'),
+                role: MentoraTextRole.body,
+              ),
+            ),
+          // Both directions — no screen ever handles them specially.
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraText(
+                sample,
+                key: Key('text-direction-${direction.name}'),
+                role: MentoraTextRole.body,
+              ),
+            ),
+          const _TextDocumentation(),
         ],
       ),
+    );
+  }
+}
+
+/// The component's living documentation — written with the component
+/// itself: what it offers, what it demands, what it refuses.
+final class _TextDocumentation extends StatelessWidget {
+  const _TextDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget section(String title, List<String> lines, String keyPrefix) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(title, role: MentoraTextRole.label),
+          for (final (index, line) in lines.indexed)
+            MentoraText(
+              line,
+              key: Key('$keyPrefix-$index'),
+              role: MentoraTextRole.caption,
+            ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MentoraText(
+          textDocHeading,
+          key: const Key('text-doc-heading'),
+          role: MentoraTextRole.subtitle,
+        ),
+        section(
+          textDocRolesTitle,
+          MentoraTextRole.officialBehaviors.entries
+              .map((entry) => '${entry.key} → ${entry.value.role.name}')
+              .toList(),
+          'text-doc-role',
+        ),
+        section(textDocRulesTitle, textDocRules, 'text-doc-rule'),
+        section(
+          textDocForbiddenTitle,
+          textDocForbidden,
+          'text-doc-forbidden',
+        ),
+        section(textDocTokensTitle, textDocTokens, 'text-doc-token'),
+        section(textDocEnginesTitle, textDocEngines, 'text-doc-engine'),
+      ],
     );
   }
 }
@@ -111,7 +232,7 @@ final class SpacingGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final scope = DesignKitScope.of(context);
     return GallerySection(
       title: spacingGalleryTitle,
       child: Column(
@@ -124,10 +245,10 @@ final class SpacingGallery extends StatelessWidget {
                   key: Key('spacing-bar-${relation.name}'),
                   width: spacing.spaceOf(relation) * 4,
                   height: spacing.spaceOf(SpacingRelation.proximiteLiee),
-                  color: theme.colorScheme.primary,
+                  color: scope.colors.colorOf(ColorRole.primary, scope.variant),
                 ),
                 SizedBox(width: spacing.spaceOf(SpacingRelation.proximiteLiee)),
-                Text(relation.name, style: theme.textTheme.labelSmall),
+                MentoraText(relation.name, role: MentoraTextRole.caption),
               ],
             ),
         ],
@@ -151,7 +272,6 @@ final class SurfaceGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return GallerySection(
       title: surfaceGalleryTitle,
       child: Wrap(
@@ -163,11 +283,7 @@ final class SurfaceGallery extends StatelessWidget {
               height: spacing.spaceOf(SpacingRelation.espaceFocus),
               color: surfaces.surfaceOf(role, variant),
               alignment: Alignment.center,
-              child: Text(
-                role.name,
-                style: theme.textTheme.labelSmall,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: MentoraText(role.name, role: MentoraTextRole.caption),
             ),
         ],
       ),
@@ -188,7 +304,6 @@ final class ElevationGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return GallerySection(
       title: elevationGalleryTitle,
       child: Column(
@@ -198,12 +313,12 @@ final class ElevationGallery extends StatelessWidget {
             Builder(
               builder: (context) {
                 final expression = elevation.expressionOf(meaning, variant);
-                return Text(
+                return MentoraText(
                   '${meaning.name} — blocks: ${expression.blocksBelow}, '
                   'dims: ${expression.dimsScene}, '
                   'exclusive: ${expression.isExclusive}',
                   key: Key('elevation-${meaning.name}'),
-                  style: textTheme.bodySmall,
+                  role: MentoraTextRole.caption,
                 );
               },
             ),
@@ -333,8 +448,8 @@ final class _CardGalleryState extends State<CardGallery> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    Widget caption(String text) => Text(text, style: textTheme.labelSmall);
+    Widget caption(String text) =>
+        MentoraText(text, role: MentoraTextRole.caption);
 
     return GallerySection(
       title: cardGalleryTitle,
@@ -418,17 +533,16 @@ final class ResponsiveGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return GallerySection(
       title: responsiveGalleryTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final entry in _representativeSizes.entries)
-            Text(
+            MentoraText(
               '${entry.key} → ${responsive.resolve(entry.value).name}',
               key: Key('responsive-${entry.key}'),
-              style: textTheme.bodySmall,
+              role: MentoraTextRole.caption,
             ),
         ],
       ),

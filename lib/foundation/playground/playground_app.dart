@@ -5,6 +5,8 @@ import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/text/mentora_text.dart';
+import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/international/international_engine.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
@@ -134,7 +136,12 @@ final class _PlaygroundShell extends StatelessWidget {
     return Directionality(
       textDirection: international.directionFor(controller.locale),
       child: Scaffold(
-        appBar: AppBar(title: Text(playgroundTitle)),
+        appBar: AppBar(
+          title: const MentoraText(
+            playgroundTitle,
+            role: MentoraTextRole.subtitle,
+          ),
+        ),
         // A laboratory shows everything: no lazy building — every
         // gallery is always mounted and verifiable.
         body: SingleChildScrollView(
@@ -159,10 +166,7 @@ final class _PlaygroundShell extends StatelessWidget {
                 colors: services.get<ColorTokenEngine>(),
                 variant: variant,
               ),
-              TypographyGallery(
-                typography: services.get<TypographyTokenEngine>(),
-                variant: variant,
-              ),
+              const TextGallery(),
               SpacingGallery(spacing: spacing),
               SurfaceGallery(
                 surfaces: services.get<SurfaceTokenEngine>(),
@@ -202,7 +206,6 @@ final class _Controls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = appearance.state;
-    final textTheme = Theme.of(context).textTheme;
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
@@ -212,7 +215,7 @@ final class _Controls extends StatelessWidget {
             for (final preference in ThemePreference.values)
               ButtonSegment(
                 value: preference,
-                label: Text(preference.name, style: textTheme.labelSmall),
+                label: MentoraText(preference.name, role: MentoraTextRole.caption),
               ),
           ],
           selected: {state.theme},
@@ -225,7 +228,7 @@ final class _Controls extends StatelessWidget {
             for (final preference in ContrastPreference.values)
               ButtonSegment(
                 value: preference,
-                label: Text(preference.name, style: textTheme.labelSmall),
+                label: MentoraText(preference.name, role: MentoraTextRole.caption),
               ),
           ],
           selected: {state.contrast},
@@ -238,7 +241,7 @@ final class _Controls extends StatelessWidget {
             for (final preference in FontScalePreference.values)
               ButtonSegment(
                 value: preference,
-                label: Text(preference.name, style: textTheme.labelSmall),
+                label: MentoraText(preference.name, role: MentoraTextRole.caption),
               ),
           ],
           selected: {state.fontScale},
@@ -251,7 +254,7 @@ final class _Controls extends StatelessWidget {
             for (final preference in MotionPreference.values)
               ButtonSegment(
                 value: preference,
-                label: Text(preference.name, style: textTheme.labelSmall),
+                label: MentoraText(preference.name, role: MentoraTextRole.caption),
               ),
           ],
           selected: {state.motion},
@@ -264,7 +267,7 @@ final class _Controls extends StatelessWidget {
             for (final preference in ReadingComfortPreference.values)
               ButtonSegment(
                 value: preference,
-                label: Text(preference.name, style: textTheme.labelSmall),
+                label: MentoraText(preference.name, role: MentoraTextRole.caption),
               ),
           ],
           selected: {state.readingComfort},
@@ -281,7 +284,10 @@ final class _Controls extends StatelessWidget {
             ])
               ButtonSegment(
                 value: locale,
-                label: Text(locale.languageCode, style: textTheme.labelSmall),
+                label: MentoraText(
+                  locale.languageCode,
+                  role: MentoraTextRole.caption,
+                ),
               ),
           ],
           selected: {controller.locale},

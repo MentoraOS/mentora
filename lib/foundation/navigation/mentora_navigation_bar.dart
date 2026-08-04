@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/components/design_kit_scope.dart';
 import '../design_kit/motion/motion_engine.dart';
+import '../design_kit/registry/semantic_roles.dart';
 import '../design_kit/tokens/navigation_bar_tokens.dart';
 
 /// One entry of the root navigation — icon pair and label, nothing
@@ -105,10 +107,13 @@ final class _MentoraNavigationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final activeColor = theme.colorScheme.primary;
-    final inactiveColor = theme.textTheme.labelSmall?.color ??
-        theme.colorScheme.onSurface;
-    final color = selected ? activeColor : inactiveColor;
+    final scope = DesignKitScope.of(context);
+    // The chrome speaks roles: the identity when chosen, the
+    // supporting voice when at rest — never an ambient TextTheme.
+    final color = scope.colors.colorOf(
+      selected ? ColorRole.primary : ColorRole.supporting,
+      scope.variant,
+    );
     final duration = motion.durationFor(
       MotionIntention.accompagner,
       appearance,
