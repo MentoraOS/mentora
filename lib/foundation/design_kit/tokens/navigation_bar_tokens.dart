@@ -20,6 +20,7 @@ final class NavigationBarTokenSet {
   final double capsuleHorizontalPadding;
   final double capsuleVerticalPadding;
   final double iconLabelGap;
+  final double dividerThickness;
 
   const NavigationBarTokenSet({
     required this.height,
@@ -30,6 +31,7 @@ final class NavigationBarTokenSet {
     required this.capsuleHorizontalPadding,
     required this.capsuleVerticalPadding,
     required this.iconLabelGap,
+    required this.dividerThickness,
   });
 }
 
@@ -42,6 +44,7 @@ const NavigationBarTokenSet navigationBarTokens = NavigationBarTokenSet(
   capsuleHorizontalPadding: 14,
   capsuleVerticalPadding: 4,
   iconLabelGap: 3,
+  dividerThickness: 1,
 );
 
 /// The single-line 11 sp label style of the bar — built here so no

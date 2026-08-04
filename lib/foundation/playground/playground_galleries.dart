@@ -5,6 +5,9 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/input/mentora_input.dart';
+import '../design_kit/components/input/mentora_input_style.dart';
+import '../design_kit/components/input/mentora_input_validator.dart';
 import '../design_kit/components/text/mentora_text.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/appearance/appearance_engine.dart';
@@ -180,21 +183,6 @@ final class _TextDocumentation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget section(String title, List<String> lines, String keyPrefix) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MentoraText(title, role: MentoraTextRole.label),
-          for (final (index, line) in lines.indexed)
-            MentoraText(
-              line,
-              key: Key('$keyPrefix-$index'),
-              role: MentoraTextRole.caption,
-            ),
-        ],
-      );
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -203,21 +191,33 @@ final class _TextDocumentation extends StatelessWidget {
           key: const Key('text-doc-heading'),
           role: MentoraTextRole.subtitle,
         ),
-        section(
-          textDocRolesTitle,
-          MentoraTextRole.officialBehaviors.entries
+        _DocumentationSection(
+          title: textDocRolesTitle,
+          lines: MentoraTextRole.officialBehaviors.entries
               .map((entry) => '${entry.key} → ${entry.value.role.name}')
               .toList(),
-          'text-doc-role',
+          keyPrefix: 'text-doc-role',
         ),
-        section(textDocRulesTitle, textDocRules, 'text-doc-rule'),
-        section(
-          textDocForbiddenTitle,
-          textDocForbidden,
-          'text-doc-forbidden',
+        const _DocumentationSection(
+          title: textDocRulesTitle,
+          lines: textDocRules,
+          keyPrefix: 'text-doc-rule',
         ),
-        section(textDocTokensTitle, textDocTokens, 'text-doc-token'),
-        section(textDocEnginesTitle, textDocEngines, 'text-doc-engine'),
+        const _DocumentationSection(
+          title: textDocForbiddenTitle,
+          lines: textDocForbidden,
+          keyPrefix: 'text-doc-forbidden',
+        ),
+        const _DocumentationSection(
+          title: textDocTokensTitle,
+          lines: textDocTokens,
+          keyPrefix: 'text-doc-token',
+        ),
+        const _DocumentationSection(
+          title: textDocEnginesTitle,
+          lines: textDocEngines,
+          keyPrefix: 'text-doc-engine',
+        ),
       ],
     );
   }
@@ -511,6 +511,260 @@ final class _CardGalleryState extends State<CardGallery> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The official Inputs catalogue — every chrome, every availability,
+/// every size and every state of the REAL component, plus its living
+/// documentation, built only with Mentora components.
+final class InputGallery extends StatefulWidget {
+  const InputGallery({super.key});
+
+  @override
+  State<InputGallery> createState() => _InputGalleryState();
+}
+
+/// A laboratory judge: it publishes a verdict without carrying any
+/// business rule — an empty value is simply not yet a value.
+final class _LaboratoryJudge implements MentoraInputValidator {
+  final String message;
+
+  const _LaboratoryJudge(this.message);
+
+  @override
+  MentoraValidation validate(String value) {
+    return value.isEmpty
+        ? MentoraValidation.invalid(message: message)
+        : const MentoraValidation.valid();
+  }
+}
+
+final class _InputGalleryState extends State<InputGallery> {
+  final MentoraInputController _loading = MentoraInputController();
+  final MentoraInputController _success = MentoraInputController();
+  final MentoraInputController _error = MentoraInputController();
+  final MentoraInputController _invalid = MentoraInputController();
+  final MentoraInputController _valid = MentoraInputController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loading.beginLoading();
+    _success.showSuccess();
+    _error.showError();
+    _invalid.publishValidation(
+      const MentoraValidation.invalid(message: 'invalid'),
+    );
+    _valid.publishValidation(const MentoraValidation.valid(message: 'valid'));
+  }
+
+  @override
+  void dispose() {
+    _loading.dispose();
+    _success.dispose();
+    _error.dispose();
+    _invalid.dispose();
+    _valid.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: inputGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraInputVariant.values)
+            MentoraInput(
+              key: Key('input-variant-${variant.name}'),
+              variant: variant,
+              label: variant.name,
+              placeholder: variant.name,
+              secureRevealLabel: variant == MentoraInputVariant.secure
+                  ? 'reveal'
+                  : null,
+            ),
+          for (final availability in MentoraInputAvailability.values)
+            MentoraInput(
+              key: Key('input-availability-${availability.name}'),
+              availability: availability,
+              label: availability.name,
+            ),
+          for (final size in MentoraInputSize.values)
+            MentoraInput(
+              key: Key('input-size-${size.name}'),
+              size: size,
+              label: size.name,
+            ),
+          // The announced phases and the published verdicts.
+          MentoraInput(
+            key: const Key('input-state-loading'),
+            controller: _loading,
+            label: MentoraInputState.loading.name,
+          ),
+          MentoraInput(
+            key: const Key('input-state-success'),
+            controller: _success,
+            label: MentoraInputState.success.name,
+          ),
+          MentoraInput(
+            key: const Key('input-state-error'),
+            controller: _error,
+            label: MentoraInputState.error.name,
+          ),
+          MentoraInput(
+            key: const Key('input-state-invalid'),
+            controller: _invalid,
+            label: MentoraInputState.invalid.name,
+          ),
+          MentoraInput(
+            key: const Key('input-state-valid'),
+            controller: _valid,
+            label: MentoraInputState.valid.name,
+          ),
+          // A live judge: type, and the verdict follows the value.
+          MentoraInput(
+            key: const Key('input-state-judged'),
+            label: 'judged',
+            validator: const _LaboratoryJudge('a value is expected'),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: MentoraInput(
+                key: Key('input-theme-${variant.name}'),
+                label: variant.name,
+              ),
+            ),
+          // The font scales, applied by the application's scaler.
+          for (final scale in FontScalePreference.values)
+            Builder(
+              builder: (context) {
+                final state = scope.appearance.copyWith(fontScale: scale);
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(
+                      scope.accessibility.textScaleFor(state),
+                    ),
+                  ),
+                  child: DesignKitScope.deriving(
+                    scope,
+                    appearance: state,
+                    child: MentoraInput(
+                      key: Key('input-scale-${scale.name}'),
+                      label: scale.name,
+                    ),
+                  ),
+                );
+              },
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: MentoraInput(
+                key: Key('input-comfort-${comfort.name}'),
+                label: comfort.name,
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraInput(
+                key: Key('input-direction-${direction.name}'),
+                label: direction.name,
+              ),
+            ),
+          const _InputDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Input's living documentation — architecture, responsibilities,
+/// Tokens, Engines, prohibitions and scans, written only with Mentora
+/// components.
+final class _InputDocumentation extends StatelessWidget {
+  const _InputDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('input-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(inputDocHeading, role: MentoraTextRole.subtitle),
+          _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: inputDocArchitecture,
+            keyPrefix: 'input-doc-architecture',
+          ),
+          _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: inputDocResponsibilities,
+            keyPrefix: 'input-doc-responsibility',
+          ),
+          _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: inputDocTokens,
+            keyPrefix: 'input-doc-token',
+          ),
+          _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: inputDocEngines,
+            keyPrefix: 'input-doc-engine',
+          ),
+          _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: inputDocForbidden,
+            keyPrefix: 'input-doc-forbidden',
+          ),
+          _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: inputDocScans,
+            keyPrefix: 'input-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One documented chapter — the shared shape of every living
+/// documentation of the catalogue.
+final class _DocumentationSection extends StatelessWidget {
+  final String title;
+  final List<String> lines;
+  final String keyPrefix;
+
+  const _DocumentationSection({
+    required this.title,
+    required this.lines,
+    required this.keyPrefix,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MentoraText(title, role: MentoraTextRole.label),
+        for (final (index, line) in lines.indexed)
+          MentoraText(
+            line,
+            key: Key('$keyPrefix-$index'),
+            role: MentoraTextRole.caption,
+          ),
+      ],
     );
   }
 }

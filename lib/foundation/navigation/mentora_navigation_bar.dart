@@ -50,10 +50,12 @@ final class MentoraNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final scope = DesignKitScope.of(context);
     return Material(
-      color: theme.navigationBarTheme.backgroundColor ??
-          theme.colorScheme.surface,
+      color: scope.surfaces.surfaceOf(
+        SurfaceRole.primarySurface,
+        scope.variant,
+      ),
       child: SafeArea(
         top: false,
         child: SizedBox(
@@ -61,9 +63,9 @@ final class MentoraNavigationBar extends StatelessWidget {
           child: Column(
             children: [
               Divider(
-                height: DividerTheme.of(context).thickness ?? 1,
-                thickness: DividerTheme.of(context).thickness ?? 1,
-                color: theme.dividerColor,
+                height: navigationBarTokens.dividerThickness,
+                thickness: navigationBarTokens.dividerThickness,
+                color: scope.colors.colorOf(ColorRole.divider, scope.variant),
               ),
               Expanded(
                 child: Row(
@@ -106,7 +108,6 @@ final class _MentoraNavigationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final scope = DesignKitScope.of(context);
     // The chrome speaks roles: the identity when chosen, the
     // supporting voice when at rest — never an ambient TextTheme.
@@ -140,7 +141,9 @@ final class _MentoraNavigationItem extends StatelessWidget {
                 vertical: navigationBarTokens.capsuleVerticalPadding,
               ),
               decoration: BoxDecoration(
-                color: selected ? theme.highlightColor : null,
+                color: selected
+                    ? scope.colors.colorOf(ColorRole.highlight, scope.variant)
+                    : null,
                 borderRadius: BorderRadius.circular(
                   navigationBarTokens.capsuleRadius,
                 ),
