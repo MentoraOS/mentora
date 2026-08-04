@@ -4,8 +4,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/components/design_kit_scope.dart';
 import '../design_kit/motion/motion_engine.dart';
+import '../design_kit/registry/token_engines.dart';
 import '../design_kit/theme/theme_engine.dart';
+import '../design_kit/theme/theme_resolver.dart';
 import '../localization/localization_engine.dart';
 import '../localization/mentora_strings.dart';
 import '../navigation/navigation_shell.dart';
@@ -47,13 +50,31 @@ final class MentoraFoundationApp extends StatelessWidget {
           },
           builder: (context, child) {
             final media = MediaQuery.of(context);
+            // The scope is the official consumption channel of the
+            // Core Components: engines, appearance and the variant
+            // resolved exactly once, for the whole tree.
+            final variant = const ThemeResolver().resolve(
+              theme: state.theme,
+              contrast: state.contrast,
+              platformBrightness: media.platformBrightness,
+            );
             return MediaQuery(
               data: media.copyWith(
                 textScaler: TextScaler.linear(
                   accessibility.textScaleFor(state),
                 ),
               ),
-              child: child ?? const SizedBox.shrink(),
+              child: DesignKitScope(
+                colors: services.get<ColorTokenEngine>(),
+                typography: services.get<TypographyTokenEngine>(),
+                spacing: services.get<SpacingTokenEngine>(),
+                surfaces: services.get<SurfaceTokenEngine>(),
+                motion: services.get<MotionEngine>(),
+                accessibility: accessibility,
+                appearance: state,
+                variant: variant,
+                child: child ?? const SizedBox.shrink(),
+              ),
             );
           },
           home: NavigationShell(

@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/components/design_kit_scope.dart';
 import '../design_kit/international/international_engine.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
@@ -68,13 +69,30 @@ final class _PlaygroundAppState extends State<PlaygroundApp> {
           builder: (context, child) {
             final media = MediaQuery.of(context);
             final accessibility = widget.services.get<AccessibilityEngine>();
+            // The laboratory consumes the components through the same
+            // official channel as the production app.
+            final variant = const ThemeResolver().resolve(
+              theme: state.theme,
+              contrast: state.contrast,
+              platformBrightness: media.platformBrightness,
+            );
             return MediaQuery(
               data: media.copyWith(
                 textScaler: TextScaler.linear(
                   accessibility.textScaleFor(state),
                 ),
               ),
-              child: child ?? const SizedBox.shrink(),
+              child: DesignKitScope(
+                colors: widget.services.get<ColorTokenEngine>(),
+                typography: widget.services.get<TypographyTokenEngine>(),
+                spacing: widget.services.get<SpacingTokenEngine>(),
+                surfaces: widget.services.get<SurfaceTokenEngine>(),
+                motion: widget.services.get<MotionEngine>(),
+                accessibility: accessibility,
+                appearance: state,
+                variant: variant,
+                child: child ?? const SizedBox.shrink(),
+              ),
             );
           },
           home: _PlaygroundShell(

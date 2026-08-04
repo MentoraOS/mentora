@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/components/button/mentora_button.dart';
+import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
 import '../design_kit/registry/token_provider.dart';
@@ -245,13 +247,12 @@ final class MotionPreviewPanel extends StatelessWidget {
                 Text(intention.name, style: theme.textTheme.labelSmall),
               ],
             ),
-          TextButton(
+          MentoraButton(
             key: const Key('motion-replay'),
+            label: '${motionGalleryTitle.split(' ').first} ▶',
             onPressed: onReplay,
-            child: Text(
-              '${motionGalleryTitle.split(' ').first} ▶',
-              style: theme.textTheme.labelMedium,
-            ),
+            variant: MentoraButtonVariant.text,
+            size: MentoraButtonSize.small,
           ),
         ],
       ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../appearance/appearance_engine.dart';
 import '../registry/semantic_roles.dart';
 import '../registry/token_engines.dart';
-import '../tokens/design_tokens.dart';
+import '../tokens/color_internals.dart';
 import 'theme_resolver.dart';
 import 'theme_variant.dart';
 
@@ -68,7 +68,7 @@ final class ThemeEngine {
             variant == ThemeVariantId.darkHighContrast
         ? Brightness.dark
         : Brightness.light;
-    final identityInternals = _identityInternalsFor(variant);
+    final identityInternals = identityInternalsFor(variant);
 
     Color role(ColorRole r) => _colors.colorOf(r, variant);
     TextStyle style(TypographyRole r) => _typography.styleOf(r, variant);
@@ -114,24 +114,5 @@ final class ThemeEngine {
         indicatorColor: role(ColorRole.highlight),
       ),
     );
-  }
-
-  /// Materialization internals of the identity/critical pairs — part
-  /// of the value sets, read from the values home.
-  ({Color onPrimary, Color onCritical}) _identityInternalsFor(
-    ThemeVariantId variant,
-  ) {
-    final ColorTokenSet set;
-    switch (variant) {
-      case ThemeVariantId.light:
-        set = lightColorTokens;
-      case ThemeVariantId.dark:
-        set = darkColorTokens;
-      case ThemeVariantId.lightHighContrast:
-        set = lightHighContrastColorTokens;
-      case ThemeVariantId.darkHighContrast:
-        set = darkHighContrastColorTokens;
-    }
-    return (onPrimary: set.onPrimary, onCritical: set.onCritical);
   }
 }
