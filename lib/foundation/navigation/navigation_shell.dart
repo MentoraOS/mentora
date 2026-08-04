@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/tokens/design_tokens.dart';
 import '../localization/mentora_strings.dart';
+import 'mentora_navigation_bar.dart';
 
 /// The official root navigation (P9.0 MF-04): five entries, one per
 /// platform — Home, Consultation, Business, Notifications, Account.
@@ -15,11 +17,13 @@ import '../localization/mentora_strings.dart';
 final class NavigationShell extends StatefulWidget {
   final AppearanceEngine appearance;
   final AccessibilityEngine accessibility;
+  final MotionEngine motion;
 
   const NavigationShell({
     super.key,
     required this.appearance,
     required this.accessibility,
+    required this.motion,
   });
 
   @override
@@ -69,35 +73,37 @@ final class _NavigationShellState extends State<NavigationShell> {
             widget.accessibility.chromeTextScaleFor(widget.appearance.state),
           ),
         ),
-        child: NavigationBar(
+        child: MentoraNavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: (index) {
             setState(() => _selectedIndex = index);
           },
+          motion: widget.motion,
+          appearance: widget.appearance.state,
           destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home),
+            MentoraNavigationDestination(
+              icon: Icons.home_outlined,
+              selectedIcon: Icons.home,
               label: strings.tabHome,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.event_note_outlined),
-              selectedIcon: const Icon(Icons.event_note),
+            MentoraNavigationDestination(
+              icon: Icons.event_note_outlined,
+              selectedIcon: Icons.event_note,
               label: strings.tabConsultation,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.insights_outlined),
-              selectedIcon: const Icon(Icons.insights),
+            MentoraNavigationDestination(
+              icon: Icons.insights_outlined,
+              selectedIcon: Icons.insights,
               label: strings.tabBusiness,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.notifications_outlined),
-              selectedIcon: const Icon(Icons.notifications),
+            MentoraNavigationDestination(
+              icon: Icons.notifications_outlined,
+              selectedIcon: Icons.notifications,
               label: strings.tabNotifications,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline),
-              selectedIcon: const Icon(Icons.person),
+            MentoraNavigationDestination(
+              icon: Icons.person_outline,
+              selectedIcon: Icons.person,
               label: strings.tabAccount,
             ),
           ],

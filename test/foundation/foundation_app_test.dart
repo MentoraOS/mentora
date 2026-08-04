@@ -7,6 +7,7 @@ import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
 import 'package:mentora/foundation/design_kit/appearance/appearance_engine.dart';
 import 'package:mentora/foundation/design_kit/tokens/design_tokens.dart';
+import 'package:mentora/foundation/navigation/mentora_navigation_bar.dart';
 
 Future<FoundationServices> _services() async {
   final services = FoundationServices();
@@ -23,8 +24,11 @@ void main() {
     await tester.pumpWidget(MentoraFoundationApp(services: services));
     await tester.pumpAndSettle();
 
-    expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.byType(NavigationDestination), findsNWidgets(5));
+    expect(find.byType(MentoraNavigationBar), findsOneWidget);
+    final bar = tester.widget<MentoraNavigationBar>(
+      find.byType(MentoraNavigationBar),
+    );
+    expect(bar.destinations.length, 5);
   });
 
   testWidgets('switching tab shows the calm foundation surface of the '
@@ -57,7 +61,7 @@ void main() {
     expect(tester.takeException(), isNull);
     // Surface title + navigation label: the French strings are live.
     expect(find.text('Accueil'), findsNWidgets(2));
-    final context = tester.element(find.byType(NavigationBar));
+    final context = tester.element(find.byType(MentoraNavigationBar));
     // The regression that motivated this sprint: MaterialLocalizations
     // must resolve for every supported locale, not only English.
     expect(MaterialLocalizations.of(context), isNotNull);
@@ -100,7 +104,7 @@ void main() {
     // The regression that motivated this sprint: no RenderFlex overflow
     // on the bottom navigation, at any official font scale.
     expect(tester.takeException(), isNull);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(MentoraNavigationBar), findsOneWidget);
   });
 
   testWidgets('F1.0.1 — the chrome scale is bounded, the content scale '
@@ -133,9 +137,15 @@ void main() {
     appearance.updateTheme(ThemePreference.dark);
     await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(NavigationBar));
+    final context = tester.element(find.byType(MentoraNavigationBar));
     expect(Theme.of(context).colorScheme.brightness, Brightness.dark);
     // The five entries are untouched by an appearance change (GE-18).
-    expect(find.byType(NavigationDestination), findsNWidgets(5));
+    expect(
+      tester
+          .widget<MentoraNavigationBar>(find.byType(MentoraNavigationBar))
+          .destinations
+          .length,
+      5,
+    );
   });
 }

@@ -498,12 +498,20 @@ void main() {
 
     test('the shell codes no interface string — words live in the '
         'strings layer', () {
-      final source = File(
+      for (final path in const [
         'lib/foundation/navigation/navigation_shell.dart',
-      ).readAsStringSync();
-      expect(source, isNot(contains("Text('")));
-      expect(source, isNot(contains('label: \'')));
-      expect(source, contains('MentoraStrings.of(context)'));
+        'lib/foundation/navigation/mentora_navigation_bar.dart',
+      ]) {
+        final source = File(path).readAsStringSync();
+        expect(source, isNot(contains("Text('")));
+        expect(source, isNot(contains('label: \'')));
+      }
+      expect(
+        File(
+          'lib/foundation/navigation/navigation_shell.dart',
+        ).readAsStringSync(),
+        contains('MentoraStrings.of(context)'),
+      );
     });
 
     test('the official root navigation has exactly five destinations', () {

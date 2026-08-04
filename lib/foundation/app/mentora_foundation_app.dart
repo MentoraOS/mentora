@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
+import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/theme/theme_engine.dart';
 import '../localization/localization_engine.dart';
 import '../localization/mentora_strings.dart';
@@ -58,6 +59,7 @@ final class MentoraFoundationApp extends StatelessWidget {
           home: NavigationShell(
             appearance: appearance,
             accessibility: accessibility,
+            motion: services.get<MotionEngine>(),
           ),
         );
       },
