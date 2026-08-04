@@ -5,6 +5,8 @@ import '../core/di/foundation_services.dart';
 import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/design_kit_scope.dart';
+import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_host.dart';
+import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_host.dart';
 import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/components/text/mentora_text.dart';
@@ -97,9 +99,14 @@ final class _PlaygroundAppState extends State<PlaygroundApp> {
                 accessibility: accessibility,
                 appearance: state,
                 variant: variant,
+                // The contextual layers live above the application
+                // and below nothing: installed once, never pushed.
                 child: MentoraDialogHost(
                   service: widget.services.get<MentoraDialogService>(),
-                  child: child ?? const SizedBox.shrink(),
+                  child: MentoraBottomSheetHost(
+                    service: widget.services.get<MentoraBottomSheetService>(),
+                    child: child ?? const SizedBox.shrink(),
+                  ),
                 ),
               ),
             );
@@ -196,6 +203,9 @@ final class _PlaygroundShell extends StatelessWidget {
               const InputGallery(),
               DialogGallery(
                 service: services.get<MentoraDialogService>(),
+              ),
+              BottomSheetGallery(
+                service: services.get<MentoraBottomSheetService>(),
               ),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],

@@ -4,6 +4,10 @@ import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
+import '../design_kit/components/bottom_sheet/mentora_bottom_sheet.dart';
+import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_request.dart';
+import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_service.dart';
+import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_style.dart';
 import '../design_kit/components/design_kit_scope.dart';
 import '../design_kit/components/dialog/mentora_dialog.dart';
 import '../design_kit/components/dialog/mentora_dialog_request.dart';
@@ -954,6 +958,190 @@ final class _DialogDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: dialogDocScans,
             keyPrefix: 'dialog-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Bottom Sheets catalogue — every variant and every
+/// state of the REAL component, shown in place, plus the live service
+/// and its living documentation.
+final class BottomSheetGallery extends StatefulWidget {
+  /// The official service of the laboratory — the same one the host
+  /// listens to: the catalogue duplicates nothing.
+  final MentoraBottomSheetService service;
+
+  const BottomSheetGallery({super.key, required this.service});
+
+  @override
+  State<BottomSheetGallery> createState() => _BottomSheetGalleryState();
+}
+
+final class _BottomSheetGalleryState extends State<BottomSheetGallery> {
+  @override
+  void initState() {
+    super.initState();
+    widget.service.addListener(_onAccompanimentChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.service.removeListener(_onAccompanimentChanged);
+    super.dispose();
+  }
+
+  void _onAccompanimentChanged() {
+    if (mounted) setState(() {});
+  }
+
+  static MentoraBottomSheetRequest demandOf(
+    MentoraBottomSheetVariant variant,
+  ) {
+    return MentoraBottomSheetRequest(
+      variant: variant,
+      title: variant.name,
+      content: const MentoraText(
+        'What this sheet accompanies.',
+        role: MentoraTextRole.body,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: sheetGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraBottomSheetVariant.values)
+            MentoraBottomSheet(
+              key: Key('sheet-variant-${variant.name}'),
+              request: demandOf(variant),
+              state: MentoraBottomSheetState.opened,
+              detent: initialDetentOf(variant),
+            ),
+          // Every state, on the standard accompaniment.
+          for (final state in MentoraBottomSheetState.values)
+            MentoraBottomSheet(
+              key: Key('sheet-state-${state.name}'),
+              request: demandOf(MentoraBottomSheetVariant.standard),
+              state: state,
+              detent: MentoraBottomSheetDetent.collapsed,
+            ),
+          // Both detents, expressed side by side.
+          for (final detent in MentoraBottomSheetDetent.values)
+            MentoraBottomSheet(
+              key: Key('sheet-detent-${detent.name}'),
+              request: demandOf(MentoraBottomSheetVariant.selection),
+              state: detent == MentoraBottomSheetDetent.expanded
+                  ? MentoraBottomSheetState.expanded
+                  : MentoraBottomSheetState.collapsed,
+              detent: detent,
+            ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: MentoraBottomSheet(
+                key: Key('sheet-theme-${variant.name}'),
+                request: demandOf(MentoraBottomSheetVariant.standard),
+                state: MentoraBottomSheetState.opened,
+                detent: MentoraBottomSheetDetent.collapsed,
+              ),
+            ),
+          // Both reading directions.
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraBottomSheet(
+                key: Key('sheet-direction-${direction.name}'),
+                request: demandOf(MentoraBottomSheetVariant.standard),
+                state: MentoraBottomSheetState.opened,
+                detent: MentoraBottomSheetDetent.collapsed,
+              ),
+            ),
+          // The live service: the layer rises above the laboratory,
+          // traps the focus, answers the keyboard, and settles.
+          MentoraButton(
+            key: const Key('sheet-open'),
+            label: 'open',
+            onPressed: () => widget.service.queue(
+              demandOf(MentoraBottomSheetVariant.selection),
+            ),
+          ),
+          MentoraButton(
+            key: const Key('sheet-expand'),
+            label: 'expand',
+            onPressed: widget.service.isBusy ? widget.service.expand : null,
+          ),
+          MentoraButton(
+            key: const Key('sheet-collapse'),
+            label: 'collapse',
+            onPressed: widget.service.isBusy ? widget.service.collapse : null,
+          ),
+          MentoraText(
+            'open: ${widget.service.isBusy} — '
+            'detent: ${widget.service.detent.name} — '
+            'pending: ${widget.service.pendingCount}',
+            key: const Key('sheet-service-state'),
+            role: MentoraTextRole.caption,
+          ),
+          const _BottomSheetDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Bottom Sheet's living documentation — built only with Mentora
+/// components.
+final class _BottomSheetDocumentation extends StatelessWidget {
+  const _BottomSheetDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('sheet-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(sheetDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: sheetDocArchitecture,
+            keyPrefix: 'sheet-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: sheetDocResponsibilities,
+            keyPrefix: 'sheet-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: sheetDocTokens,
+            keyPrefix: 'sheet-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: sheetDocEngines,
+            keyPrefix: 'sheet-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: sheetDocForbidden,
+            keyPrefix: 'sheet-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: sheetDocScans,
+            keyPrefix: 'sheet-doc-scan',
           ),
         ],
       ),

@@ -559,8 +559,14 @@ void main() {
       expect(components, isNotEmpty);
       for (final component in components) {
         final name = component.path.replaceAll('\\', '/').split('/').last;
+        // A Core Component is a directory that owns its widget; the
+        // shared machinery next to them owes the catalogue nothing.
+        if (!File('${component.path}/mentora_$name.dart').existsSync()) {
+          continue;
+        }
         final galleryType =
-            '${name[0].toUpperCase()}${name.substring(1)}Gallery';
+            '${name.split('_').map((word) => '${word[0].toUpperCase()}'
+                '${word.substring(1)}').join()}Gallery';
         expect(
           gallery.contains('components/$name/'),
           isTrue,

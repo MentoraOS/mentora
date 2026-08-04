@@ -88,6 +88,51 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String sheetGalleryTitle =
+    'Bottom Sheets — Variants (8), States (8), Detents & Service';
+const String sheetDocHeading = 'MentoraBottomSheet — official contract';
+const List<String> sheetDocArchitecture = [
+  'No route, no Navigator: the host renders the layer, always mounted',
+  'A sheet never encloses — its meaning is always the aparté',
+  'What must be answered is a dialog, never a sheet',
+  'The service owns where the sheet rests: expanding is a demand',
+  'The queue machinery is shared with the dialog — written once',
+];
+const List<String> sheetDocResponsibilities = [
+  'It never interrupts: it accompanies and extends the screen',
+  'It never replaces a page',
+  'It never occupies room without a reason — only some may expand',
+  'It disappears as soon as its purpose is served',
+  'A released gesture settles on a detent, or lets the sheet go',
+  'The focus is trapped while it lasts, and restored where it was',
+];
+const List<String> sheetDocForbidden = [
+  'showModalBottomSheet or showBottomSheet anywhere',
+  'BottomSheet or ModalBottomSheetRoute in a screen',
+  'A sheet created outside the official service',
+  'A coded color, size, radius or duration',
+  'A local animation, or reading the ambient Theme',
+];
+const List<String> sheetDocTokens = [
+  'BottomSheet: detent fractions, dismiss travel, width, radius, handle',
+  'Color: outline, focus, supporting, immersion',
+  'Surface: the primary surface — the secondary one for a preview',
+  'Elevation: the aparté meaning — never a height',
+  'Spacing: focus space, hierarchical breathing, linked proximity',
+];
+const List<String> sheetDocEngines = [
+  'Color, Surface, Spacing & Elevation Token Engines',
+  'Motion Engine — accompany, for arriving, settling and leaving',
+  'Accessibility Engine — the opposable reachable grip',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> sheetDocScans = [
+  'No Material bottom sheet and no imperative opening in the foundation',
+  'No layer built outside the official service',
+  'No coded duration, radius, padding or color',
+  'No ambient Theme read inside a Core Component',
+];
 const String dialogGalleryTitle =
     'Dialogs — Variants (8), States (8), Service & Queue';
 const String dialogDocHeading = 'MentoraDialog — official contract';
