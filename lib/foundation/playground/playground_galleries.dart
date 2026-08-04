@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../design_kit/components/button/mentora_button.dart';
+import '../design_kit/components/button/mentora_button_style.dart';
+import '../design_kit/components/card/mentora_card.dart';
+import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/registry/semantic_roles.dart';
 import '../design_kit/registry/token_engines.dart';
 import '../design_kit/responsive/responsive_engine.dart';
@@ -203,6 +207,193 @@ final class ElevationGallery extends StatelessWidget {
                 );
               },
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Buttons catalogue — every variant, every size and the
+/// application phases of the REAL component.
+final class ButtonGallery extends StatefulWidget {
+  const ButtonGallery({super.key});
+
+  @override
+  State<ButtonGallery> createState() => _ButtonGalleryState();
+}
+
+final class _ButtonGalleryState extends State<ButtonGallery> {
+  final MentoraButtonController _loading = MentoraButtonController();
+  final MentoraButtonController _success = MentoraButtonController();
+  final MentoraButtonController _error = MentoraButtonController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loading.beginLoading();
+    _success.showSuccess();
+    _error.showError();
+  }
+
+  @override
+  void dispose() {
+    _loading.dispose();
+    _success.dispose();
+    _error.dispose();
+    super.dispose();
+  }
+
+  void _noop() {}
+
+  @override
+  Widget build(BuildContext context) {
+    return GallerySection(
+      title: buttonGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraButtonVariant.values)
+            MentoraButton(
+              key: Key('button-variant-${variant.name}'),
+              label: variant.name,
+              onPressed: _noop,
+              variant: variant,
+            ),
+          for (final size in MentoraButtonSize.values)
+            MentoraButton(
+              key: Key('button-size-${size.name}'),
+              label: size.name,
+              onPressed: _noop,
+              size: size,
+            ),
+          const MentoraButton(
+            key: Key('button-state-disabled'),
+            label: 'disabled',
+            onPressed: null,
+          ),
+          MentoraButton(
+            key: const Key('button-state-loading'),
+            label: 'loading',
+            onPressed: _noop,
+            controller: _loading,
+          ),
+          MentoraButton(
+            key: const Key('button-state-success'),
+            label: 'success',
+            onPressed: _noop,
+            controller: _success,
+          ),
+          MentoraButton(
+            key: const Key('button-state-error'),
+            label: 'error',
+            onPressed: _noop,
+            controller: _error,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Cards catalogue — every variant and every state of the
+/// REAL component. The laboratory duplicates nothing: what is shown
+/// here is exactly what the screens will use.
+///
+/// The interaction states (pressed, focused, hovered) are shown as
+/// live cards: the engineer presses, tabs and hovers them to verify
+/// the expression — a catalogue of claims would prove nothing.
+final class CardGallery extends StatefulWidget {
+  const CardGallery({super.key});
+
+  @override
+  State<CardGallery> createState() => _CardGalleryState();
+}
+
+final class _CardGalleryState extends State<CardGallery> {
+  final MentoraCardController _loading = MentoraCardController();
+  final MentoraCardController _error = MentoraCardController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loading.beginLoading();
+    _error.showError();
+  }
+
+  @override
+  void dispose() {
+    _loading.dispose();
+    _error.dispose();
+    super.dispose();
+  }
+
+  /// The act served to every inviting sample of the catalogue: the
+  /// laboratory observes the expression, it performs no business.
+  void _noop() {}
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    Widget caption(String text) => Text(text, style: textTheme.labelSmall);
+
+    return GallerySection(
+      title: cardGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraCardVariant.values)
+            MentoraCard(
+              key: Key('card-variant-${variant.name}'),
+              variant: variant,
+              onTap: variant == MentoraCardVariant.interactive ? _noop : null,
+              child: caption(variant.name),
+            ),
+          // The states, on the official interactive variant.
+          MentoraCard(
+            key: const Key('card-state-idle'),
+            child: caption(MentoraCardState.idle.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-pressed'),
+            variant: MentoraCardVariant.interactive,
+            onTap: _noop,
+            child: caption(MentoraCardState.pressed.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-focused'),
+            variant: MentoraCardVariant.interactive,
+            onTap: _noop,
+            child: caption(MentoraCardState.focused.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-hovered'),
+            variant: MentoraCardVariant.interactive,
+            onTap: _noop,
+            child: caption(MentoraCardState.hovered.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-selected'),
+            variant: MentoraCardVariant.selected,
+            child: caption(MentoraCardState.selected.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-disabled'),
+            variant: MentoraCardVariant.outlined,
+            enabled: false,
+            child: caption(MentoraCardState.disabled.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-loading'),
+            variant: MentoraCardVariant.outlined,
+            controller: _loading,
+            child: caption(MentoraCardState.loading.name),
+          ),
+          MentoraCard(
+            key: const Key('card-state-error'),
+            variant: MentoraCardVariant.outlined,
+            controller: _error,
+            child: caption(MentoraCardState.error.name),
+          ),
         ],
       ),
     );

@@ -180,6 +180,8 @@ final class _PlaygroundShell extends StatelessWidget {
                 replayTick: controller.motionReplays,
                 onReplay: controller.replayMotion,
               ),
+              const ButtonGallery(),
+              const CardGallery(),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
           ),

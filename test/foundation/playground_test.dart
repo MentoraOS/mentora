@@ -30,7 +30,10 @@ Future<void> _pumpPlayground(WidgetTester tester) async {
   addTearDown(tester.view.resetDevicePixelRatio);
   final services = await _services();
   await tester.pumpWidget(PlaygroundApp(services: services));
-  await tester.pumpAndSettle();
+  // The living catalogue hosts the components' waiting states: their
+  // indicators never come to rest, by design. The laboratory is
+  // therefore pumped, never settled.
+  await tester.pump(const Duration(seconds: 1));
 }
 
 void main() {
@@ -140,10 +143,11 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(PlaygroundApp(services: services));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
 
     services.get<AppearanceEngine>().updateTheme(ThemePreference.dark);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     final context = tester.element(find.byKey(const Key('playground-scroll')));
     expect(Theme.of(context).colorScheme.brightness, Brightness.dark);
@@ -154,7 +158,7 @@ void main() {
     await _pumpPlayground(tester);
 
     await tester.tap(find.text('ar'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
 
     final context = tester.element(find.byKey(const Key('playground-scroll')));
     expect(Directionality.of(context), TextDirection.rtl);
