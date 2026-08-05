@@ -8,6 +8,8 @@ import '../design_kit/components/design_kit_scope.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_host.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_host.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_host.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/token_engines.dart';
@@ -80,15 +82,16 @@ final class MentoraFoundationApp extends StatelessWidget {
                 accessibility: accessibility,
                 appearance: state,
                 variant: variant,
-                // The dialog layer lives above the application and
-                // below nothing: installed once, never pushed.
                 // The contextual layers live above the application
                 // and below nothing: installed once, never pushed.
                 child: MentoraDialogHost(
                   service: services.get<MentoraDialogService>(),
                   child: MentoraBottomSheetHost(
                     service: services.get<MentoraBottomSheetService>(),
-                    child: child ?? const SizedBox.shrink(),
+                    child: MentoraSnackbarHost(
+                      service: services.get<MentoraSnackbarService>(),
+                      child: child ?? const SizedBox.shrink(),
+                    ),
                   ),
                 ),
               ),

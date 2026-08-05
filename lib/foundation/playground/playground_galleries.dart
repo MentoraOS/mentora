@@ -14,6 +14,10 @@ import '../design_kit/components/dialog/mentora_dialog_request.dart';
 import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_style.dart';
 import '../design_kit/components/input/mentora_input.dart';
+import '../design_kit/components/snackbar/mentora_snackbar.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_request.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_service.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_style.dart';
 import '../design_kit/components/input/mentora_input_style.dart';
 import '../design_kit/components/input/mentora_input_validator.dart';
 import '../design_kit/components/text/mentora_text.dart';
@@ -1142,6 +1146,173 @@ final class _BottomSheetDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: sheetDocScans,
             keyPrefix: 'sheet-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Snackbars catalogue — every variant and every state of
+/// the REAL component, shown in place, plus the live service and its
+/// living documentation.
+final class SnackbarGallery extends StatefulWidget {
+  /// The official service of the laboratory — the same one the host
+  /// listens to: the catalogue duplicates nothing.
+  final MentoraSnackbarService service;
+
+  const SnackbarGallery({super.key, required this.service});
+
+  @override
+  State<SnackbarGallery> createState() => _SnackbarGalleryState();
+}
+
+final class _SnackbarGalleryState extends State<SnackbarGallery> {
+  @override
+  void initState() {
+    super.initState();
+    widget.service.addListener(_onMessageChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.service.removeListener(_onMessageChanged);
+    super.dispose();
+  }
+
+  void _onMessageChanged() {
+    if (mounted) setState(() {});
+  }
+
+  static MentoraSnackbarRequest demandOf(MentoraSnackbarVariant variant) {
+    return MentoraSnackbarRequest(
+      variant: variant,
+      message: 'One message, one idea — ${variant.name}.',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: snackbarGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraSnackbarVariant.values)
+            MentoraSnackbar(
+              key: Key('snackbar-variant-${variant.name}'),
+              request: demandOf(variant),
+              state: MentoraSnackbarState.visible,
+            ),
+          // Every state, on the information message.
+          for (final state in MentoraSnackbarState.values)
+            MentoraSnackbar(
+              key: Key('snackbar-state-${state.name}'),
+              request: demandOf(MentoraSnackbarVariant.information),
+              state: state,
+            ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: MentoraSnackbar(
+                key: Key('snackbar-theme-${variant.name}'),
+                request: demandOf(MentoraSnackbarVariant.information),
+                state: MentoraSnackbarState.visible,
+              ),
+            ),
+          // Both reading directions.
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraSnackbar(
+                key: Key('snackbar-direction-${direction.name}'),
+                request: demandOf(MentoraSnackbarVariant.information),
+                state: MentoraSnackbarState.visible,
+              ),
+            ),
+          // The live service: the message speaks above the laboratory,
+          // queues, replaces, and leaves on its own.
+          MentoraButton(
+            key: const Key('snackbar-say'),
+            label: 'say',
+            onPressed: () => widget.service.queue(
+              demandOf(MentoraSnackbarVariant.success),
+            ),
+          ),
+          MentoraButton(
+            key: const Key('snackbar-replace'),
+            label: 'replace',
+            onPressed: widget.service.isShowing
+                ? () => widget.service.replace(
+                    demandOf(MentoraSnackbarVariant.warning),
+                  )
+                : null,
+          ),
+          MentoraButton(
+            key: const Key('snackbar-clear'),
+            label: 'clear',
+            onPressed: widget.service.isShowing ? widget.service.clear : null,
+          ),
+          MentoraText(
+            'showing: ${widget.service.isShowing} — '
+            'pending: ${widget.service.pendingCount}',
+            key: const Key('snackbar-service-state'),
+            role: MentoraTextRole.caption,
+          ),
+          const _SnackbarDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Snackbar's living documentation — built only with Mentora
+/// components.
+final class _SnackbarDocumentation extends StatelessWidget {
+  const _SnackbarDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('snackbar-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(snackbarDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: snackbarDocArchitecture,
+            keyPrefix: 'snackbar-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: snackbarDocResponsibilities,
+            keyPrefix: 'snackbar-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: snackbarDocTokens,
+            keyPrefix: 'snackbar-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: snackbarDocEngines,
+            keyPrefix: 'snackbar-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: snackbarDocForbidden,
+            keyPrefix: 'snackbar-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: snackbarDocScans,
+            keyPrefix: 'snackbar-doc-scan',
           ),
         ],
       ),

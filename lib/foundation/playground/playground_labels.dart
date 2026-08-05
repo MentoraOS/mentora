@@ -88,6 +88,50 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String snackbarGalleryTitle =
+    'Snackbars — Variants (8), States (6), Queue & Replace';
+const String snackbarDocHeading = 'MentoraSnackbar — official contract';
+const List<String> snackbarDocArchitecture = [
+  'No route and no framework messenger: the host renders the layer',
+  'Its meaning is the signalement: no veil, no blocking, no layer taken',
+  'One message at a time — one message, one idea',
+  'The queue machinery is shared with the dialog and the sheet',
+  'The reading time is a Token, never a motion duration',
+];
+const List<String> snackbarDocResponsibilities = [
+  'It never asks: it carries no act — what is decided is a dialog',
+  'It informs, confirms, reassures, and disappears alone',
+  'It never interrupts: no focus trap, no focus taken, no pointer stolen',
+  'It never tells a story: a single sentence, refused if it holds two',
+  'A message that reports an ongoing state waits for that state to end',
+];
+const List<String> snackbarDocForbidden = [
+  'The framework snackbar, its messenger or its imperative openings',
+  'Hiding or removing a message through the framework',
+  'A message created outside the official service',
+  'A coded color, size, padding or duration',
+  'A local animation, or reading the ambient Theme',
+];
+const List<String> snackbarDocTokens = [
+  'Snackbar: dwell times, width, radius, border, icon, entry offset',
+  'Color: information, success, warning, critical, unavailable, outline',
+  'Surface: the protected surface that carries the message',
+  'Elevation: the signalement meaning — never a height',
+  'Spacing: distinct separation and linked proximity',
+];
+const List<String> snackbarDocEngines = [
+  'Color, Surface, Spacing & Elevation Token Engines',
+  'Motion Engine — reassure, or attract when it must be seen',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Accessibility Engine — the font scale, applied once by the app',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> snackbarDocScans = [
+  'No Material snackbar and no messenger in the foundation',
+  'No message built outside the official service',
+  'No coded duration, radius, padding or color',
+  'No ambient Theme read inside a Core Component',
+];
 const String sheetGalleryTitle =
     'Bottom Sheets — Variants (8), States (8), Detents & Service';
 const String sheetDocHeading = 'MentoraBottomSheet — official contract';

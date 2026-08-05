@@ -3,6 +3,7 @@ import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_service.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_service.dart';
 import '../design_kit/international/international_engine.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
@@ -98,6 +99,7 @@ final class DesignKitBootstrapStep implements StartupStep {
     services.register<MentoraBottomSheetService>(
       MentoraBottomSheetService.new,
     );
+    services.register<MentoraSnackbarService>(MentoraSnackbarService.new);
   }
 }
 
@@ -116,6 +118,7 @@ void validateDesignKit(FoundationServices services) {
     ..get<LocalizationEngine>()
     ..get<MentoraDialogService>()
     ..get<MentoraBottomSheetService>()
+    ..get<MentoraSnackbarService>()
     ..get<ColorTokenEngine>()
     ..get<TypographyTokenEngine>()
     ..get<SpacingTokenEngine>()

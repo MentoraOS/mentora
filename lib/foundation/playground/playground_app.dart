@@ -8,6 +8,8 @@ import '../design_kit/components/design_kit_scope.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_host.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_host.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_host.dart';
+import '../design_kit/components/snackbar/mentora_snackbar_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/components/text/mentora_text.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
@@ -105,7 +107,10 @@ final class _PlaygroundAppState extends State<PlaygroundApp> {
                   service: widget.services.get<MentoraDialogService>(),
                   child: MentoraBottomSheetHost(
                     service: widget.services.get<MentoraBottomSheetService>(),
-                    child: child ?? const SizedBox.shrink(),
+                    child: MentoraSnackbarHost(
+                      service: widget.services.get<MentoraSnackbarService>(),
+                      child: child ?? const SizedBox.shrink(),
+                    ),
                   ),
                 ),
               ),
@@ -206,6 +211,9 @@ final class _PlaygroundShell extends StatelessWidget {
               ),
               BottomSheetGallery(
                 service: services.get<MentoraBottomSheetService>(),
+              ),
+              SnackbarGallery(
+                service: services.get<MentoraSnackbarService>(),
               ),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
