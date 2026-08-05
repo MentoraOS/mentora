@@ -545,44 +545,55 @@ void main() {
       }
     });
 
-    test('every Core Component is catalogued in the living playground', () {
+    test('every component of every family is catalogued in the living '
+        'playground', () {
       final gallery = File(
         'lib/foundation/playground/playground_galleries.dart',
       ).readAsStringSync();
       final mounted = File(
         'lib/foundation/playground/playground_app.dart',
       ).readAsStringSync();
-      final components = Directory(
-        'lib/foundation/design_kit/components',
-      ).listSync().whereType<Directory>();
+      // Two families now: the Core Components and the Composition
+      // Components that assemble them. Both owe the catalogue a
+      // gallery, and the rule discovers them by itself.
+      const families = ['components', 'composition'];
+      var catalogued = 0;
 
-      expect(components, isNotEmpty);
-      for (final component in components) {
-        final name = component.path.replaceAll('\\', '/').split('/').last;
-        // A Core Component is a directory that owns its widget; the
-        // shared machinery next to them owes the catalogue nothing.
-        if (!File('${component.path}/mentora_$name.dart').existsSync()) {
-          continue;
+      for (final family in families) {
+        final root = Directory('lib/foundation/design_kit/$family');
+        expect(root.existsSync(), isTrue, reason: '$family must exist');
+        for (final component in root.listSync().whereType<Directory>()) {
+          final name = component.path
+              .replaceAll(r'\', '/')
+              .split('/')
+              .last;
+          // A component is a directory that owns its widget; the
+          // shared machinery next to them owes the catalogue nothing.
+          if (!File('${component.path}/mentora_$name.dart').existsSync()) {
+            continue;
+          }
+          final galleryType =
+              '${name.split('_').map((word) => '${word[0].toUpperCase()}'
+                  '${word.substring(1)}').join()}Gallery';
+          expect(
+            gallery.contains('$family/$name/'),
+            isTrue,
+            reason: 'the $name component must appear in the catalogue',
+          );
+          expect(
+            gallery.contains('class $galleryType'),
+            isTrue,
+            reason: 'every component owns its gallery: $galleryType',
+          );
+          expect(
+            mounted.contains('$galleryType('),
+            isTrue,
+            reason: '$galleryType must be mounted in the living catalogue',
+          );
+          catalogued++;
         }
-        final galleryType =
-            '${name.split('_').map((word) => '${word[0].toUpperCase()}'
-                '${word.substring(1)}').join()}Gallery';
-        expect(
-          gallery.contains('components/$name/'),
-          isTrue,
-          reason: 'the $name component must appear in the catalogue',
-        );
-        expect(
-          gallery.contains('class $galleryType'),
-          isTrue,
-          reason: 'every Core Component owns its gallery: $galleryType',
-        );
-        expect(
-          mounted.contains('$galleryType('),
-          isTrue,
-          reason: '$galleryType must be mounted in the living catalogue',
-        );
       }
+      expect(catalogued, greaterThanOrEqualTo(families.length));
     });
   });
 }

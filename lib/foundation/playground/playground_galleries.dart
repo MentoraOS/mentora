@@ -4,6 +4,8 @@ import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
+import '../design_kit/composition/list_tile/mentora_list_tile.dart';
+import '../design_kit/composition/list_tile/mentora_list_tile_style.dart';
 import '../design_kit/components/avatar/mentora_avatar.dart';
 import '../design_kit/components/avatar/mentora_avatar_style.dart';
 import '../design_kit/components/badge/mentora_badge.dart';
@@ -1678,6 +1680,170 @@ final class _AvatarDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: avatarDocScans,
             keyPrefix: 'avatar-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official List Tiles catalogue — every density, chrome, state
+/// and composition of the REAL component, across the four themes, the
+/// reading comfort and both directions.
+final class ListTileGallery extends StatelessWidget {
+  const ListTileGallery({super.key});
+
+  static void _noop() {}
+
+  static MentoraListTile entity({
+    Key? key,
+    MentoraListTileDensity density = MentoraListTileDensity.standard,
+    MentoraListTileChrome chrome = MentoraListTileChrome.plain,
+    MentoraListTileController? controller,
+    VoidCallback? onTap,
+    bool composed = true,
+  }) {
+    return MentoraListTile(
+      key: key,
+      density: density,
+      chrome: chrome,
+      controller: controller,
+      onTap: onTap,
+      leading: composed
+          ? MentoraAvatar(
+              identity: MentoraAvatarIdentity.initials,
+              name: 'Awa Mensah',
+              initials: 'AM',
+              size: avatarSizeOf(density),
+            )
+          : null,
+      headline: 'Awa Mensah',
+      supporting: composed ? 'Consultation de suivi' : null,
+      metadata: composed ? '11:00 — 45 min' : null,
+      badges: composed
+          ? const [
+              MentoraBadge(
+                variant: MentoraBadgeVariant.success,
+                shape: MentoraBadgeShape.compact,
+                label: 'Confirmée',
+              ),
+            ]
+          : const [],
+      trailing: composed
+          ? MentoraButton(
+              label: 'Ouvrir',
+              onPressed: _noop,
+              variant: MentoraButtonVariant.text,
+              size: MentoraButtonSize.small,
+            )
+          : null,
+      footer: composed ? 'Dernier échange il y a 2 jours' : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: listTileGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final density in MentoraListTileDensity.values)
+            entity(
+              key: Key('list-tile-density-${density.name}'),
+              density: density,
+            ),
+          for (final chrome in MentoraListTileChrome.values)
+            entity(
+              key: Key('list-tile-chrome-${chrome.name}'),
+              chrome: chrome,
+            ),
+          // The announced states of the entity.
+          for (final status in MentoraListTileStatus.values)
+            entity(
+              key: Key('list-tile-status-${status.name}'),
+              controller: MentoraListTileController(status),
+              onTap: _noop,
+            ),
+          // An entity that invites an act — press, tab and hover it.
+          entity(key: const Key('list-tile-interactive'), onTap: _noop),
+          // The barest entity: a name is always enough.
+          entity(key: const Key('list-tile-bare'), composed: false),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: entity(key: Key('list-tile-theme-${variant.name}')),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: entity(key: Key('list-tile-comfort-${comfort.name}')),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: entity(key: Key('list-tile-direction-${direction.name}')),
+            ),
+          const _ListTileDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The List Tile's living documentation — built only with Mentora
+/// components.
+final class _ListTileDocumentation extends StatelessWidget {
+  const _ListTileDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('list-tile-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(listTileDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: listTileDocArchitecture,
+            keyPrefix: 'list-tile-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: listTileDocResponsibilities,
+            keyPrefix: 'list-tile-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: listTileDocComponents,
+            keyPrefix: 'list-tile-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: listTileDocTokens,
+            keyPrefix: 'list-tile-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: listTileDocEngines,
+            keyPrefix: 'list-tile-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: listTileDocForbidden,
+            keyPrefix: 'list-tile-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: listTileDocScans,
+            keyPrefix: 'list-tile-doc-scan',
           ),
         ],
       ),

@@ -88,6 +88,56 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String listTileGalleryTitle =
+    'List Tiles — Densities (4), Chromes (4), States (7) & Composition';
+const String listTileDocHeading = 'MentoraListTile — official contract';
+const String listTileDocComponentsTitle = 'Components composed';
+const List<String> listTileDocArchitecture = [
+  'The first Composition Component: it composes, it never redefines',
+  'Its zones are typed, so authority is guaranteed by the compiler',
+  'Density and chrome are orthogonal — an act is what makes it interactive',
+  'Its adapter resolves the tile surface only, never a child',
+  'Breathing is a spacing relation declined by the density',
+];
+const List<String> listTileDocResponsibilities = [
+  'It presents an entity — a line does not exist',
+  'It announces the entity, never its layout: one voice, merged',
+  'An entity that cannot be named is not an entity',
+  'An entity that invites an act honours the reachable minimum',
+  'While an entity is loading, no act is offered twice',
+];
+const List<String> listTileDocComponents = [
+  'MentoraAvatar — owns the identity',
+  'MentoraText — owns the typography',
+  'MentoraBadge — owns the states',
+  'MentoraButton — owns the acts',
+];
+const List<String> listTileDocForbidden = [
+  'The framework list tiles and their checkbox, radio, switch kinds',
+  'Any expansion tile',
+  'Styling a child component from the tile',
+  'A coded colour, size, padding or radius',
+  'Reading the ambient Theme from a component',
+];
+const List<String> listTileDocTokens = [
+  'List Tile: minimum extents, breathing factors, radius, divider',
+  'Color: highlight, selection, focus, outline, divider, disabled',
+  'Typography: body, subtitle, supporting, metadata, caption',
+  'Spacing: distinct separation and linked proximity',
+];
+const List<String> listTileDocEngines = [
+  'Color & Spacing Token Engines',
+  'Motion Engine — accompany: a tile never announces itself',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> listTileDocScans = [
+  'No framework list tile of any kind in the foundation',
+  'A composition component imports only official components',
+  'It never builds a word, an icon or a style of its own',
+  'No coded colour, padding or radius outside the Tokens',
+];
 const String avatarGalleryTitle =
     'Avatars — Identities (10), Shapes (3), Sizes (6) & States (5)';
 const String avatarDocHeading = 'MentoraAvatar — official contract';
