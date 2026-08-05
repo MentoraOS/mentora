@@ -4,6 +4,8 @@ import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
+import '../design_kit/components/badge/mentora_badge.dart';
+import '../design_kit/components/badge/mentora_badge_style.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_request.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet_service.dart';
@@ -1313,6 +1315,183 @@ final class _SnackbarDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: snackbarDocScans,
             keyPrefix: 'snackbar-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Badges catalogue — every variant, form, size and
+/// state of the REAL component, across the four themes, the font
+/// scales, the reading comfort and both directions.
+final class BadgeGallery extends StatelessWidget {
+  const BadgeGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: badgeGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            children: [
+              for (final variant in MentoraBadgeVariant.values)
+                MentoraBadge(
+                  key: Key('badge-variant-${variant.name}'),
+                  variant: variant,
+                  label: variant.name,
+                ),
+            ],
+          ),
+          Wrap(
+            children: [
+              for (final shape in MentoraBadgeShape.values)
+                MentoraBadge(
+                  key: Key('badge-shape-${shape.name}'),
+                  variant: MentoraBadgeVariant.verified,
+                  shape: shape,
+                  label: shape.name,
+                  // A form without words states its meaning: never
+                  // colour alone.
+                  semanticLabel: 'Vérifié — ${shape.name}',
+                ),
+            ],
+          ),
+          Wrap(
+            children: [
+              for (final size in MentoraBadgeSize.values)
+                MentoraBadge(
+                  key: Key('badge-size-${size.name}'),
+                  variant: MentoraBadgeVariant.information,
+                  size: size,
+                  label: size.name,
+                ),
+            ],
+          ),
+          Wrap(
+            children: [
+              for (final state in MentoraBadgeState.values)
+                MentoraBadge(
+                  key: Key('badge-state-${state.name}'),
+                  variant: MentoraBadgeVariant.success,
+                  shape: MentoraBadgeShape.compact,
+                  state: state,
+                  label: state.name,
+                ),
+            ],
+          ),
+          // The four theme variants, high contrasts included.
+          Wrap(
+            children: [
+              for (final variant in ThemeVariantId.values)
+                DesignKitScope.deriving(
+                  scope,
+                  variant: variant,
+                  child: MentoraBadge(
+                    key: Key('badge-theme-${variant.name}'),
+                    variant: MentoraBadgeVariant.premium,
+                    label: variant.name,
+                  ),
+                ),
+            ],
+          ),
+          // The font scales, applied by the application's scaler.
+          for (final scale in FontScalePreference.values)
+            Builder(
+              builder: (context) {
+                final state = scope.appearance.copyWith(fontScale: scale);
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(
+                      scope.accessibility.textScaleFor(state),
+                    ),
+                  ),
+                  child: DesignKitScope.deriving(
+                    scope,
+                    appearance: state,
+                    child: MentoraBadge(
+                      key: Key('badge-scale-${scale.name}'),
+                      variant: MentoraBadgeVariant.ai,
+                      label: scale.name,
+                    ),
+                  ),
+                );
+              },
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: MentoraBadge(
+                key: Key('badge-comfort-${comfort.name}'),
+                variant: MentoraBadgeVariant.neutral,
+                label: comfort.name,
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraBadge(
+                key: Key('badge-direction-${direction.name}'),
+                variant: MentoraBadgeVariant.offline,
+                shape: MentoraBadgeShape.extended,
+                label: direction.name,
+              ),
+            ),
+          const _BadgeDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Badge's living documentation — built only with Mentora
+/// components.
+final class _BadgeDocumentation extends StatelessWidget {
+  const _BadgeDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('badge-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(badgeDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: badgeDocArchitecture,
+            keyPrefix: 'badge-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: badgeDocResponsibilities,
+            keyPrefix: 'badge-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: badgeDocTokens,
+            keyPrefix: 'badge-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: badgeDocEngines,
+            keyPrefix: 'badge-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: badgeDocForbidden,
+            keyPrefix: 'badge-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: badgeDocScans,
+            keyPrefix: 'badge-doc-scan',
           ),
         ],
       ),

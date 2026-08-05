@@ -88,6 +88,50 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String badgeGalleryTitle =
+    'Badges — Variants (11), Shapes (6), Sizes (3) & States (6)';
+const String badgeDocHeading = 'MentoraBadge — official contract';
+const List<String> badgeDocArchitecture = [
+  'A badge is inline: no service, no host, no layer — it is content',
+  'The Badge Tokens Adapter resolves every variant and state to roles',
+  'Its words are MentoraText, in a non-structural role only',
+  'The state comes from outside: a controller, or a resting value',
+  'A tinted ground is the accent itself, never an invented colour',
+];
+const List<String> badgeDocResponsibilities = [
+  'It affirms a state — it never tells a story',
+  'It never asks a decision: it replaces no dialog and no message',
+  'It never competes with a title: it completes an information',
+  'It is never interactive — a badge one can act on is not a badge',
+  'A form without words states its meaning: never colour alone',
+];
+const List<String> badgeDocForbidden = [
+  'Chip, InputChip, ChoiceChip, FilterChip, ActionChip, RawChip',
+  'Any act, gesture or destination carried by a badge',
+  'A coded colour, size, padding or radius',
+  'A structural typography role',
+  'Reading the ambient Theme from a component',
+];
+const List<String> badgeDocTokens = [
+  'Badge: heights, paddings, icon and dot sizes, radii, opacities',
+  'Color: neutral, information, success, warning, critical, verified',
+  'Color: secondary, aiSuggestion, unavailable, disabled, outline',
+  'Typography: caption and label — never a title role',
+  'Spacing: the linked-proximity relation between mark and words',
+];
+const List<String> badgeDocEngines = [
+  'Color, Typography & Spacing Token Engines',
+  'Motion Engine — accompany: a badge never announces itself',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Accessibility Engine — the font scale, applied once by the app',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> badgeDocScans = [
+  'No Material chip of any kind in the foundation',
+  'No act, gesture or callback inside the badge',
+  'No coded colour, padding or radius outside the Tokens',
+  'No ambient Theme read inside a Core Component',
+];
 const String snackbarGalleryTitle =
     'Snackbars — Variants (8), States (6), Queue & Replace';
 const String snackbarDocHeading = 'MentoraSnackbar — official contract';
