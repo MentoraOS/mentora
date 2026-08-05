@@ -216,6 +216,7 @@ final class _PlaygroundShell extends StatelessWidget {
                 service: services.get<MentoraSnackbarService>(),
               ),
               const BadgeGallery(),
+              const AvatarGallery(),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
           ),

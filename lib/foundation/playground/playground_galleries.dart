@@ -4,6 +4,8 @@ import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
+import '../design_kit/components/avatar/mentora_avatar.dart';
+import '../design_kit/components/avatar/mentora_avatar_style.dart';
 import '../design_kit/components/badge/mentora_badge.dart';
 import '../design_kit/components/badge/mentora_badge_style.dart';
 import '../design_kit/components/bottom_sheet/mentora_bottom_sheet.dart';
@@ -1492,6 +1494,190 @@ final class _BadgeDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: badgeDocScans,
             keyPrefix: 'badge-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Avatars catalogue — every identity, form, extent and
+/// state of the REAL component, across the four themes, the font
+/// scales, the reading comfort and both directions.
+final class AvatarGallery extends StatelessWidget {
+  const AvatarGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: avatarGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            children: [
+              for (final identity in MentoraAvatarIdentity.values)
+                MentoraAvatar(
+                  key: Key('avatar-identity-${identity.name}'),
+                  identity: identity,
+                  name: identity.name,
+                  initials: 'AM',
+                ),
+            ],
+          ),
+          Wrap(
+            children: [
+              for (final shape in MentoraAvatarShape.values)
+                MentoraAvatar(
+                  key: Key('avatar-shape-${shape.name}'),
+                  identity: MentoraAvatarIdentity.initials,
+                  shape: shape,
+                  name: shape.name,
+                  initials: 'AM',
+                ),
+            ],
+          ),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final size in MentoraAvatarSize.values)
+                MentoraAvatar(
+                  key: Key('avatar-size-${size.name}'),
+                  identity: MentoraAvatarIdentity.user,
+                  size: size,
+                  name: size.name,
+                  initials: 'AM',
+                ),
+            ],
+          ),
+          Wrap(
+            children: [
+              for (final state in MentoraAvatarState.values)
+                MentoraAvatar(
+                  key: Key('avatar-state-${state.name}'),
+                  identity: MentoraAvatarIdentity.organisation,
+                  state: state,
+                  name: state.name,
+                  initials: 'MO',
+                ),
+            ],
+          ),
+          // The four theme variants, high contrasts included.
+          Wrap(
+            children: [
+              for (final variant in ThemeVariantId.values)
+                DesignKitScope.deriving(
+                  scope,
+                  variant: variant,
+                  child: MentoraAvatar(
+                    key: Key('avatar-theme-${variant.name}'),
+                    identity: MentoraAvatarIdentity.ai,
+                    name: variant.name,
+                  ),
+                ),
+            ],
+          ),
+          // The font scales, applied by the application's scaler.
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final scale in FontScalePreference.values)
+                Builder(
+                  builder: (context) {
+                    final state = scope.appearance.copyWith(fontScale: scale);
+                    return MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        textScaler: TextScaler.linear(
+                          scope.accessibility.textScaleFor(state),
+                        ),
+                      ),
+                      child: DesignKitScope.deriving(
+                        scope,
+                        appearance: state,
+                        child: MentoraAvatar(
+                          key: Key('avatar-scale-${scale.name}'),
+                          identity: MentoraAvatarIdentity.initials,
+                          name: scale.name,
+                          initials: 'AM',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: MentoraAvatar(
+                key: Key('avatar-comfort-${comfort.name}'),
+                identity: MentoraAvatarIdentity.system,
+                name: comfort.name,
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: MentoraAvatar(
+                key: Key('avatar-direction-${direction.name}'),
+                identity: MentoraAvatarIdentity.company,
+                name: direction.name,
+                initials: 'شم',
+              ),
+            ),
+          const _AvatarDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Avatar's living documentation — built only with Mentora
+/// components.
+final class _AvatarDocumentation extends StatelessWidget {
+  const _AvatarDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('avatar-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(avatarDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: avatarDocArchitecture,
+            keyPrefix: 'avatar-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: avatarDocResponsibilities,
+            keyPrefix: 'avatar-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: avatarDocTokens,
+            keyPrefix: 'avatar-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: avatarDocEngines,
+            keyPrefix: 'avatar-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: avatarDocForbidden,
+            keyPrefix: 'avatar-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: avatarDocScans,
+            keyPrefix: 'avatar-doc-scan',
           ),
         ],
       ),

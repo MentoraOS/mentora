@@ -88,6 +88,50 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String avatarGalleryTitle =
+    'Avatars — Identities (10), Shapes (3), Sizes (6) & States (5)';
+const String avatarDocHeading = 'MentoraAvatar — official contract';
+const List<String> avatarDocArchitecture = [
+  'An avatar is inline: no service, no host, no layer — it is content',
+  'The Avatar Tokens Adapter resolves identity and state into roles',
+  'A portrait, then initials, then the identity mark — always one of them',
+  'The state comes from outside: a controller, or a resting value',
+  'A circle is half of itself; a rounded form keeps its softness at any size',
+];
+const List<String> avatarDocResponsibilities = [
+  'It represents an identity — never a decoration or an illustration',
+  'The identity survives the absence of an image, and its failure',
+  'It announces who, never "image": the name is required',
+  'It stays pure: no presence, verification, premium, counter or badge',
+  'Decorators are composed around it, never built inside it',
+];
+const List<String> avatarDocForbidden = [
+  'The framework avatar widget or its account headers',
+  'Any act, gesture or destination carried by an avatar',
+  'Any decorator built inside the component',
+  'A coded colour, size, padding or radius',
+  'Reading the ambient Theme from a component',
+];
+const List<String> avatarDocTokens = [
+  'Avatar: six extents, mark sizes, radius factor, opacities, border',
+  'Color: primary, secondary, aiSuggestion, information, supporting',
+  'Color: neutral, unavailable, disabled, outline',
+  'Surface: the calm surface that carries an archived identity',
+  'Typography: caption to title — the initials grow with the extent',
+];
+const List<String> avatarDocEngines = [
+  'Color, Typography & Surface Token Engines',
+  'Motion Engine — accompany: an identity never announces itself',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Accessibility Engine — the font scale, applied once by the app',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> avatarDocScans = [
+  'No framework avatar or account header in the foundation',
+  'No act, gesture or callback inside the avatar',
+  'No decorator imported by the avatar',
+  'No coded colour, padding or radius outside the Tokens',
+];
 const String badgeGalleryTitle =
     'Badges — Variants (11), Shapes (6), Sizes (3) & States (6)';
 const String badgeDocHeading = 'MentoraBadge — official contract';
