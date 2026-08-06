@@ -88,6 +88,55 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String searchBarGalleryTitle =
+    'Search Bars — Variants (5), States (7), Aids & Prepared acts';
+const String searchBarDocHeading = 'MentoraSearchBar — official contract';
+const List<String> searchBarDocArchitecture = [
+  'A Structural Component: it carries an intention, never a field',
+  'The entry is a MentoraInput — it owns the writing and the input method',
+  'The controller carries the acknowledged intention, phase and aids',
+  'Presentation is a Token spec: extent, radius, ground and delimitation',
+  'Voice and history are prepared affordances: named, never performed',
+];
+const List<String> searchBarDocResponsibilities = [
+  'It helps to find — it never finds',
+  'It knows a query, and a query is never a result',
+  'It never interprets, never normalizes, never matches anything',
+  'It never seeks: it reports an intention, the application decides',
+  'An aid is never a search and never a way somewhere: it is reported',
+];
+const List<String> searchBarDocComponents = [
+  'MentoraInput — owns the entry, the input method and the composition',
+  'MentoraText — owns the typography of the aids',
+  'MentoraButton — owns the acts offered beside the intention',
+];
+const List<String> searchBarDocForbidden = [
+  'The framework search widgets, anchors, controllers and delegates',
+  'Any interpretation, normalization or matching of a query',
+  'Any index, any filter, any network call',
+  'Any measure of the screen or responsive decision taken here',
+  'A coded colour, size, padding or duration',
+];
+const List<String> searchBarDocTokens = [
+  'Search Bar: presentation specs, icon, aid extent, radii, opacities',
+  'Color: primary, critical, supporting, unavailable, highlight, outline',
+  'Surface: the calm surface an intention rests on',
+  'Typography: body and supporting — an aid never speaks louder',
+  'Spacing: linked proximity and distinct separation',
+];
+const List<String> searchBarDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — accompany: a bar never hurries anyone',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> searchBarDocScans = [
+  'No framework search widget in the foundation',
+  'No interpretation, no index, no filter, no network in a structure',
+  'No screen measured and no responsive decision taken by a structure',
+  'No coded colour, padding, radius or duration outside the Tokens',
+];
 const String tabsGalleryTitle =
     'Tabs — Emphases (2), Shapes (3), Overflow (2) & States (6)';
 const String tabsDocHeading = 'MentoraTabs — official contract';

@@ -5,6 +5,8 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/search_bar/mentora_search_bar.dart';
+import '../design_kit/structure/search_bar/mentora_search_bar_style.dart';
 import '../design_kit/structure/tabs/mentora_tabs.dart';
 import '../design_kit/structure/tabs/mentora_tabs_style.dart';
 import '../design_kit/structure/navigation_rail/mentora_navigation_rail.dart';
@@ -2386,6 +2388,183 @@ final class _TabsDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: tabsDocScans,
             keyPrefix: 'tabs-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Search Bars catalogue — every variant and every
+/// announced state of the REAL component, with its aids and its
+/// prepared acts, across the four themes and both directions.
+final class SearchBarGallery extends StatefulWidget {
+  const SearchBarGallery({super.key});
+
+  @override
+  State<SearchBarGallery> createState() => _SearchBarGalleryState();
+}
+
+final class _SearchBarGalleryState extends State<SearchBarGallery> {
+  final MentoraSearchController _live = MentoraSearchController();
+
+  @override
+  void initState() {
+    super.initState();
+    // The aids are PUBLISHED by the application — the laboratory plays
+    // that part; the bar computes none of them.
+    _live.publishSuggestions(const [
+      MentoraSearchSuggestion(
+        id: 'awa',
+        label: 'Awa Mensah',
+        supporting: 'Experte — Nutrition',
+        icon: Icons.person_outline,
+      ),
+      MentoraSearchSuggestion(
+        id: 'sessions',
+        label: 'Séances de cette semaine',
+        icon: Icons.event_note_outlined,
+      ),
+    ]);
+  }
+
+  @override
+  void dispose() {
+    _live.dispose();
+    super.dispose();
+  }
+
+  static void _noop() {}
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget bar({
+      Key? key,
+      MentoraSearchBarVariant variant = MentoraSearchBarVariant.standard,
+      MentoraSearchController? controller,
+      bool enabled = true,
+    }) {
+      return MentoraSearchBar(
+        key: key,
+        variant: variant,
+        enabled: enabled,
+        controller: controller ?? MentoraSearchController(),
+        placeholder: 'Rechercher',
+        semanticLabel: 'Rechercher dans Mentora',
+        clearLabel: 'Effacer',
+        onQueryChanged: (_) {},
+      );
+    }
+
+    return GallerySection(
+      title: searchBarGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraSearchBarVariant.values)
+            bar(key: Key('search-variant-${variant.name}'), variant: variant),
+          // The announced phases — the application says what it is
+          // doing with the intention it received.
+          for (final phase in MentoraSearchPhase.values)
+            bar(
+              key: Key('search-phase-${phase.name}'),
+              controller: MentoraSearchController()..announcePhase(phase),
+            ),
+          bar(key: const Key('search-disabled'), enabled: false),
+          // The live bar: aids published by the application, and acts
+          // it prepared but the Kit never performs.
+          MentoraSearchBar(
+            key: const Key('search-live'),
+            controller: _live,
+            placeholder: 'Rechercher',
+            semanticLabel: 'Rechercher dans Mentora',
+            clearLabel: 'Effacer',
+            voice: const MentoraSearchAffordance(
+              label: 'Dicter',
+              onInvoke: _noop,
+            ),
+            history: const MentoraSearchAffordance(
+              label: 'Historique',
+              onInvoke: _noop,
+            ),
+            onQueryChanged: _live.announceQuery,
+            onSuggestionChosen: (_) {},
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: bar(key: Key('search-theme-${variant.name}')),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: bar(key: Key('search-comfort-${comfort.name}')),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: bar(key: Key('search-direction-${direction.name}')),
+            ),
+          const _SearchBarDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Search Bar's living documentation — built only with Mentora
+/// components.
+final class _SearchBarDocumentation extends StatelessWidget {
+  const _SearchBarDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('search-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(searchBarDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: searchBarDocArchitecture,
+            keyPrefix: 'search-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: searchBarDocResponsibilities,
+            keyPrefix: 'search-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: searchBarDocComponents,
+            keyPrefix: 'search-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: searchBarDocTokens,
+            keyPrefix: 'search-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: searchBarDocEngines,
+            keyPrefix: 'search-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: searchBarDocForbidden,
+            keyPrefix: 'search-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: searchBarDocScans,
+            keyPrefix: 'search-doc-scan',
           ),
         ],
       ),
