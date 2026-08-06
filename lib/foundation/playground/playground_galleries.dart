@@ -3256,6 +3256,59 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
   }
 }
 
+/// The official narrow adaptation catalogue - the SAME entity, in
+/// every room, giving up in the official order and never its name.
+final class NarrowAdaptationGallery extends StatelessWidget {
+  const NarrowAdaptationGallery({super.key});
+
+  /// The rooms the catalogue presents, from the narrowest upward.
+  static const List<double> rooms = [180, 220, 260, 300, 340, 370, 420, 480];
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget entityIn(double room, {String? suffix}) => Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: SizedBox(
+        width: room,
+        child: ListTileGallery.entity(
+          key: Key('narrow-${suffix ?? ''}${room.toInt()}'),
+          onTap: () {},
+        ),
+      ),
+    );
+
+    return GallerySection(
+      title: narrowAdaptationGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final room in rooms) entityIn(room),
+          // The same descent, read from the other side.
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: entityIn(220, suffix: '${direction.name}-'),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: entityIn(220, suffix: '${comfort.name}-'),
+            ),
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: entityIn(220, suffix: '${variant.name}-'),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 /// The official Workspaces catalogue - every navigation channel,
 /// every official surface, and the layers mounted only when their
 /// service is given.

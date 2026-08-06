@@ -97,7 +97,20 @@ final class MentoraListTileTheme {
       _spacing.spaceOf(SpacingRelation.proximiteLiee) *
       specOf(density).breathingFactor;
 
+  /// What survives of the breathing when the room grows short. The
+  /// space is the first thing an entity gives up, and it gives up a
+  /// share of its own gap — never a distance chosen here.
+  double surrenderedGapOf(MentoraListTileDensity density) =>
+      gapOf(density) * listTileSurrenderedGapFactor;
+
   double get lineGap => _spacing.spaceOf(SpacingRelation.proximiteLiee);
+
+  /// The room a name needs to stay a name — everything else is given
+  /// up before the words fall below it.
+  double get wordsFloor => listTileWordsFloor;
+
+  /// The room under which what completes the name says nothing.
+  double get secondaryWordsFloor => listTileSecondaryWordsFloor;
 
   /// An entity that invites an act is a target: it honors the
   /// opposable minimum, whatever the density proposes.

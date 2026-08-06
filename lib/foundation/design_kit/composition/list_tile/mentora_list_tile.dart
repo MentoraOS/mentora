@@ -6,6 +6,7 @@ import '../../components/button/mentora_button.dart';
 import '../../components/design_kit_scope.dart';
 import '../../components/text/mentora_text.dart';
 import '../../tokens/list_tile_tokens.dart';
+import 'mentora_list_tile_arrangement.dart';
 import 'mentora_list_tile_style.dart';
 import 'mentora_list_tile_theme.dart';
 
@@ -149,20 +150,29 @@ final class _MentoraListTileState extends State<MentoraListTile> {
     final visuals = theme.visualsOf(chrome: widget.chrome, state: state);
     final radius = BorderRadius.circular(listTileCornerRadius);
 
+    final aside = _aside();
     Widget body = Padding(
       padding: theme.paddingOf(widget.density),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          // The entity answers the room it is given: it reduces, then
+          // gives up - in the official order, and never its name.
+          MentoraListTileArrangement(
+            hasIdentity: widget.leading != null,
+            badgeCount: aside.badges.length,
+            hasAct: aside.act != null,
+            gap: theme.gapOf(widget.density),
+            surrenderedGap: theme.surrenderedGapOf(widget.density),
+            wordsFloor: theme.wordsFloor,
+            secondaryWordsFloor: theme.secondaryWordsFloor,
+            textDirection: Directionality.of(context),
             children: [
-              if (widget.leading != null) ...[
-                widget.leading!,
-                SizedBox(width: theme.gapOf(widget.density)),
-              ],
-              Expanded(child: _words(theme)),
-              ..._aside(theme, visuals),
+              if (widget.leading != null) widget.leading!,
+              _words(theme),
+              ...aside.badges,
+              if (aside.act != null) aside.act!,
             ],
           ),
           if (widget.footer != null) ...[
@@ -204,10 +214,7 @@ final class _MentoraListTileState extends State<MentoraListTile> {
         borderRadius: radius,
         border: visuals.border == null
             ? null
-            : Border.all(
-                color: visuals.border!,
-                width: listTileBorderWidth,
-              ),
+            : Border.all(color: visuals.border!, width: listTileBorderWidth),
       ),
       child: body,
     );
@@ -250,31 +257,27 @@ final class _MentoraListTileState extends State<MentoraListTile> {
   /// entity and what situates it.
   Widget _words(MentoraListTileTheme theme) {
     return MergeSemantics(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: MentoraListTileWords(
+        lineGap: theme.lineGap,
         children: [
+          // The name of the entity is never given up.
           MentoraText(
             widget.headline,
             role: theme.headlineRoleOf(widget.density),
             maxLines: 1,
           ),
-          if (widget.supporting != null) ...[
-            SizedBox(height: theme.lineGap),
+          if (widget.supporting != null)
             MentoraText(
               widget.supporting!,
               role: theme.supportingRole,
               maxLines: 1,
             ),
-          ],
-          if (widget.metadata != null) ...[
-            SizedBox(height: theme.lineGap),
+          if (widget.metadata != null)
             MentoraText(
               widget.metadata!,
               role: theme.metadataRole,
               maxLines: 1,
             ),
-          ],
         ],
       ),
     );
@@ -282,34 +285,30 @@ final class _MentoraListTileState extends State<MentoraListTile> {
 
   /// What stands beside the entity: its states, then the act offered
   /// on it. While the entity is loading, no act is offered twice.
-  List<Widget> _aside(
-    MentoraListTileTheme theme,
-    MentoraListTileVisuals visuals,
-  ) {
+  ///
+  /// The states are given in the order the application announced them
+  /// and the act comes last: the arrangement gives up the last state
+  /// first, and the act last of all.
+  _MentoraListTileAside _aside() {
     if (_status == MentoraListTileStatus.loading) {
-      return [
-        SizedBox(width: theme.gapOf(widget.density)),
-        const SizedBox(
+      return const _MentoraListTileAside(
+        badges: [],
+        act: SizedBox(
           width: listTileProgressExtent,
           height: listTileProgressExtent,
-          child: CircularProgressIndicator(
-            strokeWidth: listTileProgressStroke,
-          ),
+          child: CircularProgressIndicator(strokeWidth: listTileProgressStroke),
         ),
-      ];
+      );
     }
 
-    final aside = <Widget>[];
-    for (final badge in widget.badges) {
-      aside
-        ..add(SizedBox(width: theme.gapOf(widget.density)))
-        ..add(badge);
-    }
-    if (widget.trailing != null) {
-      aside
-        ..add(SizedBox(width: theme.gapOf(widget.density)))
-        ..add(widget.trailing!);
-    }
-    return aside;
+    return _MentoraListTileAside(badges: widget.badges, act: widget.trailing);
   }
+}
+
+/// What stands beside an entity, in the order it is given up.
+final class _MentoraListTileAside {
+  final List<Widget> badges;
+  final Widget? act;
+
+  const _MentoraListTileAside({required this.badges, required this.act});
 }

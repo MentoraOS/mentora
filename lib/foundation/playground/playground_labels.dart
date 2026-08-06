@@ -189,6 +189,8 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String narrowAdaptationGalleryTitle =
+    'List Tiles — Narrow adaptation (180 to 480 dp)';
 const String workspaceGalleryTitle =
     'Workspaces — Channels (4), Surfaces (3) & Layers';
 const String workspaceDocHeading = 'MentoraWorkspace — official contract';
