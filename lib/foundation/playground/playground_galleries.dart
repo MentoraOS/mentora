@@ -10,6 +10,8 @@ import '../design_kit/structure/master_detail/mentora_master_detail.dart';
 import '../design_kit/structure/master_detail/mentora_master_detail_style.dart';
 import '../design_kit/structure/split_view/mentora_split_view.dart';
 import '../design_kit/structure/split_view/mentora_split_view_style.dart';
+import '../design_kit/structure/workspace/mentora_workspace.dart';
+import '../design_kit/structure/workspace/mentora_workspace_style.dart';
 import '../design_kit/tokens/split_view_tokens.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
@@ -3247,6 +3249,213 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Workspaces catalogue - every navigation channel,
+/// every official surface, and the layers mounted only when their
+/// service is given.
+final class WorkspaceGallery extends StatefulWidget {
+  const WorkspaceGallery({super.key});
+
+  @override
+  State<WorkspaceGallery> createState() => _WorkspaceGalleryState();
+}
+
+final class _WorkspaceGalleryState extends State<WorkspaceGallery> {
+  static const String homeId = 'home';
+
+  static Widget framed(Widget workspace) =>
+      SizedBox(height: kMinInteractiveDimension * 6, child: workspace);
+
+  static MentoraPageScaffold get page => MentoraPageScaffold(
+    semanticLabel: workspacePageLabel,
+    content: MentoraCard(
+      variant: MentoraCardVariant.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(workspaceHeading, role: MentoraTextRole.subtitle),
+          MentoraText(workspaceBody, role: MentoraTextRole.body),
+        ],
+      ),
+    ),
+  );
+
+  static MentoraBottomNavigation get base => MentoraBottomNavigation(
+    destinations: _BottomNavigationGalleryState.places(5),
+    selectedDestinationId: homeId,
+    semanticLabel: 'Navigation principale',
+    onDestinationRequested: (_) {},
+  );
+
+  static MentoraNavigationRail get rail => MentoraNavigationRail(
+    destinations: _NavigationRailGalleryState.places,
+    controller: MentoraNavigationRailController(homeId),
+    onDestinationSelected: (_) {},
+  );
+
+  static MentoraNavigationDrawer get orientation => MentoraNavigationDrawer(
+    controller: MentoraNavigationDrawerController(
+      selectedId: homeId,
+      visibility: MentoraDrawerVisibility.opened,
+    ),
+    sections: _NavigationDrawerGalleryState.sections,
+    semanticLabel: 'Espace de Awa Mensah',
+    onDestinationSelected: (_) {},
+  );
+
+  static MentoraWorkspace workspace({
+    Key? key,
+    required MentoraWorkspaceSurface surface,
+    MentoraWorkspaceNavigationChannel channel =
+        MentoraWorkspaceNavigationChannel.none,
+  }) {
+    return MentoraWorkspace(
+      key: key,
+      semanticLabel: workspaceLabel,
+      configuration: MentoraWorkspaceConfiguration(navigation: channel),
+      navigation: const MentoraWorkspaceNavigationState(destinationId: homeId),
+      base: channel == MentoraWorkspaceNavigationChannel.base ? base : null,
+      rail: channel == MentoraWorkspaceNavigationChannel.rail ? rail : null,
+      orientation: channel == MentoraWorkspaceNavigationChannel.orientation
+          ? orientation
+          : null,
+      surface: surface,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget scene(
+      String name, {
+      MentoraWorkspaceNavigationChannel channel =
+          MentoraWorkspaceNavigationChannel.none,
+      MentoraWorkspaceSurface? surface,
+    }) {
+      return framed(
+        workspace(
+          key: Key('workspace-$name'),
+          channel: channel,
+          surface: surface ?? MentoraWorkspaceSurface.page(page),
+        ),
+      );
+    }
+
+    return GallerySection(
+      title: workspaceGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // The four channels the application may announce.
+          scene('channel-none'),
+          scene(
+            'channel-base',
+            channel: MentoraWorkspaceNavigationChannel.base,
+          ),
+          scene(
+            'channel-rail',
+            channel: MentoraWorkspaceNavigationChannel.rail,
+          ),
+          scene(
+            'channel-orientation',
+            channel: MentoraWorkspaceNavigationChannel.orientation,
+          ),
+          // The three official surfaces - exactly one at a time.
+          scene(
+            'surface-shared',
+            surface: MentoraWorkspaceSurface.shared(
+              MentoraSplitView(
+                regions: _SplitViewGalleryState.regions(),
+                layout: _SplitViewGalleryState.specification(),
+              ),
+            ),
+          ),
+          scene(
+            'surface-relation',
+            surface: MentoraWorkspaceSurface.relation(
+              _MasterDetailGalleryState.relation(),
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: scene('theme-${variant.name}'),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: scene('comfort-${comfort.name}'),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: scene('direction-${direction.name}'),
+            ),
+          const _WorkspaceDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Workspace's living documentation - built only with Mentora
+/// components.
+final class _WorkspaceDocumentation extends StatelessWidget {
+  const _WorkspaceDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('workspace-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(workspaceDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: workspaceDocArchitecture,
+            keyPrefix: 'workspace-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: workspaceDocResponsibilities,
+            keyPrefix: 'workspace-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: workspaceDocComponents,
+            keyPrefix: 'workspace-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: workspaceDocTokens,
+            keyPrefix: 'workspace-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: workspaceDocEngines,
+            keyPrefix: 'workspace-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: workspaceDocForbidden,
+            keyPrefix: 'workspace-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: workspaceDocScans,
+            keyPrefix: 'workspace-doc-scan',
           ),
         ],
       ),

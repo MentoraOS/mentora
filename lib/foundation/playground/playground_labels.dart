@@ -189,6 +189,60 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String workspaceGalleryTitle =
+    'Workspaces — Channels (4), Surfaces (3) & Layers';
+const String workspaceDocHeading = 'MentoraWorkspace — official contract';
+
+/// The words of the catalogue scene. The context composes none of
+/// them: the application owns every string it carries.
+const String workspaceLabel = 'Contexte de travail';
+const String workspacePageLabel = 'Page courante';
+const String workspaceHeading = 'Surface de travail';
+const String workspaceBody =
+    'Le contenu appartient entierement a l application.';
+const List<String> workspaceDocArchitecture = [
+  'A Structural Component: THE working context, never a page',
+  'The surface is SEALED: the compiler admits exactly one of three',
+  'The disposition is announced, and disagreement is refused',
+  'Where the person is arrives resolved, and every channel is held to it',
+  'The layers are composed from the single official order, never restated',
+];
+const List<String> workspaceDocResponsibilities = [
+  'It assembles official components; it owns none of them',
+  'It never decides a disposition, a navigation or a surface',
+  'It creates no scroll view, and no padding: the surface stays intact',
+  'Each zone travels as its own focus group; the focus is never taken',
+  'A layer is mounted only when its service is given',
+];
+const List<String> workspaceDocComponents = [
+  'MentoraPageScaffold, MentoraSplitView, MentoraMasterDetail — surfaces',
+  'MentoraNavigationDrawer, MentoraNavigationRail, MentoraBottomNavigation',
+  'The three official hosts — own the layers that come and go',
+];
+const List<String> workspaceDocForbidden = [
+  'The framework scaffold, drawer, navigation bar, app bar and dialogs',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, GoRouter and every address',
+  'Any business, any data, any model, any list, any sort, any filter',
+  'A Widget? where an official type exists, and any coded value',
+];
+const List<String> workspaceDocTokens = [
+  'Workspace: the room a context adds between its zones — zero, declared',
+  'Surface: the scene the whole working context rests on',
+];
+const List<String> workspaceDocEngines = [
+  'Surface Token Engine',
+  'Motion Engine — show the continuity: a context does not change',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> workspaceDocScans = [
+  'No framework scaffold, drawer, navigation or app bar in the foundation',
+  'No navigator, no platform, no measure, no responsive decision',
+  'No business, no data, no model named by a working context',
+  'No component rebuilt, no ambient theme, no coded value',
+  'One MentoraWorkspace exists in the whole product',
+];
 const String splitViewGalleryTitle =
     'Split Views — Axes (2), Regions by identity & Separations';
 const String splitViewDocHeading = 'MentoraSplitView — official contract';

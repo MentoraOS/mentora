@@ -19,6 +19,7 @@ import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
 import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import 'package:mentora/foundation/design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
+import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
 import 'package:mentora/foundation/design_kit/tokens/bottom_navigation_tokens.dart';
@@ -519,23 +520,36 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
-      final page = tester.widget<MentoraPageScaffold>(
-        find.byType(MentoraPageScaffold),
+      // The principal level survives a change of surface: it belongs
+      // to the working context, never to one page of it.
+      expect(find.byType(MentoraWorkspace), findsOneWidget);
+      final workspace = tester.widget<MentoraWorkspace>(
+        find.byType(MentoraWorkspace),
       );
-      expect(page.bottomNavigation, isNotNull);
+      expect(workspace.base, isNotNull);
+      expect(
+        tester
+            .widget<MentoraPageScaffold>(find.byType(MentoraPageScaffold))
+            .bottomNavigation,
+        isNull,
+      );
     });
 
-    testWidgets('the page places the principal level at its base, across '
-        'the whole context', (tester) async {
+    testWidgets('the working context places the principal level at its '
+        'base, across the whole context', (tester) async {
       final services = await _services();
       await tester.pumpWidget(MentoraFoundationApp(services: services));
       await tester.pumpAndSettle();
 
-      final page = tester.getRect(find.byType(MentoraPageScaffold));
+      final workspace = tester.getRect(find.byType(MentoraWorkspace));
       final structure = tester.getRect(find.byType(MentoraBottomNavigation));
-      expect(structure.bottom, page.bottom);
-      expect(structure.width, page.width);
-      // The content stops where the principal level begins.
+      expect(structure.bottom, workspace.bottom);
+      expect(structure.width, workspace.width);
+      // The surface stops where the principal level begins.
+      expect(
+        tester.getRect(find.byType(MentoraPageScaffold)).bottom,
+        lessThanOrEqualTo(structure.top),
+      );
       expect(
         tester.getRect(find.text('Nothing needs your attention.')).bottom,
         lessThanOrEqualTo(structure.top),

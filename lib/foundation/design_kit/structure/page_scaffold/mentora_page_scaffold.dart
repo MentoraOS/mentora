@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../components/bottom_sheet/mentora_bottom_sheet_host.dart';
 import '../../components/bottom_sheet/mentora_bottom_sheet_service.dart';
 import '../../components/button/mentora_button.dart';
 import '../../components/design_kit_scope.dart';
-import '../../components/dialog/mentora_dialog_host.dart';
 import '../../components/dialog/mentora_dialog_service.dart';
-import '../../components/snackbar/mentora_snackbar_host.dart';
+import '../../components/overlay/official_layers.dart';
 import '../../components/snackbar/mentora_snackbar_service.dart';
 import '../../tokens/page_scaffold_tokens.dart';
 import '../app_bar/mentora_app_bar.dart';
@@ -204,20 +202,12 @@ final class MentoraPageScaffold extends StatelessWidget {
     );
   }
 
-  /// The temporary layers, composed in the official order: what must
-  /// be answered stands above what accompanies, which stands above
-  /// what merely passes.
-  Widget _layers(Widget child) {
-    var assembled = child;
-    if (messages != null) {
-      assembled = MentoraSnackbarHost(service: messages!, child: assembled);
-    }
-    if (sheets != null) {
-      assembled = MentoraBottomSheetHost(service: sheets!, child: assembled);
-    }
-    if (dialogs != null) {
-      assembled = MentoraDialogHost(service: dialogs!, child: assembled);
-    }
-    return assembled;
-  }
+  /// The temporary layers, composed in the official order — read from
+  /// the single truth every container shares, never restated here.
+  Widget _layers(Widget child) => mountOfficialLayers(
+    child: child,
+    dialogs: dialogs,
+    sheets: sheets,
+    messages: messages,
+  );
 }

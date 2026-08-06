@@ -6,6 +6,8 @@ import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
+import '../design_kit/structure/workspace/mentora_workspace.dart';
+import '../design_kit/structure/workspace/mentora_workspace_style.dart';
 import '../design_kit/tokens/design_tokens.dart';
 import '../localization/mentora_strings.dart';
 
@@ -90,16 +92,27 @@ final class _NavigationShellState extends State<NavigationShell> {
     ];
     final current = destinations.firstWhere((place) => place.id == _selectedId);
 
-    return MentoraPageScaffold(
-      semanticLabel: current.label,
-      content: _FoundationSurface(title: current.label, spacing: _spacing),
-      bottomNavigation: MentoraBottomNavigation(
+    // The working context of the product: the way through it survives
+    // every change of surface, and the surface is one page.
+    return MentoraWorkspace(
+      semanticLabel: strings.appTitle,
+      configuration: const MentoraWorkspaceConfiguration(
+        navigation: MentoraWorkspaceNavigationChannel.base,
+      ),
+      navigation: MentoraWorkspaceNavigationState(destinationId: _selectedId),
+      base: MentoraBottomNavigation(
         semanticLabel: strings.rootNavigation,
         destinations: destinations,
         selectedDestinationId: _selectedId,
         // The structure reports the identity; the application decides
         // what happens next.
         onDestinationRequested: (id) => setState(() => _selectedId = id),
+      ),
+      surface: MentoraWorkspaceSurface.page(
+        MentoraPageScaffold(
+          semanticLabel: current.label,
+          content: _FoundationSurface(title: current.label, spacing: _spacing),
+        ),
       ),
     );
   }
