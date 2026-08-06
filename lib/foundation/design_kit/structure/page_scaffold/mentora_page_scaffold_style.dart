@@ -28,4 +28,14 @@ MentoraPageZonePlacement placementOf(MentoraDrawerPresentation presentation) {
 /// They exist so that a page is always assembled the same way, in
 /// every context of the product: a place, a way through it, a
 /// content, the acts kept at hand, and the layers that come and go.
-enum MentoraPageZone { place, orientation, facets, intention, content, acts }
+enum MentoraPageZone {
+  place,
+  orientation,
+  facets,
+  intention,
+  content,
+  acts,
+
+  /// The principal level of the product, at the base of the page.
+  bottomNavigation,
+}

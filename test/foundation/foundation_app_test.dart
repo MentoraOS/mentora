@@ -7,7 +7,7 @@ import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
 import 'package:mentora/foundation/design_kit/appearance/appearance_engine.dart';
 import 'package:mentora/foundation/design_kit/tokens/design_tokens.dart';
-import 'package:mentora/foundation/navigation/mentora_navigation_bar.dart';
+import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
 
 Future<FoundationServices> _services() async {
   final services = FoundationServices();
@@ -24,11 +24,11 @@ void main() {
     await tester.pumpWidget(MentoraFoundationApp(services: services));
     await tester.pumpAndSettle();
 
-    expect(find.byType(MentoraNavigationBar), findsOneWidget);
-    final bar = tester.widget<MentoraNavigationBar>(
-      find.byType(MentoraNavigationBar),
+    expect(find.byType(MentoraBottomNavigation), findsOneWidget);
+    final structure = tester.widget<MentoraBottomNavigation>(
+      find.byType(MentoraBottomNavigation),
     );
-    expect(bar.destinations.length, 5);
+    expect(structure.destinations.length, 5);
   });
 
   testWidgets('switching tab shows the calm foundation surface of the '
@@ -61,7 +61,7 @@ void main() {
     expect(tester.takeException(), isNull);
     // Surface title + navigation label: the French strings are live.
     expect(find.text('Accueil'), findsNWidgets(2));
-    final context = tester.element(find.byType(MentoraNavigationBar));
+    final context = tester.element(find.byType(MentoraBottomNavigation));
     // The regression that motivated this sprint: MaterialLocalizations
     // must resolve for every supported locale, not only English.
     expect(MaterialLocalizations.of(context), isNotNull);
@@ -104,26 +104,32 @@ void main() {
     // The regression that motivated this sprint: no RenderFlex overflow
     // on the bottom navigation, at any official font scale.
     expect(tester.takeException(), isNull);
-    expect(find.byType(MentoraNavigationBar), findsOneWidget);
+    expect(find.byType(MentoraBottomNavigation), findsOneWidget);
   });
 
-  testWidgets('F1.0.1 — the chrome scale is bounded, the content scale '
-      'is not', (tester) async {
+  testWidgets('F1.3.17 — the chrome is no longer bounded: the person '
+      'keeps their full scale, everywhere', (tester) async {
     final services = await _services();
     final accessibility = services.get<AccessibilityEngine>();
     const extraLarge = AppearanceState(
       fontScale: FontScalePreference.extraLarge,
     );
 
-    expect(
-      accessibility.textScaleFor(extraLarge),
-      greaterThan(maximumChromeFontScale),
+    // One scale for the whole product: the principal level grows with
+    // the words instead of clipping them, so nothing needs clamping.
+    expect(accessibility.textScaleFor(extraLarge), extraLargeFontScale);
+    expect(accessibility.textScaleFor(const AppearanceState()), 1.0);
+
+    services.get<AppearanceEngine>().updateFontScale(
+      FontScalePreference.extraLarge,
     );
-    expect(
-      accessibility.chromeTextScaleFor(extraLarge),
-      maximumChromeFontScale,
-    );
-    expect(accessibility.chromeTextScaleFor(const AppearanceState()), 1.0);
+    await tester.pumpWidget(MentoraFoundationApp(services: services));
+    await tester.pumpAndSettle();
+
+    final scaler = MediaQuery.of(
+      tester.element(find.byType(MentoraBottomNavigation)),
+    ).textScaler;
+    expect(scaler.scale(10), 10 * extraLargeFontScale);
   });
 
   testWidgets('the dark preference switches the theme without changing '
@@ -137,12 +143,12 @@ void main() {
     appearance.updateTheme(ThemePreference.dark);
     await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(MentoraNavigationBar));
+    final context = tester.element(find.byType(MentoraBottomNavigation));
     expect(Theme.of(context).colorScheme.brightness, Brightness.dark);
     // The five entries are untouched by an appearance change (GE-18).
     expect(
       tester
-          .widget<MentoraNavigationBar>(find.byType(MentoraNavigationBar))
+          .widget<MentoraBottomNavigation>(find.byType(MentoraBottomNavigation))
           .destinations
           .length,
       5,

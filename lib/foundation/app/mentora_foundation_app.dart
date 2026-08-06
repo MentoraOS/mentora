@@ -97,11 +97,10 @@ final class MentoraFoundationApp extends StatelessWidget {
               ),
             );
           },
-          home: NavigationShell(
-            appearance: appearance,
-            accessibility: accessibility,
-            motion: services.get<MotionEngine>(),
-          ),
+          // The shell owns no navigation: the engines it once handed
+          // to a bar now reach the Structural Components through the
+          // official channel, the scope.
+          home: NavigationShell(appearance: appearance),
         );
       },
     );

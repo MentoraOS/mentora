@@ -31,6 +31,7 @@ final class MentoraStrings {
   }
 
   String get appTitle => _get('appTitle');
+  String get rootNavigation => _get('rootNavigation');
   String get tabHome => _get('tabHome');
   String get tabConsultation => _get('tabConsultation');
   String get tabBusiness => _get('tabBusiness');
@@ -46,6 +47,7 @@ final class MentoraStrings {
 const Map<String, Map<String, String>> mentoraStringTables = {
   'fr': {
     'appTitle': 'Mentora',
+    'rootNavigation': 'Navigation principale',
     'tabHome': 'Accueil',
     'tabConsultation': 'Consultation',
     'tabBusiness': 'Activité',
@@ -58,6 +60,7 @@ const Map<String, Map<String, String>> mentoraStringTables = {
   },
   'en': {
     'appTitle': 'Mentora',
+    'rootNavigation': 'Main navigation',
     'tabHome': 'Home',
     'tabConsultation': 'Consultation',
     'tabBusiness': 'Business',
@@ -70,6 +73,7 @@ const Map<String, Map<String, String>> mentoraStringTables = {
   },
   'ar': {
     'appTitle': 'مينتورا',
+    'rootNavigation': 'التنقل الرئيسي',
     'tabHome': 'الرئيسية',
     'tabConsultation': 'الاستشارة',
     'tabBusiness': 'النشاط',
@@ -81,6 +85,7 @@ const Map<String, Map<String, String>> mentoraStringTables = {
   },
   'es': {
     'appTitle': 'Mentora',
+    'rootNavigation': 'Navegación principal',
     'tabHome': 'Inicio',
     'tabConsultation': 'Consulta',
     'tabBusiness': 'Actividad',
@@ -93,6 +98,7 @@ const Map<String, Map<String, String>> mentoraStringTables = {
   },
   'pt': {
     'appTitle': 'Mentora',
+    'rootNavigation': 'Navegação principal',
     'tabHome': 'Início',
     'tabConsultation': 'Consulta',
     'tabBusiness': 'Atividade',
@@ -105,6 +111,7 @@ const Map<String, Map<String, String>> mentoraStringTables = {
   },
   'de': {
     'appTitle': 'Mentora',
+    'rootNavigation': 'Hauptnavigation',
     'tabHome': 'Start',
     'tabConsultation': 'Beratung',
     'tabBusiness': 'Geschäft',

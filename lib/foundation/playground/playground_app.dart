@@ -223,6 +223,7 @@ final class _PlaygroundShell extends StatelessWidget {
               const TabsGallery(),
               const SearchBarGallery(),
               const NavigationDrawerGallery(),
+              const BottomNavigationGallery(),
               const PageScaffoldGallery(),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],

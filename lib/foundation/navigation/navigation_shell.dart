@@ -1,39 +1,44 @@
 import 'package:flutter/material.dart';
 
-import '../design_kit/accessibility/accessibility_engine.dart';
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/text/mentora_text.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
-import '../design_kit/motion/motion_engine.dart';
+import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
+import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
+import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/tokens/design_tokens.dart';
 import '../localization/mentora_strings.dart';
-import 'mentora_navigation_bar.dart';
 
 /// The official root navigation (P9.0 MF-04): five entries, one per
 /// platform — Home, Consultation, Business, Notifications, Account.
 /// AI lives inside Account. No business screen exists yet: each entry
 /// hosts its calm foundation surface until its platform waves arrive.
 ///
-/// No logic lives here (no calculation, no decision): the shell only
-/// carries the official root movement.
+/// The shell owns NO navigation component: the page and its principal
+/// level are Structural Components of the Design Kit. What lives here
+/// is what belongs to the application alone — the identities of the
+/// product, and the place the person is in.
 final class NavigationShell extends StatefulWidget {
   final AppearanceEngine appearance;
-  final AccessibilityEngine accessibility;
-  final MotionEngine motion;
 
-  const NavigationShell({
-    super.key,
-    required this.appearance,
-    required this.accessibility,
-    required this.motion,
-  });
+  const NavigationShell({super.key, required this.appearance});
 
   @override
   State<NavigationShell> createState() => _NavigationShellState();
 }
 
 final class _NavigationShellState extends State<NavigationShell> {
-  int _selectedIndex = 0;
+  /// The identities of the principal level — never positions, and
+  /// stable for as long as the product exists.
+  static const String _home = 'home';
+  static const String _consultation = 'consultation';
+  static const String _business = 'business';
+  static const String _notifications = 'notifications';
+  static const String _account = 'account';
+
+  /// Where the person is. The application decides it — the structure
+  /// only reports what was asked for.
+  String _selectedId = _home;
 
   SpacingTokenSet get _spacing {
     final double factor;
@@ -51,65 +56,50 @@ final class _NavigationShellState extends State<NavigationShell> {
   @override
   Widget build(BuildContext context) {
     final strings = MentoraStrings.of(context);
-    final titles = [
-      strings.tabHome,
-      strings.tabConsultation,
-      strings.tabBusiness,
-      strings.tabNotifications,
-      strings.tabAccount,
-    ];
-
-    return Scaffold(
-      body: SafeArea(
-        child: _FoundationSurface(
-          title: titles[_selectedIndex],
-          spacing: _spacing,
-        ),
+    final destinations = <MentoraBottomNavigationDestination>[
+      MentoraBottomNavigationDestination(
+        id: _home,
+        label: strings.tabHome,
+        icon: Icons.home_outlined,
+        selectedIcon: Icons.home,
       ),
-      // Fixed-height chrome renders under the bounded chrome scale:
-      // labels stay readable, the layout never overflows, and the
-      // information stays complete through the icons (AFI-04).
-      bottomNavigationBar: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          textScaler: TextScaler.linear(
-            widget.accessibility.chromeTextScaleFor(widget.appearance.state),
-          ),
-        ),
-        child: MentoraNavigationBar(
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (index) {
-            setState(() => _selectedIndex = index);
-          },
-          motion: widget.motion,
-          appearance: widget.appearance.state,
-          destinations: [
-            MentoraNavigationDestination(
-              icon: Icons.home_outlined,
-              selectedIcon: Icons.home,
-              label: strings.tabHome,
-            ),
-            MentoraNavigationDestination(
-              icon: Icons.event_note_outlined,
-              selectedIcon: Icons.event_note,
-              label: strings.tabConsultation,
-            ),
-            MentoraNavigationDestination(
-              icon: Icons.insights_outlined,
-              selectedIcon: Icons.insights,
-              label: strings.tabBusiness,
-            ),
-            MentoraNavigationDestination(
-              icon: Icons.notifications_outlined,
-              selectedIcon: Icons.notifications,
-              label: strings.tabNotifications,
-            ),
-            MentoraNavigationDestination(
-              icon: Icons.person_outline,
-              selectedIcon: Icons.person,
-              label: strings.tabAccount,
-            ),
-          ],
-        ),
+      MentoraBottomNavigationDestination(
+        id: _consultation,
+        label: strings.tabConsultation,
+        icon: Icons.event_note_outlined,
+        selectedIcon: Icons.event_note,
+      ),
+      MentoraBottomNavigationDestination(
+        id: _business,
+        label: strings.tabBusiness,
+        icon: Icons.insights_outlined,
+        selectedIcon: Icons.insights,
+      ),
+      MentoraBottomNavigationDestination(
+        id: _notifications,
+        label: strings.tabNotifications,
+        icon: Icons.notifications_outlined,
+        selectedIcon: Icons.notifications,
+      ),
+      MentoraBottomNavigationDestination(
+        id: _account,
+        label: strings.tabAccount,
+        icon: Icons.person_outline,
+        selectedIcon: Icons.person,
+      ),
+    ];
+    final current = destinations.firstWhere((place) => place.id == _selectedId);
+
+    return MentoraPageScaffold(
+      semanticLabel: current.label,
+      content: _FoundationSurface(title: current.label, spacing: _spacing),
+      bottomNavigation: MentoraBottomNavigation(
+        semanticLabel: strings.rootNavigation,
+        destinations: destinations,
+        selectedDestinationId: _selectedId,
+        // The structure reports the identity; the application decides
+        // what happens next.
+        onDestinationRequested: (id) => setState(() => _selectedId = id),
       ),
     );
   }

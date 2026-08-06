@@ -332,8 +332,7 @@ void main() {
     bool materializesTypography(String normalized) {
       return normalized.contains('design_kit/components/') ||
           normalized.contains('design_kit/tokens/') ||
-          normalized.contains('design_kit/theme/theme_engine.dart') ||
-          normalized.contains('navigation/mentora_navigation_bar.dart');
+          normalized.contains('design_kit/theme/theme_engine.dart');
     }
 
     test('no raw text widget survives outside the places whose job is '

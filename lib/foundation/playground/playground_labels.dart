@@ -90,8 +90,7 @@ const List<String> inputDocEngines = [
 ];
 const String pageScaffoldGalleryTitle =
     'Page Scaffolds — Zones, layers and assemblies';
-const String pageScaffoldDocHeading =
-    'MentoraPageScaffold — official contract';
+const String pageScaffoldDocHeading = 'MentoraPageScaffold — official contract';
 const List<String> pageScaffoldDocArchitecture = [
   'A page is a context: it gathers, it never decides',
   'Every zone is typed: the authority of each structure is compiled in',
@@ -140,10 +139,59 @@ const List<String> pageScaffoldDocScans = [
   'No structure or Core Component rebuilt',
   'No coded colour, padding, radius or duration outside the Tokens',
 ];
+const String bottomNavigationGalleryTitle =
+    'Bottom Navigations — Destinations (2 to 5), States (5) & Badges';
+const String bottomNavigationDocHeading =
+    'MentoraBottomNavigation — official contract';
+const List<String> bottomNavigationDocArchitecture = [
+  'A Structural Component: the principal level, never a menu',
+  'A destination is an IDENTITY — never a position, never an index',
+  'The application announces where the person is',
+  'The structure reports the identity that was asked for',
+  'Below two destinations there is no choice; beyond five, no level',
+];
+const List<String> bottomNavigationDocResponsibilities = [
+  'It shows where the person is, and where they may go',
+  'It never navigates: no address, no route, no push, no link',
+  'It knows no platform and no surface: it is given its configuration',
+  'It never takes the focus, and always gives it back',
+  'The band is a minimum: when the words grow, it grows with them',
+];
+const List<String> bottomNavigationDocComponents = [
+  'MentoraText — owns the typography of the names',
+  'MentoraBadge — owns what is happening in a place',
+  'The mark stays a Flutter primitive until the Iconography wave',
+];
+const List<String> bottomNavigationDocForbidden = [
+  'The framework bottom navigations and their destinations',
+  'Any address, any navigator, any routing known by the structure',
+  'Any knowledge of the platform, and any responsive decision',
+  'Rebuilding a badge or a word, and any index of any kind',
+  'A coded colour, size, padding or duration',
+];
+const List<String> bottomNavigationDocTokens = [
+  'Bottom Navigation: the band, the mark, the capsule and the line',
+  'Color: primary, highlight, focus, supporting, unavailable, divider',
+  'Surface: the primary surface the principal level rests on',
+  'Typography: label — the principal level never speaks louder',
+  'Spacing: the linked proximity around each place',
+];
+const List<String> bottomNavigationDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — show the continuity: the place never jumps',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> bottomNavigationDocScans = [
+  'No framework bottom navigation anywhere in the foundation',
+  'No navigation, no platform, no position known by the structure',
+  'No official navigation component left in the application shell',
+  'No Core Component rebuilt, and no coded value outside the Tokens',
+];
 const String drawerGalleryTitle =
     'Navigation Drawers — Presentations (3), Visibility (2) & States (5)';
-const String drawerDocHeading =
-    'MentoraNavigationDrawer — official contract';
+const String drawerDocHeading = 'MentoraNavigationDrawer — official contract';
 const List<String> drawerDocArchitecture = [
   'A Structural Component: an orientation map, never a menu',
   'A destination is an IDENTITY — never a position, never an address',

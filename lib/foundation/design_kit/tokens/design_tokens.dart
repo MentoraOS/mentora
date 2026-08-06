@@ -261,12 +261,6 @@ const double extraLargeFontScale = 1.3;
 const double minimumFontScale = 0.8;
 const double maximumFontScale = 1.6;
 
-/// Fixed-height chrome (the root navigation bar) scales its labels up
-/// to this bound only: chrome labels are redundant with their icons
-/// and position (AFI-04 — the information is never lost), while the
-/// content keeps the full scale (TSA-06).
-const double maximumChromeFontScale = 1.2;
-
 /// Interaction requirements — catalog §D9.
 final class InteractionTokenSet {
   final double cibleAtteignable;

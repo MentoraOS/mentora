@@ -10,6 +10,7 @@ import '../../components/snackbar/mentora_snackbar_host.dart';
 import '../../components/snackbar/mentora_snackbar_service.dart';
 import '../../tokens/page_scaffold_tokens.dart';
 import '../app_bar/mentora_app_bar.dart';
+import '../bottom_navigation/mentora_bottom_navigation.dart';
 import '../navigation_drawer/mentora_navigation_drawer.dart';
 import '../navigation_rail/mentora_navigation_rail.dart';
 import '../search_bar/mentora_search_bar.dart';
@@ -55,6 +56,10 @@ final class MentoraPageScaffold extends StatelessWidget {
   /// The intention of finding — the Search Bar remains its owner.
   final MentoraSearchBar? intention;
 
+  /// The principal level of the product, at the base of the page —
+  /// the Bottom Navigation remains its owner.
+  final MentoraBottomNavigation? bottomNavigation;
+
   /// The content. It belongs entirely to the application: the page
   /// wraps it in nothing and changes nothing about it.
   final Widget content;
@@ -82,6 +87,7 @@ final class MentoraPageScaffold extends StatelessWidget {
     this.orientation,
     this.facets,
     this.intention,
+    this.bottomNavigation,
     this.acts = const [],
     this.dialogs,
     this.sheets,
@@ -132,6 +138,16 @@ final class MentoraPageScaffold extends StatelessWidget {
       ],
     );
 
+    // The principal level is the base of the page: it stands under
+    // everything the context gathers, and never inside it.
+    final frame = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: body),
+        if (bottomNavigation != null) zone(bottomNavigation!),
+      ],
+    );
+
     return Semantics(
       container: true,
       label: semanticLabel,
@@ -146,7 +162,7 @@ final class MentoraPageScaffold extends StatelessWidget {
             child: _layers(
               Stack(
                 children: [
-                  Positioned.fill(child: body),
+                  Positioned.fill(child: frame),
                   // A map that passes in front takes no room from the
                   // content: it covers the page it belongs to.
                   if (map != null && !besideTheContent)

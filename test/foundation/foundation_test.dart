@@ -500,7 +500,6 @@ void main() {
         'strings layer', () {
       for (final path in const [
         'lib/foundation/navigation/navigation_shell.dart',
-        'lib/foundation/navigation/mentora_navigation_bar.dart',
       ]) {
         final source = File(path).readAsStringSync();
         expect(source, isNot(contains("Text('")));
@@ -518,7 +517,14 @@ void main() {
       final source = File(
         'lib/foundation/navigation/navigation_shell.dart',
       ).readAsStringSync();
-      expect(RegExp(r'NavigationDestination\(').allMatches(source).length, 5);
+      expect(
+        RegExp(
+          r'MentoraBottomNavigationDestination\(',
+        ).allMatches(source).length,
+        5,
+      );
+      // Five identities, never five positions.
+      expect(RegExp(r'id: _\w+,').allMatches(source).length, 5);
     });
   });
 }

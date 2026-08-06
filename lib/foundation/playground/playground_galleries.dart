@@ -5,6 +5,8 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
+import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer_style.dart';
@@ -2811,8 +2813,10 @@ final class PageScaffoldGallery extends StatelessWidget {
 
   static void _noop() {}
 
+  // A page gathers up to six structures: the catalogue gives each
+  // scene the room the assembled one needs.
   static Widget framed(Widget page) =>
-      SizedBox(height: kMinInteractiveDimension * 5, child: page);
+      SizedBox(height: kMinInteractiveDimension * 8, child: page);
 
   static MentoraPageScaffold page({
     Key? key,
@@ -2821,6 +2825,7 @@ final class PageScaffoldGallery extends StatelessWidget {
     MentoraNavigationDrawer? orientation,
     MentoraTabs? facets,
     MentoraSearchBar? intention,
+    MentoraBottomNavigation? bottomNavigation,
     List<MentoraButton> acts = const [],
   }) {
     return MentoraPageScaffold(
@@ -2831,6 +2836,7 @@ final class PageScaffoldGallery extends StatelessWidget {
       orientation: orientation,
       facets: facets,
       intention: intention,
+      bottomNavigation: bottomNavigation,
       acts: acts,
       content: const MentoraText(
         'Le contenu appartient entièrement à l’application.',
@@ -2902,6 +2908,17 @@ final class PageScaffoldGallery extends StatelessWidget {
           ),
           framed(
             page(
+              key: const Key('page-bottom-navigation'),
+              bottomNavigation: MentoraBottomNavigation(
+                destinations: _BottomNavigationGalleryState.places(5),
+                selectedDestinationId: 'home',
+                semanticLabel: 'Navigation principale',
+                onDestinationRequested: (_) {},
+              ),
+            ),
+          ),
+          framed(
+            page(
               key: const Key('page-acts'),
               acts: [
                 MentoraButton(
@@ -2932,6 +2949,12 @@ final class PageScaffoldGallery extends StatelessWidget {
                 destinations: _NavigationRailGalleryState.places,
                 controller: MentoraNavigationRailController('home'),
                 onDestinationSelected: (_) {},
+              ),
+              bottomNavigation: MentoraBottomNavigation(
+                destinations: _BottomNavigationGalleryState.places(5),
+                selectedDestinationId: 'home',
+                semanticLabel: 'Navigation principale',
+                onDestinationRequested: (_) {},
               ),
               acts: [
                 MentoraButton(
@@ -3015,6 +3038,210 @@ final class _PageScaffoldDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: pageScaffoldDocScans,
             keyPrefix: 'page-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Bottom Navigations catalogue — every admitted number
+/// of destinations, every state, and the badges a place may carry.
+final class BottomNavigationGallery extends StatefulWidget {
+  const BottomNavigationGallery({super.key});
+
+  @override
+  State<BottomNavigationGallery> createState() =>
+      _BottomNavigationGalleryState();
+}
+
+final class _BottomNavigationGalleryState
+    extends State<BottomNavigationGallery> {
+  /// The principal places of the catalogue — identities, never
+  /// positions.
+  static const List<
+    ({String id, String label, IconData icon, IconData selectedIcon})
+  >
+  catalogue = [
+    (
+      id: 'home',
+      label: 'Accueil',
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home,
+    ),
+    (
+      id: 'consultation',
+      label: 'Consultation',
+      icon: Icons.event_note_outlined,
+      selectedIcon: Icons.event_note,
+    ),
+    (
+      id: 'business',
+      label: 'Activité',
+      icon: Icons.insights_outlined,
+      selectedIcon: Icons.insights,
+    ),
+    (
+      id: 'notifications',
+      label: 'Notifications',
+      icon: Icons.notifications_outlined,
+      selectedIcon: Icons.notifications,
+    ),
+    (
+      id: 'account',
+      label: 'Compte',
+      icon: Icons.person_outline,
+      selectedIcon: Icons.person,
+    ),
+  ];
+
+  static List<MentoraBottomNavigationDestination> places(
+    int count, {
+    bool badges = false,
+    Set<String> unavailable = const {},
+  }) {
+    return [
+      for (final place in catalogue.take(count))
+        MentoraBottomNavigationDestination(
+          id: place.id,
+          label: place.label,
+          icon: place.icon,
+          selectedIcon: place.selectedIcon,
+          enabled: !unavailable.contains(place.id),
+          badge: badges && place.id == 'notifications'
+              ? const MentoraBadge(
+                  variant: MentoraBadgeVariant.information,
+                  shape: MentoraBadgeShape.compact,
+                  size: MentoraBadgeSize.small,
+                  label: '3',
+                  semanticLabel: '3 notifications non lues',
+                )
+              : null,
+        ),
+    ];
+  }
+
+  /// Where the person is in the live scene — the gallery is the
+  /// application here: the structure only reports.
+  String _selectedId = 'home';
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget scene(
+      String name,
+      List<MentoraBottomNavigationDestination> destinations, {
+      String? selectedId = 'home',
+    }) {
+      return MentoraBottomNavigation(
+        key: Key('bottom-navigation-$name'),
+        destinations: destinations,
+        selectedDestinationId: selectedId,
+        semanticLabel: 'Navigation principale',
+        onDestinationRequested: (_) {},
+      );
+    }
+
+    return GallerySection(
+      title: bottomNavigationGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          scene('three', places(3)),
+          scene('four', places(4)),
+          scene('five', places(5)),
+          scene('badges', places(5, badges: true)),
+          // A place that cannot be reached stays visible: the person
+          // keeps seeing that it exists.
+          scene('unavailable', places(5, unavailable: const {'business'})),
+          // Nowhere announced: a structure never guesses where the
+          // person is.
+          scene('unselected', places(5), selectedId: null),
+          // The live scene: the structure reports, the gallery decides.
+          MentoraBottomNavigation(
+            key: const Key('bottom-navigation-live'),
+            destinations: places(5, badges: true),
+            selectedDestinationId: _selectedId,
+            semanticLabel: 'Navigation principale',
+            onDestinationRequested: (id) => setState(() => _selectedId = id),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: scene('theme-${variant.name}', places(5)),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: scene('comfort-${comfort.name}', places(5)),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: scene('direction-${direction.name}', places(5)),
+            ),
+          const _BottomNavigationDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Bottom Navigation's living documentation — built only with
+/// Mentora components.
+final class _BottomNavigationDocumentation extends StatelessWidget {
+  const _BottomNavigationDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('bottom-navigation-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(
+            bottomNavigationDocHeading,
+            role: MentoraTextRole.subtitle,
+          ),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: bottomNavigationDocArchitecture,
+            keyPrefix: 'bottom-navigation-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: bottomNavigationDocResponsibilities,
+            keyPrefix: 'bottom-navigation-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: bottomNavigationDocComponents,
+            keyPrefix: 'bottom-navigation-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: bottomNavigationDocTokens,
+            keyPrefix: 'bottom-navigation-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: bottomNavigationDocEngines,
+            keyPrefix: 'bottom-navigation-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: bottomNavigationDocForbidden,
+            keyPrefix: 'bottom-navigation-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: bottomNavigationDocScans,
+            keyPrefix: 'bottom-navigation-doc-scan',
           ),
         ],
       ),
