@@ -519,6 +519,10 @@ void main() {
       final import = RegExp(r"import '[.][.]/[.][.]/([a-z_]+)/");
       const admitted = {
         'components',
+        // A structure may compose a Composition Component: an
+        // orientation map presents the person's space with the very
+        // component that presents an entity.
+        'composition',
         'tokens',
         'registry',
         'theme',

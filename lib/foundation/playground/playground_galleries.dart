@@ -5,6 +5,8 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
+import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer_style.dart';
 import '../design_kit/structure/search_bar/mentora_search_bar.dart';
 import '../design_kit/structure/search_bar/mentora_search_bar_style.dart';
 import '../design_kit/structure/tabs/mentora_tabs.dart';
@@ -2565,6 +2567,234 @@ final class _SearchBarDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: searchBarDocScans,
             keyPrefix: 'search-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Navigation Drawers catalogue — every presentation,
+/// both visibilities and every destination state of the REAL
+/// component, across the four themes and both directions.
+final class NavigationDrawerGallery extends StatefulWidget {
+  const NavigationDrawerGallery({super.key});
+
+  @override
+  State<NavigationDrawerGallery> createState() =>
+      _NavigationDrawerGalleryState();
+}
+
+final class _NavigationDrawerGalleryState
+    extends State<NavigationDrawerGallery> {
+  final MentoraNavigationDrawerController _live =
+      MentoraNavigationDrawerController(
+        selectedId: 'home',
+        visibility: MentoraDrawerVisibility.opened,
+      );
+
+  @override
+  void dispose() {
+    _live.dispose();
+    super.dispose();
+  }
+
+  static void _noop() {}
+
+  static const List<MentoraDrawerSection> sections = [
+    MentoraDrawerSection(
+      destinations: [
+        MentoraDrawerDestination(
+          id: 'home',
+          label: 'Accueil',
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+        ),
+        MentoraDrawerDestination(
+          id: 'consultation',
+          label: 'Consultations',
+          icon: Icons.event_note_outlined,
+          selectedIcon: Icons.event_note,
+          badge: MentoraBadge(
+            variant: MentoraBadgeVariant.information,
+            shape: MentoraBadgeShape.dot,
+            semanticLabel: 'Nouvelles consultations',
+          ),
+        ),
+      ],
+    ),
+    MentoraDrawerSection(
+      title: 'Espace professionnel',
+      destinations: [
+        MentoraDrawerDestination(
+          id: 'business',
+          label: 'Activité',
+          icon: Icons.insights_outlined,
+          selectedIcon: Icons.insights,
+        ),
+        MentoraDrawerDestination(
+          id: 'archive',
+          label: 'Archives',
+          icon: Icons.inventory_2_outlined,
+          selectedIcon: Icons.inventory_2,
+          enabled: false,
+        ),
+      ],
+    ),
+  ];
+
+  static MentoraListTile get space => MentoraListTile(
+    leading: const MentoraAvatar(
+      identity: MentoraAvatarIdentity.initials,
+      name: 'Awa Mensah',
+      initials: 'AM',
+    ),
+    headline: 'Awa Mensah',
+    supporting: 'Experte — Nutrition',
+  );
+
+  static Widget framed(Widget map) =>
+      SizedBox(height: kMinInteractiveDimension * 7, child: map);
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget map({
+      Key? key,
+      MentoraDrawerPresentation presentation =
+          MentoraDrawerPresentation.permanent,
+      MentoraDrawerVisibility visibility = MentoraDrawerVisibility.opened,
+    }) {
+      return framed(
+        MentoraNavigationDrawer(
+          key: key,
+          presentation: presentation,
+          controller: MentoraNavigationDrawerController(
+            selectedId: 'home',
+            visibility: visibility,
+          ),
+          sections: sections,
+          space: space,
+          semanticLabel: 'Espace de Awa Mensah',
+          onDestinationSelected: (_) {},
+          onDismissRequested:
+              presentation == MentoraDrawerPresentation.permanent
+              ? null
+              : _noop,
+          actions: [
+            MentoraButton(
+              label: 'Paramètres',
+              onPressed: _noop,
+              variant: MentoraButtonVariant.text,
+              size: MentoraButtonSize.small,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GallerySection(
+      title: drawerGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final presentation in MentoraDrawerPresentation.values)
+            map(
+              key: Key('drawer-presentation-${presentation.name}'),
+              presentation: presentation,
+            ),
+          for (final visibility in MentoraDrawerVisibility.values)
+            map(
+              key: Key('drawer-visibility-${visibility.name}'),
+              presentation: MentoraDrawerPresentation.dismissible,
+              visibility: visibility,
+            ),
+          // The live map: the application announces where the person
+          // is — the map only reported the intention.
+          framed(
+            MentoraNavigationDrawer(
+              key: const Key('drawer-live'),
+              controller: _live,
+              sections: sections,
+              space: space,
+              semanticLabel: 'Espace de Awa Mensah',
+              onDestinationSelected: _live.announceSelection,
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: map(key: Key('drawer-theme-${variant.name}')),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: map(key: Key('drawer-comfort-${comfort.name}')),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: map(key: Key('drawer-direction-${direction.name}')),
+            ),
+          const _NavigationDrawerDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Navigation Drawer's living documentation — built only with
+/// Mentora components.
+final class _NavigationDrawerDocumentation extends StatelessWidget {
+  const _NavigationDrawerDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('drawer-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(drawerDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: drawerDocArchitecture,
+            keyPrefix: 'drawer-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: drawerDocResponsibilities,
+            keyPrefix: 'drawer-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: drawerDocComponents,
+            keyPrefix: 'drawer-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: drawerDocTokens,
+            keyPrefix: 'drawer-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: drawerDocEngines,
+            keyPrefix: 'drawer-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: drawerDocForbidden,
+            keyPrefix: 'drawer-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: drawerDocScans,
+            keyPrefix: 'drawer-doc-scan',
           ),
         ],
       ),

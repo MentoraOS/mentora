@@ -88,6 +88,58 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String drawerGalleryTitle =
+    'Navigation Drawers — Presentations (3), Visibility (2) & States (5)';
+const String drawerDocHeading =
+    'MentoraNavigationDrawer — official contract';
+const List<String> drawerDocArchitecture = [
+  'A Structural Component: an orientation map, never a menu',
+  'A destination is an IDENTITY — never a position, never an address',
+  'The application announces the presentation and the visibility',
+  'The person space is a MentoraListTile: the entity that owns it',
+  'A permanent map lives beside the content; the others pass in front',
+];
+const List<String> drawerDocResponsibilities = [
+  'It says where the person is, and where they may go',
+  'It never decides for them: it reports an identity',
+  'It never opens and never closes itself: it is told',
+  'Asking to be put away is reported — a permanent map never asks',
+  'It never takes the focus, and always gives it back',
+];
+const List<String> drawerDocComponents = [
+  'MentoraListTile — presents the space, and owns the entity',
+  'MentoraAvatar — owns the identity, inside that tile',
+  'MentoraText — owns the typography',
+  'MentoraBadge — owns what is happening in a place',
+  'MentoraButton — owns the acts',
+];
+const List<String> drawerDocForbidden = [
+  'The framework drawers, their destinations and their controllers',
+  'Any address, any navigator, any routing known by the map',
+  'Any knowledge of the platform, and any responsive decision',
+  'Rebuilding an avatar, a badge, a button, a word or a tile',
+  'A coded colour, size, padding or duration',
+];
+const List<String> drawerDocTokens = [
+  'Drawer: presentation specs, scrim, destination extent, radii',
+  'Color: primary, highlight, focus, supporting, unavailable, immersion',
+  'Surface: the primary surface a map rests on',
+  'Typography: label and supporting — a map never speaks louder',
+  'Spacing: linked proximity, distinct separation, hierarchical breathing',
+];
+const List<String> drawerDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — show the continuity: the space never changes',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> drawerDocScans = [
+  'No framework drawer or navigation widget in the foundation',
+  'No platform known by a structure',
+  'No address, no position, no screen measured',
+  'No Core Component rebuilt, and no coded value outside the Tokens',
+];
 const String searchBarGalleryTitle =
     'Search Bars — Variants (5), States (7), Aids & Prepared acts';
 const String searchBarDocHeading = 'MentoraSearchBar — official contract';
