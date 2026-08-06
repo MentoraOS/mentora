@@ -6,6 +6,8 @@ import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
+import '../design_kit/structure/master_detail/mentora_master_detail.dart';
+import '../design_kit/structure/master_detail/mentora_master_detail_style.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
@@ -3242,6 +3244,238 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Master Details catalogue - every presentation, every
+/// visibility and both regions of the REAL relation.
+final class MasterDetailGallery extends StatefulWidget {
+  const MasterDetailGallery({super.key});
+
+  @override
+  State<MasterDetailGallery> createState() => _MasterDetailGalleryState();
+}
+
+final class _MasterDetailGalleryState extends State<MasterDetailGallery> {
+  static void _noop() {}
+
+  /// The room the two spaces take - decided here, by the application
+  /// that owns the catalogue, and never by the relation.
+  static const MentoraMasterDetailLayoutSpecification layout =
+      MentoraMasterDetailLayoutSpecification(masterExtent: 240);
+
+  static Widget framed(Widget relation) =>
+      SizedBox(height: kMinInteractiveDimension * 6, child: relation);
+
+  /// The space that presents: entities, and nothing else.
+  static Widget get master => MentoraCard(
+    variant: MentoraCardVariant.surface,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MentoraText(masterDetailMasterHeading, role: MentoraTextRole.subtitle),
+        // A presenting space is narrow by nature: the entity is shown
+        // compact, as a real conversation list shows it.
+        ListTileGallery.entity(onTap: _noop, composed: false),
+      ],
+    ),
+  );
+
+  /// The space that deepens: what one entity carries.
+  static Widget get detail => MentoraCard(
+    variant: MentoraCardVariant.surface,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MentoraText(masterDetailDetailHeading, role: MentoraTextRole.subtitle),
+        MentoraText(masterDetailDetailBody, role: MentoraTextRole.body),
+        MentoraButton(
+          label: masterDetailDetailAct,
+          onPressed: _noop,
+          size: MentoraButtonSize.small,
+        ),
+      ],
+    ),
+  );
+
+  static MentoraMasterDetail relation({
+    Key? key,
+    MentoraMasterDetailPresentation presentation =
+        MentoraMasterDetailPresentation.split,
+    MentoraMasterPaneVisibility visibility = MentoraMasterPaneVisibility.shown,
+    MentoraMasterDetailRegion activeRegion = MentoraMasterDetailRegion.detail,
+    VoidCallback? onDismissRequested,
+  }) {
+    return MentoraMasterDetail(
+      key: key,
+      master: master,
+      detail: detail,
+      layout: layout,
+      presentation: presentation,
+      visibility: visibility,
+      activeRegion: activeRegion,
+      masterSemanticLabel: masterDetailMasterLabel,
+      detailSemanticLabel: masterDetailDetailLabel,
+      onDismissRequested: onDismissRequested,
+    );
+  }
+
+  /// Which space the catalogue says is being worked in - the gallery
+  /// is the application here: the relation only expresses it.
+  MentoraMasterDetailRegion _activeRegion = MentoraMasterDetailRegion.master;
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: masterDetailGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // The presenting space alone: one space at a time.
+          framed(
+            relation(
+              key: const Key('master-detail-stacked-master'),
+              presentation: MentoraMasterDetailPresentation.stacked,
+              activeRegion: MentoraMasterDetailRegion.master,
+            ),
+          ),
+          // The deepening space alone: the presenting one was put away.
+          framed(
+            relation(
+              key: const Key('master-detail-stacked-detail'),
+              presentation: MentoraMasterDetailPresentation.stacked,
+              visibility: MentoraMasterPaneVisibility.hidden,
+            ),
+          ),
+          // The two spaces, side by side.
+          framed(relation(key: const Key('master-detail-split'))),
+          framed(
+            relation(
+              key: const Key('master-detail-split-hidden'),
+              visibility: MentoraMasterPaneVisibility.hidden,
+            ),
+          ),
+          // The presenting space passes in front of the other.
+          framed(
+            relation(
+              key: const Key('master-detail-overlay'),
+              presentation: MentoraMasterDetailPresentation.overlay,
+              activeRegion: MentoraMasterDetailRegion.master,
+              onDismissRequested: _noop,
+            ),
+          ),
+          framed(
+            relation(
+              key: const Key('master-detail-overlay-hidden'),
+              presentation: MentoraMasterDetailPresentation.overlay,
+              visibility: MentoraMasterPaneVisibility.hidden,
+              onDismissRequested: _noop,
+            ),
+          ),
+          // The live scene: the region worked in changes, announced by
+          // the application - the ground follows, nothing else moves.
+          framed(
+            relation(
+              key: const Key('master-detail-live'),
+              activeRegion: _activeRegion,
+            ),
+          ),
+          MentoraButton(
+            key: const Key('master-detail-region-toggle'),
+            label: masterDetailRegionToggleLabel,
+            onPressed: () => setState(() {
+              _activeRegion = _activeRegion == MentoraMasterDetailRegion.master
+                  ? MentoraMasterDetailRegion.detail
+                  : MentoraMasterDetailRegion.master;
+            }),
+            variant: MentoraButtonVariant.text,
+            size: MentoraButtonSize.small,
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: framed(
+                relation(key: Key('master-detail-theme-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: framed(
+                relation(key: Key('master-detail-comfort-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: framed(
+                relation(key: Key('master-detail-direction-${direction.name}')),
+              ),
+            ),
+          const _MasterDetailDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Master Detail's living documentation - built only with Mentora
+/// components.
+final class _MasterDetailDocumentation extends StatelessWidget {
+  const _MasterDetailDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('master-detail-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(masterDetailDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: masterDetailDocArchitecture,
+            keyPrefix: 'master-detail-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: masterDetailDocResponsibilities,
+            keyPrefix: 'master-detail-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: masterDetailDocComponents,
+            keyPrefix: 'master-detail-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: masterDetailDocTokens,
+            keyPrefix: 'master-detail-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: masterDetailDocEngines,
+            keyPrefix: 'master-detail-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: masterDetailDocForbidden,
+            keyPrefix: 'master-detail-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: masterDetailDocScans,
+            keyPrefix: 'master-detail-doc-scan',
           ),
         ],
       ),

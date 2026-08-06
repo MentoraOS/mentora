@@ -189,6 +189,63 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String masterDetailGalleryTitle =
+    'Master Details — Presentations (3), Visibility (2) & Regions (2)';
+const String masterDetailDocHeading = 'MentoraMasterDetail — official contract';
+
+/// The two spaces of the catalogue scene. The relation composes none
+/// of these words: the application owns every string it carries.
+const String masterDetailMasterHeading = 'Conversations';
+const String masterDetailDetailHeading = 'Awa Mensah';
+const String masterDetailDetailBody =
+    'Le contenu appartient entierement a l application.';
+const String masterDetailDetailAct = 'Repondre';
+const String masterDetailMasterLabel = 'Liste des conversations';
+const String masterDetailDetailLabel = 'Conversation ouverte';
+const String masterDetailRegionToggleLabel = 'Changer de region active';
+const List<String> masterDetailDocArchitecture = [
+  'A Structural Component: a relation between two spaces, never a layout',
+  'The application announces the presentation, the visibility, the region',
+  'The room is announced already decided: a specification, never a ratio',
+  'Placement only — no flex, no measure, no proportion computed here',
+  'A space that is not shown is not built: nothing of it stays reachable',
+];
+const List<String> masterDetailDocResponsibilities = [
+  'One space presents, the other deepens: the relation holds them',
+  'It knows no content, no data, no business and no selection',
+  'It never decides which space is shown, nor which one is worked in',
+  'Each space is a named landmark and its own focus group',
+  'Asking a space to step aside is reported, never performed',
+];
+const List<String> masterDetailDocComponents = [
+  'The two spaces are given whole: the relation composes neither',
+  'MentoraPageScaffold — carries the relation as its content',
+  'MentoraCard, MentoraListTile, MentoraText, MentoraButton — inside them',
+];
+const List<String> masterDetailDocForbidden = [
+  'The framework scaffold, and a Row used as a split view',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Expanded or Flexible: a relation never decides a proportion',
+  'Any selection, any data, any business, any navigation',
+  'A coded colour, size, padding or duration',
+];
+const List<String> masterDetailDocTokens = [
+  'Master Detail: the line between two spaces, the veil, the extent floor',
+  'Color: the divider and immersion roles',
+  'Surface: primary for the space worked in, secondary for the one waiting',
+];
+const List<String> masterDetailDocEngines = [
+  'Color & Surface Token Engines',
+  'Motion Engine — show the continuity: a relation never jumps',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> masterDetailDocScans = [
+  'No framework scaffold, no MediaQuery, no LayoutBuilder, no responsive',
+  'No flex, no proportion, no measure taken by the relation',
+  'No business, no data, no selection named by the relation',
+  'No Core Component rebuilt, and no coded value outside the Tokens',
+];
 const String drawerGalleryTitle =
     'Navigation Drawers — Presentations (3), Visibility (2) & States (5)';
 const String drawerDocHeading = 'MentoraNavigationDrawer — official contract';
