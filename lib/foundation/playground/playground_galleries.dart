@@ -5,6 +5,8 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/tabs/mentora_tabs.dart';
+import '../design_kit/structure/tabs/mentora_tabs_style.dart';
 import '../design_kit/structure/navigation_rail/mentora_navigation_rail.dart';
 import '../design_kit/structure/navigation_rail/mentora_navigation_rail_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar_style.dart';
@@ -2220,6 +2222,170 @@ final class _NavigationRailDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: navigationRailDocScans,
             keyPrefix: 'rail-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Tabs catalogue — every emphasis, shape, overflow and
+/// state of the REAL component, across the four themes, the reading
+/// comfort and both directions.
+final class TabsGallery extends StatefulWidget {
+  const TabsGallery({super.key});
+
+  @override
+  State<TabsGallery> createState() => _TabsGalleryState();
+}
+
+final class _TabsGalleryState extends State<TabsGallery> {
+  final MentoraTabsController _controller = MentoraTabsController('overview');
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  static const List<MentoraTab> facets = [
+    MentoraTab(
+      id: 'overview',
+      label: 'Vue d’ensemble',
+      icon: Icons.dashboard_outlined,
+    ),
+    MentoraTab(
+      id: 'sessions',
+      label: 'Séances',
+      icon: Icons.event_note_outlined,
+      badge: MentoraBadge(
+        variant: MentoraBadgeVariant.information,
+        shape: MentoraBadgeShape.pill,
+        label: '3',
+        semanticLabel: '3 séances',
+      ),
+    ),
+    MentoraTab(id: 'documents', label: 'Documents', loading: true),
+    MentoraTab(id: 'archive', label: 'Archives', enabled: false),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget tabs({
+      Key? key,
+      MentoraTabsEmphasis emphasis = MentoraTabsEmphasis.primary,
+      MentoraTabsShape shape = MentoraTabsShape.underline,
+      MentoraTabsOverflow overflow = MentoraTabsOverflow.scroll,
+      bool enabled = true,
+      MentoraTabsController? controller,
+    }) {
+      return MentoraTabs(
+        key: key,
+        emphasis: emphasis,
+        shape: shape,
+        overflow: overflow,
+        enabled: enabled,
+        controller: controller ?? MentoraTabsController('overview'),
+        tabs: facets,
+        onTabSelected: (_) {},
+      );
+    }
+
+    return GallerySection(
+      title: tabsGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final emphasis in MentoraTabsEmphasis.values)
+            tabs(key: Key('tabs-emphasis-${emphasis.name}'), emphasis: emphasis),
+          for (final shape in MentoraTabsShape.values)
+            tabs(key: Key('tabs-shape-${shape.name}'), shape: shape),
+          for (final overflow in MentoraTabsOverflow.values)
+            tabs(key: Key('tabs-overflow-${overflow.name}'), overflow: overflow),
+          tabs(key: const Key('tabs-disabled'), enabled: false),
+          // The live set: the application announces the facet it
+          // revealed — the set only reported the intention.
+          MentoraTabs(
+            key: const Key('tabs-live'),
+            controller: _controller,
+            tabs: facets,
+            onTabSelected: _controller.announceSelection,
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: tabs(key: Key('tabs-theme-${variant.name}')),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: tabs(key: Key('tabs-comfort-${comfort.name}')),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: tabs(key: Key('tabs-direction-${direction.name}')),
+            ),
+          const _TabsDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Tabs' living documentation — built only with Mentora
+/// components.
+final class _TabsDocumentation extends StatelessWidget {
+  const _TabsDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('tabs-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(tabsDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: tabsDocArchitecture,
+            keyPrefix: 'tabs-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: tabsDocResponsibilities,
+            keyPrefix: 'tabs-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: tabsDocComponents,
+            keyPrefix: 'tabs-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: tabsDocTokens,
+            keyPrefix: 'tabs-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: tabsDocEngines,
+            keyPrefix: 'tabs-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: tabsDocForbidden,
+            keyPrefix: 'tabs-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: tabsDocScans,
+            keyPrefix: 'tabs-doc-scan',
           ),
         ],
       ),

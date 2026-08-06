@@ -88,6 +88,54 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String tabsGalleryTitle =
+    'Tabs — Emphases (2), Shapes (3), Overflow (2) & States (6)';
+const String tabsDocHeading = 'MentoraTabs — official contract';
+const List<String> tabsDocArchitecture = [
+  'A Structural Component: it organizes the facets of one context',
+  'A facet is an IDENTITY — never a position, an address or a page',
+  'Selection travels by identity: no position exists in its API',
+  'Overflow is declared by the application: the set measures nothing',
+  'Emphasis and shape are orthogonal — any shape may be secondary',
+];
+const List<String> tabsDocResponsibilities = [
+  'Changing facet never means leaving the context',
+  'It organizes; it never navigates between modules',
+  'It never decides what is shown: it reports, the application announces',
+  'A single facet reveals nothing: at least two are required',
+  'A facet still being prepared is never chosen',
+];
+const List<String> tabsDocComponents = [
+  'MentoraText — owns the typography',
+  'MentoraBadge — owns what is happening in a facet',
+];
+const List<String> tabsDocForbidden = [
+  'The framework tab widgets and their controllers',
+  'Any address, any page or any position known by the set',
+  'Any measure of the screen or responsive decision taken here',
+  'An identity or a way out: those belong to the other structures',
+  'A coded colour, size, padding or duration',
+];
+const List<String> tabsDocTokens = [
+  'Tabs: facet extent, minimum width, indicator, radii, opacities',
+  'Color: primary, secondary, focus, highlight, supporting, unavailable',
+  'Surface: the calm surface a segmented set encloses its facets on',
+  'Typography: label — a set never speaks with the voice of its content',
+  'Spacing: distinct separation and linked proximity',
+];
+const List<String> tabsDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — show the continuity: the context never changes',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> tabsDocScans = [
+  'No framework tab widget or controller in the foundation',
+  'No position in the public API of a structure',
+  'No address and no screen measured by a structure',
+  'No coded colour, padding, radius or duration outside the Tokens',
+];
 const String navigationRailGalleryTitle =
     'Navigation Rails — Displays (2), Chromes (3) & States (7)';
 const String navigationRailDocHeading =
