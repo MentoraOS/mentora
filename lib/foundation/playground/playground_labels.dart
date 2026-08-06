@@ -189,6 +189,67 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String splitViewGalleryTitle =
+    'Split Views — Axes (2), Regions by identity & Separations';
+const String splitViewDocHeading = 'MentoraSplitView — official contract';
+
+/// The regions of the catalogue scene. The workspace composes none of
+/// these words: the application owns every string it carries.
+const String splitViewNavigationLabel = 'Region de navigation';
+const String splitViewWorkspaceLabel = 'Espace de travail';
+const String splitViewInspectorLabel = 'Region de details';
+const String splitViewResizeLabel = 'Redimensionner la region';
+const String splitViewNavigationHeading = 'Navigation';
+const String splitViewWorkspaceHeading = 'Espace de travail';
+const String splitViewInspectorHeading = 'Details';
+const String splitViewContentBody =
+    'Le contenu appartient entierement a l application.';
+const String splitViewHideLabel = 'Masquer les details';
+const String splitViewShowLabel = 'Montrer les details';
+const List<String> splitViewDocArchitecture = [
+  'A Structural Component: a shared workspace, never a responsive layout',
+  'A region is an IDENTITY — never a position, never an index',
+  'The room is announced already decided: a specification, never a ratio',
+  'Exactly one region takes what is left, and it is named by identity',
+  'Placement only — no flex, no measure, no breakpoint read here',
+];
+const List<String> splitViewDocResponsibilities = [
+  'It expresses a spatial relation; it decides none of it',
+  'A separation says that two regions exist, and nothing else',
+  'Moving a separation is an intention: it is reported, never performed',
+  'A hidden region does not exist: not built, not focusable, not spoken',
+  'Each region is a named landmark and its own focus group',
+];
+const List<String> splitViewDocComponents = [
+  'The regions are given whole: the workspace composes neither',
+  'MentoraPageScaffold — carries the workspace as its content',
+  'MentoraCard, MentoraListTile, MentoraText, MentoraButton — inside them',
+];
+const List<String> splitViewDocForbidden = [
+  'The framework split views, and a Row used to share a room',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Expanded, Flexible or any flex factor',
+  'Any position, any index, any business, any data',
+  'A coded colour, size, padding or duration',
+];
+const List<String> splitViewDocTokens = [
+  'Split View: the separation, the room to take hold of, the extent floor',
+  'Color: the divider and focus roles',
+  'Surface: the primary surface the regions share',
+];
+const List<String> splitViewDocEngines = [
+  'Color & Surface Token Engines',
+  'Motion Engine — show the continuity: a workspace never jumps',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> splitViewDocScans = [
+  'No framework split view, no screen measured, no platform known',
+  'No position: identities travel, ranks do not exist',
+  'No business, no data, no selection named by the workspace',
+  'No Core Component rebuilt, and no coded value outside the Tokens',
+];
 const String masterDetailGalleryTitle =
     'Master Details — Presentations (3), Visibility (2) & Regions (2)';
 const String masterDetailDocHeading = 'MentoraMasterDetail — official contract';

@@ -8,6 +8,9 @@ import '../design_kit/structure/app_bar/mentora_app_bar.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
 import '../design_kit/structure/master_detail/mentora_master_detail.dart';
 import '../design_kit/structure/master_detail/mentora_master_detail_style.dart';
+import '../design_kit/structure/split_view/mentora_split_view.dart';
+import '../design_kit/structure/split_view/mentora_split_view_style.dart';
+import '../design_kit/tokens/split_view_tokens.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
@@ -3244,6 +3247,229 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Split Views catalogue - both axes, regions announced
+/// by identity, fixed and movable separations, and a live workspace
+/// where the catalogue itself decides what the component reports.
+final class SplitViewGallery extends StatefulWidget {
+  const SplitViewGallery({super.key});
+
+  @override
+  State<SplitViewGallery> createState() => _SplitViewGalleryState();
+}
+
+final class _SplitViewGalleryState extends State<SplitViewGallery> {
+  static const String navigationId = 'navigation';
+  static const String workspaceId = 'workspace';
+  static const String inspectorId = 'inspector';
+
+  static Widget framed(Widget workspace) =>
+      SizedBox(height: kMinInteractiveDimension * 6, child: workspace);
+
+  static Widget space(String heading) => MentoraCard(
+    variant: MentoraCardVariant.surface,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MentoraText(heading, role: MentoraTextRole.subtitle),
+        MentoraText(splitViewContentBody, role: MentoraTextRole.body),
+      ],
+    ),
+  );
+
+  static MentoraSplitRegion region(
+    String id,
+    String semanticLabel,
+    String heading, {
+    MentoraSplitRegionVisibility visibility =
+        MentoraSplitRegionVisibility.shown,
+  }) {
+    return MentoraSplitRegion(
+      id: id,
+      semanticLabel: semanticLabel,
+      content: space(heading),
+      visibility: visibility,
+      resizeSemanticLabel: splitViewResizeLabel,
+    );
+  }
+
+  static List<MentoraSplitRegion> regions({
+    MentoraSplitRegionVisibility inspector = MentoraSplitRegionVisibility.shown,
+  }) => [
+    region(navigationId, splitViewNavigationLabel, splitViewNavigationHeading),
+    region(workspaceId, splitViewWorkspaceLabel, splitViewWorkspaceHeading),
+    region(
+      inspectorId,
+      splitViewInspectorLabel,
+      splitViewInspectorHeading,
+      visibility: inspector,
+    ),
+  ];
+
+  static MentoraSplitLayoutSpecification specification({
+    MentoraSplitAxis axis = MentoraSplitAxis.horizontal,
+    double navigation = 240,
+    double inspector = 280,
+  }) {
+    return MentoraSplitLayoutSpecification(
+      axis: axis,
+      extents: {navigationId: navigation, inspectorId: inspector},
+      fillsRemainingRegionId: workspaceId,
+    );
+  }
+
+  /// The room the catalogue announces, and the visibility it decides.
+  /// The gallery is the application here: the workspace only reports.
+  double _navigationExtent = 240;
+  MentoraSplitRegionVisibility _inspector = MentoraSplitRegionVisibility.shown;
+
+  void _apply(MentoraSplitResizeIntention intention) {
+    if (intention.regionId != navigationId) return;
+    setState(() {
+      _navigationExtent = (_navigationExtent + intention.delta).clamp(
+        splitViewMinimumRegionExtent,
+        splitViewMinimumRegionExtent * 3,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget scene(
+      String name, {
+      MentoraSplitAxis axis = MentoraSplitAxis.horizontal,
+      MentoraSplitRegionVisibility inspector =
+          MentoraSplitRegionVisibility.shown,
+      ValueChanged<MentoraSplitResizeIntention>? onResizeRequested,
+    }) {
+      return framed(
+        MentoraSplitView(
+          key: Key('split-view-$name'),
+          regions: regions(inspector: inspector),
+          layout: specification(axis: axis),
+          onResizeRequested: onResizeRequested,
+        ),
+      );
+    }
+
+    return GallerySection(
+      title: splitViewGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Fixed separations: they say that regions exist, and offer
+          // nothing else.
+          scene('fixed'),
+          // Movable separations: what a person asks for is reported.
+          scene('movable', onResizeRequested: (_) {}),
+          // The other axis, announced by the application.
+          scene('vertical', axis: MentoraSplitAxis.vertical),
+          // A hidden region does not exist at all.
+          scene('hidden', inspector: MentoraSplitRegionVisibility.hidden),
+          // The live workspace: the component reports, the catalogue
+          // decides, and the announced room follows.
+          framed(
+            MentoraSplitView(
+              key: const Key('split-view-live'),
+              regions: regions(inspector: _inspector),
+              layout: specification(navigation: _navigationExtent),
+              onResizeRequested: _apply,
+            ),
+          ),
+          MentoraButton(
+            key: const Key('split-view-visibility-toggle'),
+            label: _inspector == MentoraSplitRegionVisibility.shown
+                ? splitViewHideLabel
+                : splitViewShowLabel,
+            onPressed: () => setState(() {
+              _inspector = _inspector == MentoraSplitRegionVisibility.shown
+                  ? MentoraSplitRegionVisibility.hidden
+                  : MentoraSplitRegionVisibility.shown;
+            }),
+            variant: MentoraButtonVariant.text,
+            size: MentoraButtonSize.small,
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: scene('theme-${variant.name}'),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: scene('comfort-${comfort.name}'),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: scene('direction-${direction.name}'),
+            ),
+          const _SplitViewDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Split View's living documentation - built only with Mentora
+/// components.
+final class _SplitViewDocumentation extends StatelessWidget {
+  const _SplitViewDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('split-view-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(splitViewDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: splitViewDocArchitecture,
+            keyPrefix: 'split-view-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: splitViewDocResponsibilities,
+            keyPrefix: 'split-view-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: splitViewDocComponents,
+            keyPrefix: 'split-view-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: splitViewDocTokens,
+            keyPrefix: 'split-view-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: splitViewDocEngines,
+            keyPrefix: 'split-view-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: splitViewDocForbidden,
+            keyPrefix: 'split-view-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: splitViewDocScans,
+            keyPrefix: 'split-view-doc-scan',
           ),
         ],
       ),
