@@ -5,6 +5,7 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer_style.dart';
 import '../design_kit/structure/search_bar/mentora_search_bar.dart';
@@ -2795,6 +2796,225 @@ final class _NavigationDrawerDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: drawerDocScans,
             keyPrefix: 'drawer-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Page Scaffolds catalogue — every zone and every
+/// assembly of the REAL container, from the barest page to the one
+/// that gathers all the structures at once.
+final class PageScaffoldGallery extends StatelessWidget {
+  const PageScaffoldGallery({super.key});
+
+  static void _noop() {}
+
+  static Widget framed(Widget page) =>
+      SizedBox(height: kMinInteractiveDimension * 5, child: page);
+
+  static MentoraPageScaffold page({
+    Key? key,
+    MentoraAppBar? place,
+    MentoraNavigationRail? rail,
+    MentoraNavigationDrawer? orientation,
+    MentoraTabs? facets,
+    MentoraSearchBar? intention,
+    List<MentoraButton> acts = const [],
+  }) {
+    return MentoraPageScaffold(
+      key: key,
+      semanticLabel: 'Consultations',
+      place: place,
+      rail: rail,
+      orientation: orientation,
+      facets: facets,
+      intention: intention,
+      acts: acts,
+      content: const MentoraText(
+        'Le contenu appartient entièrement à l’application.',
+        role: MentoraTextRole.body,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: pageScaffoldGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          framed(page(key: const Key('page-simple'))),
+          framed(
+            page(
+              key: const Key('page-place'),
+              place: const MentoraAppBar(title: 'Consultations'),
+            ),
+          ),
+          framed(
+            page(
+              key: const Key('page-rail'),
+              rail: MentoraNavigationRail(
+                destinations: _NavigationRailGalleryState.places,
+                controller: MentoraNavigationRailController('home'),
+                onDestinationSelected: (_) {},
+              ),
+            ),
+          ),
+          framed(
+            page(
+              key: const Key('page-orientation'),
+              orientation: MentoraNavigationDrawer(
+                controller: MentoraNavigationDrawerController(
+                  selectedId: 'home',
+                  visibility: MentoraDrawerVisibility.opened,
+                ),
+                sections: _NavigationDrawerGalleryState.sections,
+                semanticLabel: 'Espace de Awa Mensah',
+                onDestinationSelected: (_) {},
+              ),
+            ),
+          ),
+          framed(
+            page(
+              key: const Key('page-facets'),
+              facets: MentoraTabs(
+                controller: MentoraTabsController('overview'),
+                tabs: _TabsGalleryState.facets,
+                onTabSelected: (_) {},
+              ),
+            ),
+          ),
+          framed(
+            page(
+              key: const Key('page-intention'),
+              intention: MentoraSearchBar(
+                controller: MentoraSearchController(),
+                placeholder: 'Rechercher',
+                semanticLabel: 'Rechercher dans Mentora',
+                onQueryChanged: (_) {},
+              ),
+            ),
+          ),
+          framed(
+            page(
+              key: const Key('page-acts'),
+              acts: [
+                MentoraButton(
+                  label: 'Confirmer',
+                  onPressed: _noop,
+                  size: MentoraButtonSize.small,
+                ),
+              ],
+            ),
+          ),
+          // Everything at once: a page gathers, and stays a context.
+          framed(
+            page(
+              key: const Key('page-assembled'),
+              place: const MentoraAppBar(title: 'Consultations'),
+              intention: MentoraSearchBar(
+                controller: MentoraSearchController(),
+                placeholder: 'Rechercher',
+                semanticLabel: 'Rechercher dans Mentora',
+                onQueryChanged: (_) {},
+              ),
+              facets: MentoraTabs(
+                controller: MentoraTabsController('overview'),
+                tabs: _TabsGalleryState.facets,
+                onTabSelected: (_) {},
+              ),
+              rail: MentoraNavigationRail(
+                destinations: _NavigationRailGalleryState.places,
+                controller: MentoraNavigationRailController('home'),
+                onDestinationSelected: (_) {},
+              ),
+              acts: [
+                MentoraButton(
+                  label: 'Confirmer',
+                  onPressed: _noop,
+                  size: MentoraButtonSize.small,
+                ),
+              ],
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: framed(page(key: Key('page-theme-${variant.name}'))),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: framed(page(key: Key('page-comfort-${comfort.name}'))),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: framed(page(key: Key('page-direction-${direction.name}'))),
+            ),
+          const _PageScaffoldDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Page Scaffold's living documentation — built only with Mentora
+/// components.
+final class _PageScaffoldDocumentation extends StatelessWidget {
+  const _PageScaffoldDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('page-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(pageScaffoldDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: pageScaffoldDocArchitecture,
+            keyPrefix: 'page-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: pageScaffoldDocResponsibilities,
+            keyPrefix: 'page-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: pageScaffoldDocComponents,
+            keyPrefix: 'page-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: pageScaffoldDocTokens,
+            keyPrefix: 'page-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: pageScaffoldDocEngines,
+            keyPrefix: 'page-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: pageScaffoldDocForbidden,
+            keyPrefix: 'page-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: pageScaffoldDocScans,
+            keyPrefix: 'page-doc-scan',
           ),
         ],
       ),

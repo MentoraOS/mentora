@@ -186,9 +186,9 @@ final class _MentoraNavigationDrawerState
     final spec = specOf(widget.presentation);
     final panel = _panel(theme, visuals, spec);
 
-    if (widget.presentation == MentoraDrawerPresentation.permanent) {
-      // A permanent map lives beside the content: it gives its room
-      // back when it is told to, and takes nothing else.
+    if (standsBeside(widget.presentation)) {
+      // A map that stands beside the content gives its room back when
+      // it is told to, and takes nothing else.
       return AnimatedContainer(
         key: const Key('drawer-surface'),
         duration: theme.transitionDuration,

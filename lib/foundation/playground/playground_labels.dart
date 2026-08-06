@@ -88,6 +88,58 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String pageScaffoldGalleryTitle =
+    'Page Scaffolds — Zones, layers and assemblies';
+const String pageScaffoldDocHeading =
+    'MentoraPageScaffold — official contract';
+const List<String> pageScaffoldDocArchitecture = [
+  'A page is a context: it gathers, it never decides',
+  'Every zone is typed: the authority of each structure is compiled in',
+  'It is given a configuration already decided by the application',
+  'It places the map where its own presentation says it stands',
+  'The temporary layers are composed, and never recreated',
+];
+const List<String> pageScaffoldDocResponsibilities = [
+  'It knows no business: it assembles components, never their content',
+  'It knows no platform and takes no responsive decision',
+  'It never chooses the way through the context: it is given it',
+  'It touches the content in no way — no padding, no scroll, no order',
+  'Each zone travels as its own focus group',
+];
+const List<String> pageScaffoldDocComponents = [
+  'MentoraAppBar — owns the place',
+  'MentoraNavigationRail & MentoraNavigationDrawer — own the way through',
+  'MentoraTabs — owns the facets of the context',
+  'MentoraSearchBar — owns the intention of finding',
+  'MentoraButton — owns the acts kept at hand',
+  'The three official hosts — own the layers that come and go',
+];
+const List<String> pageScaffoldDocForbidden = [
+  'The framework scaffold and every structure it carries',
+  'Any business, any platform, any responsive decision',
+  'Rebuilding a structure, a layer or a Core Component',
+  'Wrapping, padding or reordering the content',
+  'A coded colour, size, padding or duration',
+];
+const List<String> pageScaffoldDocTokens = [
+  'Page Scaffold: the lines between zones, and nothing more',
+  'Surface: the scene the whole page rests on',
+  'Color: the divider role',
+  'Spacing: the breathing around the acts a page keeps at hand',
+];
+const List<String> pageScaffoldDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — show the continuity: a context does not change',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Accessibility Engine — the font scale, applied once by the app',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> pageScaffoldDocScans = [
+  'No framework scaffold in the Design Kit',
+  'No business, no platform, no navigation decided by a page',
+  'No structure or Core Component rebuilt',
+  'No coded colour, padding, radius or duration outside the Tokens',
+];
 const String drawerGalleryTitle =
     'Navigation Drawers — Presentations (3), Visibility (2) & States (5)';
 const String drawerDocHeading =

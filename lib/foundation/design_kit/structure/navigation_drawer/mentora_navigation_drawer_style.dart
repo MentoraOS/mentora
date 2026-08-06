@@ -77,6 +77,14 @@ DrawerPresentationSpec specOf(MentoraDrawerPresentation presentation) {
 bool acceptsDismissal(MentoraDrawerPresentation presentation) =>
     presentation != MentoraDrawerPresentation.permanent;
 
+/// Whether the map stands BESIDE the content and takes its own room,
+/// or passes in front of it and takes none.
+///
+/// This is the single truth about where a map stands: the page that
+/// assembles it reads it here rather than deciding again.
+bool standsBeside(MentoraDrawerPresentation presentation) =>
+    presentation != MentoraDrawerPresentation.modal;
+
 /// Carries what the application knows: where the person is, and
 /// whether the map is shown.
 ///

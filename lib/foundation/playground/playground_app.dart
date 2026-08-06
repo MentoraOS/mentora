@@ -14,6 +14,7 @@ import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/components/text/mentora_text.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/international/international_engine.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
@@ -155,13 +156,14 @@ final class _PlaygroundShell extends StatelessWidget {
 
     return Directionality(
       textDirection: international.directionFor(controller.locale),
-      child: Scaffold(
-        // The laboratory uses the official structure, like every
-        // screen will: the framework bars stay primitives.
-        appBar: const MentoraAppBar(title: playgroundTitle),
+      // The laboratory is a page like every other: the official
+      // container assembles it, and the framework one is never used.
+      child: MentoraPageScaffold(
+        semanticLabel: playgroundTitle,
+        place: const MentoraAppBar(title: playgroundTitle),
         // A laboratory shows everything: no lazy building — every
         // gallery is always mounted and verifiable.
-        body: SingleChildScrollView(
+        content: SingleChildScrollView(
           key: const Key('playground-scroll'),
           padding: EdgeInsets.all(pad),
           child: Column(
@@ -221,6 +223,7 @@ final class _PlaygroundShell extends StatelessWidget {
               const TabsGallery(),
               const SearchBarGallery(),
               const NavigationDrawerGallery(),
+              const PageScaffoldGallery(),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
           ),
