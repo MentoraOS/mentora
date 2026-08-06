@@ -217,6 +217,7 @@ final class _PlaygroundShell extends StatelessWidget {
               const AvatarGallery(),
               const ListTileGallery(),
               const AppBarGallery(),
+              const NavigationRailGallery(),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
           ),

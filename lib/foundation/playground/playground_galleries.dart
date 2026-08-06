@@ -5,6 +5,8 @@ import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/navigation_rail/mentora_navigation_rail.dart';
+import '../design_kit/structure/navigation_rail/mentora_navigation_rail_style.dart';
 import '../design_kit/structure/app_bar/mentora_app_bar_style.dart';
 import '../design_kit/composition/list_tile/mentora_list_tile.dart';
 import '../design_kit/composition/list_tile/mentora_list_tile_style.dart';
@@ -2021,6 +2023,203 @@ final class _AppBarDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: appBarDocScans,
             keyPrefix: 'app-bar-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Navigation Rails catalogue — every display, chrome
+/// and state of the REAL component, across the four themes, the
+/// reading comfort and both directions.
+final class NavigationRailGallery extends StatefulWidget {
+  const NavigationRailGallery({super.key});
+
+  @override
+  State<NavigationRailGallery> createState() => _NavigationRailGalleryState();
+}
+
+final class _NavigationRailGalleryState extends State<NavigationRailGallery> {
+  final MentoraNavigationRailController _controller =
+      MentoraNavigationRailController('home');
+  MentoraNavigationRailDisplay _display = MentoraNavigationRailDisplay.compact;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  static const List<MentoraNavigationRailDestination> places = [
+    MentoraNavigationRailDestination(
+      id: 'home',
+      label: 'Accueil',
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home,
+    ),
+    MentoraNavigationRailDestination(
+      id: 'consultation',
+      label: 'Consultation',
+      icon: Icons.event_note_outlined,
+      selectedIcon: Icons.event_note,
+      badge: MentoraBadge(
+        variant: MentoraBadgeVariant.information,
+        shape: MentoraBadgeShape.dot,
+        semanticLabel: 'Nouvelles consultations',
+      ),
+    ),
+    MentoraNavigationRailDestination(
+      id: 'business',
+      label: 'Activité',
+      icon: Icons.insights_outlined,
+      selectedIcon: Icons.insights,
+    ),
+    MentoraNavigationRailDestination(
+      id: 'archive',
+      label: 'Archives',
+      icon: Icons.inventory_2_outlined,
+      selectedIcon: Icons.inventory_2,
+      enabled: false,
+    ),
+  ];
+
+  static Widget framed(Widget rail) =>
+      SizedBox(height: kMinInteractiveDimension * 6, child: rail);
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget rail({
+      Key? key,
+      MentoraNavigationRailDisplay display =
+          MentoraNavigationRailDisplay.compact,
+      MentoraNavigationRailChrome chrome = MentoraNavigationRailChrome.surface,
+      MentoraNavigationRailController? controller,
+    }) {
+      return framed(
+        MentoraNavigationRail(
+          key: key,
+          display: display,
+          chrome: chrome,
+          controller: controller ?? MentoraNavigationRailController('home'),
+          destinations: places,
+          onDestinationSelected: (_) {},
+        ),
+      );
+    }
+
+    return GallerySection(
+      title: navigationRailGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final display in MentoraNavigationRailDisplay.values)
+            rail(key: Key('rail-display-${display.name}'), display: display),
+          for (final chrome in MentoraNavigationRailChrome.values)
+            rail(key: Key('rail-chrome-${chrome.name}'), chrome: chrome),
+          // A structure the application put to rest.
+          rail(
+            key: const Key('rail-disabled'),
+            controller: MentoraNavigationRailController('home')
+              ..announceAvailability(enabled: false),
+          ),
+          // The live structure: the application announces the place,
+          // and performs the change of display itself.
+          framed(
+            MentoraNavigationRail(
+              key: const Key('rail-live'),
+              display: _display,
+              controller: _controller,
+              destinations: places,
+              onDestinationSelected: _controller.announceSelection,
+              displayToggle: MentoraNavigationRailToggle(
+                label: 'Afficher',
+                onInvoke: () => setState(() {
+                  _display = _display == MentoraNavigationRailDisplay.compact
+                      ? MentoraNavigationRailDisplay.expanded
+                      : MentoraNavigationRailDisplay.compact;
+                }),
+              ),
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: rail(key: Key('rail-theme-${variant.name}')),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: rail(key: Key('rail-comfort-${comfort.name}')),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: rail(
+                key: Key('rail-direction-${direction.name}'),
+                display: MentoraNavigationRailDisplay.expanded,
+              ),
+            ),
+          const _NavigationRailDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Navigation Rail's living documentation — built only with
+/// Mentora components.
+final class _NavigationRailDocumentation extends StatelessWidget {
+  const _NavigationRailDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('rail-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(navigationRailDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: navigationRailDocArchitecture,
+            keyPrefix: 'rail-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: navigationRailDocResponsibilities,
+            keyPrefix: 'rail-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: navigationRailDocComponents,
+            keyPrefix: 'rail-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: navigationRailDocTokens,
+            keyPrefix: 'rail-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: navigationRailDocEngines,
+            keyPrefix: 'rail-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: navigationRailDocForbidden,
+            keyPrefix: 'rail-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: navigationRailDocScans,
+            keyPrefix: 'rail-doc-scan',
           ),
         ],
       ),

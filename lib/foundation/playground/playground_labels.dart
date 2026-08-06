@@ -88,6 +88,57 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String navigationRailGalleryTitle =
+    'Navigation Rails — Displays (2), Chromes (3) & States (7)';
+const String navigationRailDocHeading =
+    'MentoraNavigationRail — official contract';
+const List<String> navigationRailDocArchitecture = [
+  'A Structural Component: it expresses the principal navigation',
+  'A destination is an IDENTITY — never an icon, a position or an address',
+  'Selection travels by identity: no index exists in its API',
+  'It never measures the surface it lives on: the application decides',
+  'Its adapter resolves the structure and its destinations only',
+];
+const List<String> navigationRailDocResponsibilities = [
+  'It accompanies: it never competes with the content',
+  'It never becomes a menu',
+  'It never decides where to go: it reports, the application announces',
+  'A place announced that it does not present is refused',
+  'Every destination is a reachable target and a keyboard control',
+];
+const List<String> navigationRailDocComponents = [
+  'MentoraAvatar — owns the identity',
+  'MentoraText — owns the typography',
+  'MentoraBadge — owns what is happening in a place',
+  'MentoraButton — owns the acts and the display toggle',
+];
+const List<String> navigationRailDocForbidden = [
+  'The framework rails, drawers and their destinations',
+  'Any address, any navigator, any routing known by the structure',
+  'Any measure of the screen or responsive decision taken here',
+  'A coded colour, size, padding or duration',
+  'Reading the ambient Theme from a component',
+];
+const List<String> navigationRailDocTokens = [
+  'Navigation Rail: widths, destination extent, indicator, radii',
+  'Color: primary, highlight, focus, supporting, unavailable, outline',
+  'Surface: the primary surface a structure rests on',
+  'Typography: label — a structure never speaks with a title voice',
+  'Spacing: linked proximity and hierarchical breathing',
+];
+const List<String> navigationRailDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — accompany: a structure never announces itself',
+  'Accessibility Engine — the opposable reachable target',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> navigationRailDocScans = [
+  'No framework rail or drawer in the foundation',
+  'No address and no navigator known by a structure',
+  'No screen measured and no responsive decision taken by a structure',
+  'No coded colour, padding, radius or duration outside the Tokens',
+];
 const String appBarGalleryTitle =
     'App Bars — Variants (6), States (7) & Scroll declarations (4)';
 const String appBarDocHeading = 'MentoraAppBar — official contract';
