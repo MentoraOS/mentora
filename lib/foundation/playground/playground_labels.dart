@@ -88,6 +88,57 @@ const List<String> inputDocEngines = [
   'Appearance Engine — theme, contrast, density, reading comfort',
   'Localization & International Engines — the strings and the direction',
 ];
+const String appBarGalleryTitle =
+    'App Bars — Variants (6), States (7) & Scroll declarations (4)';
+const String appBarDocHeading = 'MentoraAppBar — official contract';
+const List<String> appBarDocArchitecture = [
+  'The first Structural Component: it owns the context of a place',
+  'It implements PreferredSizeWidget: a host reserves its room',
+  'The framework bars stay primitives — none of them is ever used',
+  'The reserved room is stable: the context collapses inside it',
+  'Its adapter resolves the structure surface only, never a child',
+];
+const List<String> appBarDocResponsibilities = [
+  'It announces where the person is — it is a header, not a layout',
+  'It never competes with the content: it names the place, then steps back',
+  'A place that cannot be named announces nothing',
+  'A context has one start: a way out and an identity never share it',
+  'It subscribes to no scroll: the application announces, it expresses',
+];
+const List<String> appBarDocComponents = [
+  'MentoraAvatar — owns the identity',
+  'MentoraText — owns the typography',
+  'MentoraBadge — owns the states',
+  'MentoraButton — owns the acts and the way out',
+  'MentoraInput — owns the search entry',
+];
+const List<String> appBarDocForbidden = [
+  'The framework app bars used as a business component',
+  'A scroll listened to, an offset measured, a decision taken',
+  'A control offered without a name',
+  'A coded colour, size, padding or duration',
+  'Reading the ambient Theme from a component',
+];
+const List<String> appBarDocTokens = [
+  'App Bar: reserved and collapsed extents, divider, progress, stretch',
+  'Color: primary, divider',
+  'Surface: the primary surface a context rests on',
+  'Typography: title, subtitle and supporting — never the content voice',
+  'Spacing: distinct separation and linked proximity',
+];
+const List<String> appBarDocEngines = [
+  'Color, Surface & Spacing Token Engines',
+  'Motion Engine — show the continuity, never an entrance',
+  'Appearance Engine — theme, contrast, density, reading comfort',
+  'Accessibility Engine — the font scale, applied once by the app',
+  'Localization & International Engines — the strings and the direction',
+];
+const List<String> appBarDocScans = [
+  'No framework app bar of any kind in the foundation',
+  'A structure imports only official components',
+  'It never builds a word, a pictogram or a style of its own',
+  'No coded colour, padding, radius or duration outside the Tokens',
+];
 const String listTileGalleryTitle =
     'List Tiles — Densities (4), Chromes (4), States (7) & Composition';
 const String listTileDocHeading = 'MentoraListTile — official contract';

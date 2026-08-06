@@ -4,6 +4,8 @@ import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
 import '../design_kit/components/card/mentora_card.dart';
 import '../design_kit/components/card/mentora_card_style.dart';
+import '../design_kit/structure/app_bar/mentora_app_bar.dart';
+import '../design_kit/structure/app_bar/mentora_app_bar_style.dart';
 import '../design_kit/composition/list_tile/mentora_list_tile.dart';
 import '../design_kit/composition/list_tile/mentora_list_tile_style.dart';
 import '../design_kit/components/avatar/mentora_avatar.dart';
@@ -1844,6 +1846,181 @@ final class _ListTileDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: listTileDocScans,
             keyPrefix: 'list-tile-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official App Bars catalogue — every variant, every announced
+/// state and every scroll declaration of the REAL component, across
+/// the four themes, the reading comfort and both directions.
+final class AppBarGallery extends StatelessWidget {
+  const AppBarGallery({super.key});
+
+  static void _noop() {}
+
+  static MentoraAppBar context({
+    Key? key,
+    MentoraAppBarVariant variant = MentoraAppBarVariant.standard,
+    MentoraAppBarController? controller,
+    MentoraAppBarScrollBehaviour scrollBehaviour =
+        MentoraAppBarScrollBehaviour.pinned,
+  }) {
+    return MentoraAppBar(
+      key: key,
+      variant: variant,
+      scrollBehaviour: scrollBehaviour,
+      controller: controller,
+      title: 'Consultations',
+      subtitle: 'Aujourd’hui',
+      navigation: MentoraAppBarNavigation.back(
+        label: 'Retour',
+        onInvoke: _noop,
+      ),
+      badge: const MentoraBadge(
+        variant: MentoraBadgeVariant.information,
+        shape: MentoraBadgeShape.pill,
+        label: '4',
+        semanticLabel: '4 consultations',
+      ),
+      actions: [
+        MentoraButton(
+          label: 'Filtrer',
+          onPressed: _noop,
+          variant: MentoraButtonVariant.text,
+          size: MentoraButtonSize.small,
+        ),
+      ],
+      search: variant == MentoraAppBarVariant.search
+          ? const MentoraInput(
+              variant: MentoraInputVariant.search,
+              placeholder: 'Rechercher',
+              semanticLabel: 'Rechercher une consultation',
+            )
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: appBarGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final variant in MentoraAppBarVariant.values)
+            AppBarGallery.context(
+              key: Key('app-bar-variant-${variant.name}'),
+              variant: variant,
+              controller: variant == MentoraAppBarVariant.search
+                  ? MentoraAppBarController(MentoraAppBarStatus.searching)
+                  : null,
+            ),
+          // The announced states of the context.
+          for (final status in MentoraAppBarStatus.values)
+            AppBarGallery.context(
+              key: Key('app-bar-status-${status.name}'),
+              variant: status == MentoraAppBarStatus.searching
+                  ? MentoraAppBarVariant.search
+                  : MentoraAppBarVariant.standard,
+              controller: MentoraAppBarController(status),
+            ),
+          // A large title, expanded then collapsed by an announced
+          // progress — the structure measures nothing itself.
+          AppBarGallery.context(
+            key: const Key('app-bar-expanded'),
+            variant: MentoraAppBarVariant.largeTitle,
+            scrollBehaviour: MentoraAppBarScrollBehaviour.collapsible,
+          ),
+          AppBarGallery.context(
+            key: const Key('app-bar-collapsed'),
+            variant: MentoraAppBarVariant.largeTitle,
+            scrollBehaviour: MentoraAppBarScrollBehaviour.collapsible,
+            controller: MentoraAppBarController()..reportProgress(1),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: AppBarGallery.context(
+                key: Key('app-bar-theme-${variant.name}'),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: AppBarGallery.context(
+                key: Key('app-bar-comfort-${comfort.name}'),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: AppBarGallery.context(
+                key: Key('app-bar-direction-${direction.name}'),
+              ),
+            ),
+          const _AppBarDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The App Bar's living documentation — built only with Mentora
+/// components.
+final class _AppBarDocumentation extends StatelessWidget {
+  const _AppBarDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('app-bar-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(appBarDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: appBarDocArchitecture,
+            keyPrefix: 'app-bar-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: appBarDocResponsibilities,
+            keyPrefix: 'app-bar-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: appBarDocComponents,
+            keyPrefix: 'app-bar-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: appBarDocTokens,
+            keyPrefix: 'app-bar-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: appBarDocEngines,
+            keyPrefix: 'app-bar-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: appBarDocForbidden,
+            keyPrefix: 'app-bar-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: appBarDocScans,
+            keyPrefix: 'app-bar-doc-scan',
           ),
         ],
       ),

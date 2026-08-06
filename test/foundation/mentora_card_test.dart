@@ -556,7 +556,7 @@ void main() {
       // Two families now: the Core Components and the Composition
       // Components that assemble them. Both owe the catalogue a
       // gallery, and the rule discovers them by itself.
-      const families = ['components', 'composition'];
+      const families = ['components', 'composition', 'structure'];
       var catalogued = 0;
 
       for (final family in families) {

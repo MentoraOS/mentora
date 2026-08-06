@@ -13,6 +13,7 @@ import '../design_kit/components/snackbar/mentora_snackbar_service.dart';
 import '../design_kit/components/dialog/mentora_dialog_service.dart';
 import '../design_kit/components/text/mentora_text.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
+import '../design_kit/structure/app_bar/mentora_app_bar.dart';
 import '../design_kit/international/international_engine.dart';
 import '../design_kit/motion/motion_engine.dart';
 import '../design_kit/registry/binding_integrity_engine.dart';
@@ -155,12 +156,9 @@ final class _PlaygroundShell extends StatelessWidget {
     return Directionality(
       textDirection: international.directionFor(controller.locale),
       child: Scaffold(
-        appBar: AppBar(
-          title: const MentoraText(
-            playgroundTitle,
-            role: MentoraTextRole.subtitle,
-          ),
-        ),
+        // The laboratory uses the official structure, like every
+        // screen will: the framework bars stay primitives.
+        appBar: const MentoraAppBar(title: playgroundTitle),
         // A laboratory shows everything: no lazy building — every
         // gallery is always mounted and verifiable.
         body: SingleChildScrollView(
@@ -218,6 +216,7 @@ final class _PlaygroundShell extends StatelessWidget {
               const BadgeGallery(),
               const AvatarGallery(),
               const ListTileGallery(),
+              const AppBarGallery(),
               ResponsiveGallery(responsive: services.get<ResponsiveEngine>()),
             ],
           ),
