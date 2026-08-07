@@ -18,6 +18,7 @@ import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.d
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
+import '../design_kit/layout/section_layout/mentora_section_layout.dart';
 import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import '../design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import '../design_kit/tokens/split_view_tokens.dart';
@@ -3257,6 +3258,144 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Section Layout catalogue - logical units of content,
+/// each announced once, with nothing added around them.
+final class SectionLayoutGallery extends StatelessWidget {
+  const SectionLayoutGallery({super.key});
+
+  static MentoraSection section(
+    String id,
+    String title, {
+    String? description,
+  }) {
+    return MentoraSection(
+      id: id,
+      title: title,
+      description: description,
+      content: MentoraCard(
+        variant: MentoraCardVariant.surface,
+        child: MentoraText(layoutContentBody, role: MentoraTextRole.body),
+      ),
+    );
+  }
+
+  static MentoraSectionLayout shape({Key? key, bool completed = true}) {
+    return MentoraSectionLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      sections: [
+        section(
+          'resume',
+          sectionFirstTitle,
+          description: completed ? sectionDescription : null,
+        ),
+        section('echanges', sectionSecondTitle),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: sectionLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(shape(key: const Key('layout-shape-section'))),
+          // A section that says nothing more than its name.
+          _LayoutScene.framed(
+            shape(key: const Key('layout-section-bare'), completed: false),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-section-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-section-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-section-${direction.name}')),
+              ),
+            ),
+          const _SectionLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Section Layout's living documentation - built only with Mentora
+/// components.
+final class _SectionLayoutDocumentation extends StatelessWidget {
+  const _SectionLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('section-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(sectionLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: sectionLayoutDocArchitecture,
+            keyPrefix: 'section-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: sectionLayoutDocResponsibilities,
+            keyPrefix: 'section-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: sectionLayoutDocComponents,
+            keyPrefix: 'section-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: sectionLayoutDocTokens,
+            keyPrefix: 'section-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: sectionLayoutDocEngines,
+            keyPrefix: 'section-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: sectionLayoutDocForbidden,
+            keyPrefix: 'section-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: sectionLayoutDocScans,
+            keyPrefix: 'section-layout-doc-scan',
           ),
         ],
       ),

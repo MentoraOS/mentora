@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../components/button/mentora_button.dart';
-import '../../components/design_kit_scope.dart';
 import '../../structure/app_bar/mentora_app_bar.dart';
 import '../../structure/search_bar/mentora_search_bar.dart';
 import '../../structure/tabs/mentora_tabs.dart';
@@ -10,7 +9,6 @@ import '../foundation/mentora_layout_assembly.dart';
 import '../foundation/mentora_layout_context.dart';
 import '../foundation/mentora_layout_kind.dart';
 import '../foundation/mentora_layout_style.dart';
-import '../foundation/mentora_layout_theme.dart';
 
 /// The official Content Layout — the way content is disposed in
 /// Mentora.
@@ -90,37 +88,13 @@ final class MentoraContentLayout extends MentoraLayout {
 
   @override
   MentoraLayoutSurface surfaceOf(BuildContext context) {
-    final theme = MentoraLayoutTheme.fromScope(DesignKitScope.of(context));
-
-    return MentoraLayoutSurface.page(
+    return MentoraLayoutSurface.regions(
       semanticLabel: pageSemanticLabel,
       place: place,
       facets: facets,
       intention: intention,
       acts: acts,
-      content: Column(
-        key: const Key('content-regions'),
-        // The room a layout adds between the regions it was handed:
-        // none, and it is a Token so that the none is opposable.
-        spacing: theme.contentGap,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [for (final region in regions) _region(region)],
-      ),
-    );
-  }
-
-  /// One region: a named landmark, its own focus group, and what it
-  /// carries — handed on exactly as it was given.
-  Widget _region(MentoraContentRegion region) {
-    return Semantics(
-      key: Key('content-region-${region.id}'),
-      container: true,
-      explicitChildNodes: true,
-      label: region.semanticLabel,
-      // Each region travels as its own focus group: reading a page
-      // follows its regions, and never wanders between them.
-      child: FocusTraversalGroup(child: region.content),
+      regions: regions,
     );
   }
 }

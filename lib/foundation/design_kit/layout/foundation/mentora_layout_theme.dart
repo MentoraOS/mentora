@@ -38,4 +38,11 @@ final class MentoraLayoutTheme {
   /// A panel names its subject; it never speaks louder than the page
   /// it belongs to.
   MentoraTextRole get panelTitleRole => MentoraTextRole.subtitle;
+
+  /// A section names what it gathers, with the same voice a panel
+  /// names its subject: the layer speaks one language.
+  MentoraTextRole get sectionTitleRole => MentoraTextRole.subtitle;
+
+  /// What completes the name of a section says less than the name.
+  MentoraTextRole get sectionDescriptionRole => MentoraTextRole.caption;
 }

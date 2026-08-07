@@ -189,6 +189,51 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String sectionLayoutGalleryTitle = 'Layouts — Section';
+const String sectionLayoutDocHeading =
+    'MentoraSectionLayout — official contract';
+const String sectionFirstTitle = 'Resume du mois';
+const String sectionSecondTitle = 'Derniers echanges';
+const String sectionDescription = 'Ce qui complete le nom';
+const List<String> sectionLayoutDocArchitecture = [
+  'A specialization of the Layout Foundation, like every other shape',
+  'A section is a logical UNIT: identity, name, completion, content',
+  'It asks the assembly for the single disposition — it orders nothing',
+  'The name is composed with MentoraText — never styled here',
+  'Two sections never share one identity; a section without one fails',
+];
+const List<String> sectionLayoutDocResponsibilities = [
+  'A section gathers. It never decides.',
+  'It creates no padding, no margin, no spacing, no scroll, no grid',
+  'The content is handed on strictly intact — proven geometrically',
+  'Each section is a landmark of its own and its own focus group',
+  'A section is announced ONCE: the name is never said twice',
+];
+const List<String> sectionLayoutDocComponents = [
+  'MentoraText — owns the name and what completes it',
+  'The Layout Assembly — which alone builds the page and the regions',
+  'Every official component may live inside a section: it knows none',
+];
+const List<String> sectionLayoutDocForbidden = [
+  'Padding, SafeArea, Container, DecoratedBox, ColoredBox',
+  'Expanded, Flexible, Spacer, any scroll view, any grid',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, business, data, dynamic, Object?',
+  'A coded colour, size, padding, radius, voice or duration',
+];
+const List<String> sectionLayoutDocTokens = [
+  'Layout: the room a section adds around what it gathers — none',
+];
+const List<String> sectionLayoutDocEngines = [
+  'Spacing Token Engine — through the shared Layout adapter, only',
+  'Typography, through MentoraText: the section names a role, never a size',
+];
+const List<String> sectionLayoutDocScans = [
+  'No framework widget, no room of its own, no scroll, no grid',
+  'No measure, no platform, no address, no business, no data',
+  'No ambient theme and no coded value',
+  'One MentoraSectionLayout, extending the foundation, building nothing',
+];
 const String contentLayoutGalleryTitle = 'Layouts — Content';
 const String contentLayoutDocHeading =
     'MentoraContentLayout — official contract';

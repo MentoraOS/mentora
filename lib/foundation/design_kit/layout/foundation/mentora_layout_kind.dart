@@ -26,4 +26,8 @@ enum MentoraLayoutKind {
   /// Content, disposed the official way: named regions, in the order
   /// the application announced them, and nothing added between them.
   content,
+
+  /// Sections: logical units of content, each with its own identity,
+  /// its own name and what it gathers.
+  section,
 }

@@ -27,6 +27,7 @@ import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_c
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_kind.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_style.dart';
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
@@ -181,6 +182,18 @@ Map<MentoraLayoutKind, Widget> _layouts({
         ),
       ],
     ),
+    MentoraLayoutKind.section: MentoraSectionLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      sections: const [
+        MentoraSection(
+          id: 'resume',
+          title: 'Résumé',
+          description: 'Ce qui complète le nom',
+          content: _content,
+        ),
+      ],
+    ),
     MentoraLayoutKind.masterDetail: MentoraMasterDetailLayout(
       frame: plain,
       master: const SizedBox.shrink(),
@@ -277,6 +290,10 @@ void main() {
       await _pump(tester, layouts[MentoraLayoutKind.content]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byKey(const Key('content-regions')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.section]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('section-resume')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.splitWorkspace]!);
       expect(find.byType(MentoraSplitView), findsOneWidget);
@@ -782,6 +799,7 @@ void main() {
         'MentoraSplitWorkspaceLayout',
         'MentoraMasterDetailLayout',
         'MentoraContentLayout',
+        'MentoraSectionLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

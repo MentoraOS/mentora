@@ -60,3 +60,35 @@ final class MentoraContentRegion {
     required this.content,
   });
 }
+
+/// One section: a logical unit of content.
+///
+/// A section is not a card, not a container, not a column and not a
+/// panel. It is what gathers: an identity that never changes, the name
+/// of what is gathered, what completes that name when something must
+/// be said, and the content itself — already built.
+///
+/// The layer composes the official words; it styles none of them, and
+/// it knows nothing of what a section gathers.
+final class MentoraSection {
+  /// What this section IS — stable forever, never a position.
+  final String id;
+
+  /// The name of what is gathered. The application owns every string
+  /// (Localization Engine); the layer composes none.
+  final String title;
+
+  /// What completes the name, when something must be said.
+  final String? description;
+
+  /// What the section gathers, already built by the application. It is
+  /// handed on strictly intact.
+  final Widget content;
+
+  const MentoraSection({
+    required this.id,
+    required this.title,
+    required this.content,
+    this.description,
+  });
+}
