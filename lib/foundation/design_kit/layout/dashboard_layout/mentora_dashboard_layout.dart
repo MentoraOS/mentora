@@ -5,30 +5,31 @@ import '../../components/card/mentora_card_style.dart';
 import '../../components/design_kit_scope.dart';
 import '../../components/text/mentora_text.dart';
 import '../../structure/app_bar/mentora_app_bar.dart';
-import '../../structure/page_scaffold/mentora_page_scaffold.dart';
-import '../../structure/workspace/mentora_workspace_style.dart';
-import '../mentora_layout.dart';
-import '../mentora_layout_style.dart';
-import '../mentora_layout_theme.dart';
+import '../foundation/mentora_layout.dart';
+import '../foundation/mentora_layout_assembly.dart';
+import '../foundation/mentora_layout_context.dart';
+import '../foundation/mentora_layout_kind.dart';
+import '../foundation/mentora_layout_style.dart';
+import '../foundation/mentora_layout_theme.dart';
 
-/// The official Dashboard Layout — a page whose content is a set of
+/// The official Dashboard Layout - a page whose content is a set of
 /// panels.
 ///
 /// A dashboard is not a grid: it is a set of subjects, each in its own
 /// official container, laid beside one another for as long as the room
 /// allows and then under one another. Nothing is measured and nothing
-/// is computed: the panels take the room they need, the family's
+/// is computed: the panels take the room they need, the layer's
 /// breathing separates them, and the arrangement follows the reading
 /// direction on its own.
 ///
-/// It composes, and nothing else: the container is a MentoraCard, the
-/// subject a MentoraText, the acts MentoraButtons — the layout styles
-/// none of them and knows nothing of what a panel carries.
-final class MentoraDashboardLayout extends StatelessWidget {
-  /// What every layout of the family is handed.
+/// It is a specialization: the only thing it builds is the set of
+/// panels, from the official container, the official words and the
+/// official acts - and it styles none of them.
+final class MentoraDashboardLayout extends MentoraLayout {
+  @override
   final MentoraLayoutContext frame;
 
-  /// Where the person is — the App Bar remains its owner.
+  /// Where the person is - the App Bar remains its owner.
   final MentoraAppBar? place;
 
   /// The subjects the dashboard shows.
@@ -46,18 +47,14 @@ final class MentoraDashboardLayout extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = MentoraLayoutTheme.fromScope(DesignKitScope.of(context));
-    if (pageSemanticLabel.isEmpty) {
-      throw StateError(
-        'A page announces the context it gathers: without a name it '
-        'gathers nothing.',
-      );
-    }
+  MentoraLayoutKind get kind => MentoraLayoutKind.dashboard;
+
+  @override
+  void verify() {
     if (panels.isEmpty) {
       throw StateError(
         'A dashboard shows subjects: without one it shows nothing, and '
-        'an empty page is a page — never a dashboard.',
+        'an empty page is a page - never a dashboard.',
       );
     }
     for (final panel in panels) {
@@ -65,26 +62,25 @@ final class MentoraDashboardLayout extends StatelessWidget {
         throw StateError('A panel without a subject is not a panel.');
       }
     }
+  }
 
-    return MentoraLayoutAssembly(
-      kind: MentoraLayoutKind.dashboard,
-      frame: frame,
-      surface: MentoraWorkspaceSurface.page(
-        MentoraPageScaffold(
-          semanticLabel: pageSemanticLabel,
-          place: place,
-          content: Wrap(
-            key: const Key('dashboard-panels'),
-            spacing: theme.panelGap,
-            runSpacing: theme.panelGap,
-            children: [for (final panel in panels) _panel(theme, panel)],
-          ),
-        ),
+  @override
+  MentoraLayoutSurface surfaceOf(BuildContext context) {
+    final theme = MentoraLayoutTheme.fromScope(DesignKitScope.of(context));
+
+    return MentoraLayoutSurface.page(
+      semanticLabel: pageSemanticLabel,
+      place: place,
+      content: Wrap(
+        key: const Key('dashboard-panels'),
+        spacing: theme.panelGap,
+        runSpacing: theme.panelGap,
+        children: [for (final panel in panels) _panel(theme, panel)],
       ),
     );
   }
 
-  /// One subject, in the official container — never a container of the
+  /// One subject, in the official container - never a container of the
   /// layout's own making.
   Widget _panel(MentoraLayoutTheme theme, MentoraDashboardPanel panel) {
     return MentoraCard(

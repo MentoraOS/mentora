@@ -20,8 +20,11 @@ import 'package:mentora/foundation/design_kit/components/text/mentora_text.dart'
 import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.dart';
 import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
-import 'package:mentora/foundation/design_kit/layout/mentora_layout.dart';
-import 'package:mentora/foundation/design_kit/layout/mentora_layout_style.dart';
+import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_assembly.dart';
+import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_context.dart';
+import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_kind.dart';
+import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_style.dart';
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
@@ -212,6 +215,21 @@ Finder _shape(MentoraLayoutKind kind) => find.byKey(Key('layout-${kind.name}'));
 
 void main() {
   group('The Layout family — five shapes, one assembly', () {
+    testWidgets('every official shape is a specialization of the one '
+        'foundation', (tester) async {
+      for (final entry in _layouts().entries) {
+        expect(
+          entry.value,
+          isA<MentoraLayout>(),
+          reason:
+              '${entry.key.name} must extend the foundation: it is the '
+              'only path from a layout to a screen',
+        );
+      }
+      // The registry is closed, and every shape in it is materialized.
+      expect(_layouts().keys.toSet(), MentoraLayoutKind.values.toSet());
+    });
+
     testWidgets('every official shape is assembled in the working '
         'context, and says which shape it is', (tester) async {
       for (final entry in _layouts().entries) {
@@ -587,21 +605,157 @@ void main() {
       }
     });
 
-    test('the family is assembled in exactly one place: no layout ever '
-        'restates the working context', () {
-      final assemblies = <String>[];
-      for (final file in dartFilesOf('lib/foundation')) {
-        if (RegExp(r'MentoraWorkspace\(').hasMatch(file.readAsStringSync())) {
-          assemblies.add(file.path.replaceAll(r'\', '/'));
+    test('the layer is assembled in exactly one place: no layout ever '
+        'assembles, mounts a layer, or builds a context or a page', () {
+      // No layout mounts a layer at all: the working context composes
+      // them from the single official order, and the layer above it
+      // never touches one.
+      final mounts = RegExp(
+        r'(MentoraDialogHost\(|MentoraBottomSheetHost\(|'
+        r'MentoraSnackbarHost\(|mountOfficialLayers\()',
+      );
+      for (final file in layoutFiles()) {
+        expect(
+          mounts.hasMatch(file.readAsStringSync()),
+          isFalse,
+          reason: '${file.path}: a layout never mounts a layer itself',
+        );
+      }
+
+      final built = <String, RegExp>{
+        'a working context': RegExp(r'MentoraWorkspace\('),
+        'a page': RegExp(r'MentoraPageScaffold\('),
+      };
+      for (final entry in built.entries) {
+        final places = <String>[];
+        for (final file in layoutFiles()) {
+          if (entry.value.hasMatch(file.readAsStringSync())) {
+            places.add(file.path.replaceAll(r'\', '/'));
+          }
+        }
+        expect(
+          places,
+          hasLength(1),
+          reason: '${entry.key} is built in exactly one place',
+        );
+        expect(
+          places.single,
+          contains('layout/foundation/mentora_layout_assembly.dart'),
+          reason: '${entry.key} belongs to the assembly, and to it alone',
+        );
+      }
+    });
+
+    test('a specialization never builds: the foundation is the only '
+        'path from a layout to a screen', () {
+      for (final file in layoutFiles()) {
+        final normalized = file.path.replaceAll(r'\', '/');
+        if (normalized.contains('layout/foundation/')) continue;
+        final source = file.readAsStringSync();
+        expect(
+          RegExp(r'Widget\s+build\(').hasMatch(source),
+          isFalse,
+          reason:
+              '$normalized: a specialization declares its kind, its '
+              'context and the surface it asks for — never a build',
+        );
+        expect(
+          RegExp(r'extends\s+MentoraLayout(?![A-Za-z])').hasMatch(source),
+          isTrue,
+          reason: '$normalized: every layout extends the foundation',
+        );
+      }
+    });
+
+    test('the foundation depends on no particular layout', () {
+      final specialization = RegExp(r"import '[.][.]/\w+_layout/");
+      for (final file in dartFilesOf(
+        'lib/foundation/design_kit/layout/foundation',
+      )) {
+        expect(
+          specialization.hasMatch(file.readAsStringSync()),
+          isFalse,
+          reason:
+              '${file.path}: the foundation carries the contracts, the '
+              'abstractions and the assembly — never a specialization',
+        );
+      }
+    });
+
+    test('the layer has exactly one contract, one style, one theme, one '
+        'registry and one assembly', () {
+      const singletons = {
+        'MentoraLayoutAssembly': 'mentora_layout_assembly.dart',
+        'MentoraLayoutContext': 'mentora_layout_context.dart',
+        'MentoraLayoutTheme': 'mentora_layout_theme.dart',
+        'MentoraLayout': 'mentora_layout.dart',
+      };
+      for (final entry in singletons.entries) {
+        final declarations = <String>[];
+        for (final file in dartFilesOf('lib')) {
+          if (RegExp(
+            'class\\s+${entry.key}(?![A-Za-z])',
+          ).hasMatch(file.readAsStringSync())) {
+            declarations.add(file.path.replaceAll(r'\', '/'));
+          }
+        }
+        expect(declarations, hasLength(1), reason: entry.key);
+        expect(
+          declarations.single,
+          endsWith('layout/foundation/${entry.value}'),
+          reason: entry.key,
+        );
+      }
+
+      // One registry, and no second one may be opened anywhere.
+      final registries = <String>[];
+      for (final file in dartFilesOf('lib')) {
+        if (RegExp(
+          r'enum\s+\w*LayoutKind(?![A-Za-z])',
+        ).hasMatch(file.readAsStringSync())) {
+          registries.add(file.path.replaceAll(r'\', '/'));
         }
       }
-      // The Design Kit assembles it once, for the whole family; the
-      // application shell assembles its own, once.
-      final inTheFamily = assemblies
-          .where((path) => path.contains('design_kit/layout/'))
-          .toList();
-      expect(inTheFamily, hasLength(1));
-      expect(inTheFamily.single, contains('layout/mentora_layout.dart'));
+      expect(registries, hasLength(1));
+      expect(
+        registries.single,
+        endsWith('layout/foundation/mentora_layout_kind.dart'),
+      );
+
+      // One style file for the layer, and no local one beside a layout.
+      final styles = <String>[];
+      for (final file in layoutFiles()) {
+        if (file.path.endsWith('_style.dart')) {
+          styles.add(file.path.replaceAll(r'\', '/'));
+        }
+      }
+      expect(styles, hasLength(1));
+      expect(
+        styles.single,
+        endsWith('layout/foundation/mentora_layout_style.dart'),
+      );
+    });
+
+    test('every materialized value lives in the tokens layer: no local '
+        'tokens file exists anywhere', () {
+      for (final file in dartFilesOf('lib/foundation')) {
+        final normalized = file.path.replaceAll(r'\', '/');
+        if (!normalized.endsWith('_tokens.dart')) continue;
+        expect(
+          normalized.contains('design_kit/tokens/'),
+          isTrue,
+          reason:
+              '$normalized: the Universal Token Registry is one layer — '
+              'a tokens file never lives beside what consumes it',
+        );
+      }
+      // The whole Layout layer shares that one file.
+      expect(
+        File(
+          'lib/foundation/design_kit/tokens/layout_tokens.dart',
+        ).existsSync(),
+        isTrue,
+      );
     });
 
     test('each official shape exists exactly once in the product', () {

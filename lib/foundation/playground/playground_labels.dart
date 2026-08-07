@@ -196,6 +196,17 @@ const String navigationLayoutGalleryTitle = 'Layouts — Navigation';
 const String splitWorkspaceLayoutGalleryTitle = 'Layouts — Split workspace';
 const String masterDetailLayoutGalleryTitle = 'Layouts — Master detail';
 const String layoutDocHeading = 'The Layout family — official contract';
+const String layoutDocHierarchyTitle = 'The official hierarchy';
+
+/// The hierarchy the whole layer is built on. Every future family
+/// enters the product through exactly these five levels.
+const List<String> layoutDocHierarchy = [
+  '1. Layout Foundation — the contracts, the abstraction, the adapters',
+  '2. Layout Assembly — the ONE place a screen is ever assembled',
+  '3. Layout Context — the ONE contract every layout is handed',
+  '4. Layout Kind — the closed registry of the shapes that may exist',
+  '5. A specialized Layout — kind, context, surface, and its refusals',
+];
 
 /// The words of the catalogue scenes. A layout composes none of them:
 /// the application owns every string it carries.
@@ -208,10 +219,10 @@ const String layoutSecondPanel = 'Second sujet';
 const String layoutPanelAct = 'Ouvrir';
 const List<String> layoutDocArchitecture = [
   'Five shapes, and no sixth: a product speaks this vocabulary alone',
-  'One assembly for the five of them — the working context, once',
-  'Every layout is handed the SAME contract: name, state, disposition',
-  'A layout declares only what makes it that layout',
-  'The surface is sealed: the compiler admits exactly one',
+  'A layout EXTENDS the foundation: that is the only path to a screen',
+  'It declares four things — kind, context, surface, refusals — and no more',
+  'It never builds: no working context, no page, no layer, no assembly',
+  'Both surfaces are sealed: the compiler admits exactly one of each',
 ];
 const List<String> layoutDocResponsibilities = [
   'A layout composes official components; it owns none of them',

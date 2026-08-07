@@ -14,7 +14,8 @@ import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
-import '../design_kit/layout/mentora_layout_style.dart';
+import '../design_kit/layout/foundation/mentora_layout_context.dart';
+import '../design_kit/layout/foundation/mentora_layout_style.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import '../design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
@@ -3481,6 +3482,11 @@ final class _LayoutFamilyDocumentation extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           MentoraText(layoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: layoutDocHierarchyTitle,
+            lines: layoutDocHierarchy,
+            keyPrefix: 'layout-doc-hierarchy',
+          ),
           const _DocumentationSection(
             title: inputDocArchitectureTitle,
             lines: layoutDocArchitecture,
