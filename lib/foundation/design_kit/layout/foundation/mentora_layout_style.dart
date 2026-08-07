@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart' show Widget;
 
 import '../../components/button/mentora_button.dart';
+import '../../tokens/layout_tokens.dart';
 
 /// The shared vocabulary of the Layout layer.
 ///
@@ -110,4 +111,92 @@ final class MentoraListItem {
   final Widget content;
 
   const MentoraListItem({required this.id, required this.content});
+}
+
+/// One cell of a grid.
+///
+/// A cell is an IDENTITY, the room it was given, and what it is. It is
+/// not a position: the application announces where every cell stands,
+/// and the identity is what the product refers to forever.
+///
+/// What it is, is already built. It is handed on strictly intact: the
+/// layer never modifies it, never rebuilds it, never styles it — and
+/// never speaks in its place. A cell keeps its own voice.
+final class MentoraGridCell {
+  /// What this cell IS — stable forever, never a position.
+  final String id;
+
+  /// The room this cell takes in its row, already decided by the
+  /// application. It is announced, never computed.
+  final double extent;
+
+  /// What the cell is, already built by the application.
+  final Widget content;
+
+  const MentoraGridCell({
+    required this.id,
+    required this.extent,
+    required this.content,
+  });
+}
+
+/// One row of a grid: an identity, and the cells that stand in it.
+final class MentoraGridRow {
+  /// What this row IS — stable forever, never a rank.
+  final String id;
+
+  final List<MentoraGridCell> cells;
+
+  const MentoraGridRow({required this.id, required this.cells});
+}
+
+/// Where every cell of a grid stands — already decided.
+///
+/// The arrangement is DATA, not a result: the layer never counts
+/// columns, never counts rows, never measures a surface and never
+/// adapts anything. The application decides; the layer expresses.
+final class MentoraGridDisposition {
+  final List<MentoraGridRow> rows;
+
+  const MentoraGridDisposition({required this.rows});
+
+  /// What the disposition alone can verify — fail closed.
+  ///
+  /// It verifies identities and a floor; it never chooses a place.
+  void verify() {
+    if (rows.isEmpty) {
+      throw StateError(
+        'A grid stands where it was placed: a disposition without a '
+        'row places nothing.',
+      );
+    }
+    final placedRows = <String>{};
+    final placedCells = <String>{};
+    for (final row in rows) {
+      if (row.id.isEmpty) {
+        throw StateError('A row without an identity is not a row.');
+      }
+      if (!placedRows.add(row.id)) {
+        throw StateError('Two rows never share one identity.');
+      }
+      if (row.cells.isEmpty) {
+        throw StateError('A row without a cell stands for nothing.');
+      }
+      for (final cell in row.cells) {
+        if (cell.id.isEmpty) {
+          throw StateError('A cell without an identity is not a cell.');
+        }
+        if (!placedCells.add(cell.id)) {
+          throw StateError('Two cells never share one identity.');
+        }
+        if (!cell.extent.isFinite || cell.extent < layoutMinimumCellExtent) {
+          throw StateError(
+            'A cell needs room to be a cell: the extent announced for '
+            '"${cell.id}" is below the opposable floor of '
+            '$layoutMinimumCellExtent.',
+          );
+        }
+      }
+    }
+  }
 }

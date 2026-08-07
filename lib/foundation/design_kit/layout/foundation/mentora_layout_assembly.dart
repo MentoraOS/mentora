@@ -68,6 +68,22 @@ sealed class MentoraLayoutSurface {
     List<MentoraButton> acts,
   }) = MentoraLayoutCollectionSurface;
 
+  /// One page whose content is a GRID: cells standing exactly where
+  /// the application announced them, with nothing added between them.
+  ///
+  /// Only the grid is announced. Each cell keeps its own voice, its
+  /// own identity and its own semantics.
+  const factory MentoraLayoutSurface.grid({
+    required String semanticLabel,
+    required String gridId,
+    required String gridSemanticLabel,
+    required MentoraGridDisposition disposition,
+    MentoraAppBar? place,
+    MentoraTabs? facets,
+    MentoraSearchBar? intention,
+    List<MentoraButton> acts,
+  }) = MentoraLayoutGridSurface;
+
   /// A room shared between regions, already built by the structure
   /// that owns it.
   const factory MentoraLayoutSurface.shared(MentoraSplitView workspace) =
@@ -133,6 +149,23 @@ final class MentoraLayoutCollectionSurface
     required this.collectionId,
     required this.collectionSemanticLabel,
     required this.items,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
+  });
+}
+
+final class MentoraLayoutGridSurface extends MentoraLayoutPageLikeSurface {
+  final String gridId;
+  final String gridSemanticLabel;
+  final MentoraGridDisposition disposition;
+
+  const MentoraLayoutGridSurface({
+    required super.semanticLabel,
+    required this.gridId,
+    required this.gridSemanticLabel,
+    required this.disposition,
     super.place,
     super.facets,
     super.intention,
@@ -233,6 +266,10 @@ final class MentoraLayoutAssembly extends StatelessWidget {
         return MentoraWorkspaceSurface.page(
           _page(asked, content: _collection(asked, theme)),
         );
+      case MentoraLayoutGridSurface():
+        return MentoraWorkspaceSurface.page(
+          _page(asked, content: _grid(asked, theme)),
+        );
       case MentoraLayoutSharedSurface(:final workspace):
         return MentoraWorkspaceSurface.shared(workspace);
       case MentoraLayoutRelationSurface(:final relation):
@@ -291,6 +328,52 @@ final class MentoraLayoutAssembly extends StatelessWidget {
               KeyedSubtree(
                 key: Key('list-item-${item.id}'),
                 child: item.content,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// One grid: a single landmark, one focus group, and the cells
+  /// exactly where they were announced.
+  ///
+  /// Nothing is counted, nothing is deduced and nothing is adapted:
+  /// the rows are the rows that were given, and every cell takes the
+  /// room that was announced for it.
+  Widget _grid(MentoraLayoutGridSurface asked, MentoraLayoutTheme theme) {
+    return Semantics(
+      key: Key('grid-${asked.gridId}'),
+      container: true,
+      explicitChildNodes: true,
+      label: asked.gridSemanticLabel,
+      // A grid travels as one focus group: moving through it follows
+      // its cells, and never wanders out of it.
+      child: FocusTraversalGroup(
+        child: Column(
+          key: Key('grid-rows-${asked.gridId}'),
+          // The room the layer adds between what it was handed: none,
+          // and it is a Token so that the none is opposable.
+          spacing: theme.contentGap,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final row in asked.disposition.rows)
+              Row(
+                key: Key('grid-row-${row.id}'),
+                spacing: theme.contentGap,
+                mainAxisSize: MainAxisSize.min,
+                // A cell keeps the height it has: a row never stretches
+                // what it places beside something taller.
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final cell in row.cells)
+                    SizedBox(
+                      key: Key('grid-cell-${cell.id}'),
+                      width: cell.extent,
+                      child: cell.content,
+                    ),
+                ],
               ),
           ],
         ),

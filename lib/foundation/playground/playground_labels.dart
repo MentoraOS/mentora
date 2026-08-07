@@ -189,6 +189,49 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String gridLayoutGalleryTitle = 'Layouts — Grid';
+const String gridLayoutDocHeading = 'MentoraGridLayout — official contract';
+const String gridCollectionLabel = 'Les indicateurs du mois';
+const List<String> gridLayoutDocArchitecture = [
+  'A specialization of the Layout Foundation, like every other shape',
+  'A grid is a spatial collection ALREADY DECIDED by the application',
+  'The disposition is DATA: rows, cells, and the room each cell takes',
+  'It describes the grid — the assembly alone places it',
+  'Two cells never share one identity; a missing identity fails',
+];
+const List<String> gridLayoutDocResponsibilities = [
+  'It expresses. It never decides.',
+  'It counts no column, no row, and deduces no place',
+  'No measure, no breakpoint, no responsive, no scroll, no room added',
+  'The cells are handed on strictly intact, and never stretched',
+  'Only the grid is announced: a cell keeps its own voice',
+];
+const List<String> gridLayoutDocComponents = [
+  'MentoraCard, MentoraListTile — what a cell usually is',
+  'The Layout Assembly — which alone places the grid',
+  'Every official component may be a cell: the grid knows none',
+];
+const List<String> gridLayoutDocForbidden = [
+  'GridView, SliverGrid, GridTile, Wrap, Flow, Table, multi-child layouts',
+  'Padding, SafeArea, Expanded, Flexible, Spacer, scroll views',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, business, data, dynamic, Object?',
+  'Any count of columns or rows, and any coded value',
+];
+const List<String> gridLayoutDocTokens = [
+  'Layout: the room the layer adds between cells — none',
+  'Layout: the opposable floor under which a cell is not a cell',
+];
+const List<String> gridLayoutDocEngines = [
+  'Spacing Token Engine — through the shared Layout adapter, only',
+  'Every other engine is consumed by the cells themselves',
+];
+const List<String> gridLayoutDocScans = [
+  'No framework grid, no scroll view, no room of its own',
+  'No count of columns or rows, no arithmetic of places, no measure',
+  'No address, no business, no data, no untyped value',
+  'One MentoraGridLayout, extending the foundation, building nothing',
+];
 const String listLayoutGalleryTitle = 'Layouts — List';
 const String listLayoutDocHeading = 'MentoraListLayout — official contract';
 const String listCollectionLabel = 'Les entites du mois';

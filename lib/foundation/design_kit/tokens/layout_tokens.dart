@@ -19,3 +19,9 @@ const double layoutPanelBreathingFactor = 1;
 /// It is zero, and it is a Token so that the zero is opposable: a
 /// layout that ever padded a surface would be styling what it composes.
 const double layoutContentGap = 0;
+
+/// The smallest room a cell can be given and still be a cell.
+///
+/// It is a floor, never a proportion: the application decides the room
+/// each cell takes, and this refuses only what would make a cell a lie.
+const double layoutMinimumCellExtent = 96;

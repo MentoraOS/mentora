@@ -17,6 +17,7 @@ import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
+import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import '../design_kit/layout/section_layout/mentora_section_layout.dart';
@@ -3259,6 +3260,150 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Grid Layout catalogue - cells standing exactly where
+/// the catalogue announced them, and nowhere else.
+final class GridLayoutGallery extends StatelessWidget {
+  const GridLayoutGallery({super.key});
+
+  /// The room the catalogue gives each cell. The application decides
+  /// it; the grid only expresses it.
+  static const double cellExtent = 160;
+
+  static MentoraGridCell cell(String id, String heading) {
+    return MentoraGridCell(
+      id: id,
+      extent: cellExtent,
+      content: MentoraCard(
+        variant: MentoraCardVariant.outlined,
+        child: MentoraText(heading, role: MentoraTextRole.subtitle),
+      ),
+    );
+  }
+
+  static MentoraGridLayout shape({Key? key, bool wide = true}) {
+    return MentoraGridLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      gridId: 'indicateurs',
+      gridSemanticLabel: gridCollectionLabel,
+      disposition: MentoraGridDisposition(
+        rows: [
+          MentoraGridRow(
+            id: 'haut',
+            cells: [
+              cell('nord', layoutFirstPanel),
+              if (wide) cell('est', layoutSecondPanel),
+            ],
+          ),
+          MentoraGridRow(id: 'bas', cells: [cell('sud', layoutPageLabel)]),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: gridLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(shape(key: const Key('layout-shape-grid'))),
+          // The same grid, announced with one cell fewer: the layout
+          // deduces nothing - the disposition changed, that is all.
+          _LayoutScene.framed(
+            shape(key: const Key('layout-grid-narrow'), wide: false),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-grid-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-grid-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-grid-${direction.name}')),
+              ),
+            ),
+          const _GridLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Grid Layout's living documentation - built only with Mentora
+/// components.
+final class _GridLayoutDocumentation extends StatelessWidget {
+  const _GridLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('grid-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(gridLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: gridLayoutDocArchitecture,
+            keyPrefix: 'grid-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: gridLayoutDocResponsibilities,
+            keyPrefix: 'grid-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: gridLayoutDocComponents,
+            keyPrefix: 'grid-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: gridLayoutDocTokens,
+            keyPrefix: 'grid-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: gridLayoutDocEngines,
+            keyPrefix: 'grid-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: gridLayoutDocForbidden,
+            keyPrefix: 'grid-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: gridLayoutDocScans,
+            keyPrefix: 'grid-layout-doc-scan',
           ),
         ],
       ),

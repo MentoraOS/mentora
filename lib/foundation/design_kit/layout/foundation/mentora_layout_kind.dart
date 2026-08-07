@@ -34,4 +34,8 @@ enum MentoraLayoutKind {
   /// A collection: a logical sequence of elements, in the order the
   /// application announced them, each keeping its own voice.
   list,
+
+  /// A spatial collection, already decided: cells placed exactly where
+  /// the application announced them.
+  grid,
 }
