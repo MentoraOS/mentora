@@ -31,6 +31,7 @@ import 'package:mentora/foundation/design_kit/layout/list_layout/mentora_list_la
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
@@ -42,6 +43,8 @@ import 'package:mentora/foundation/design_kit/structure/master_detail/mentora_ma
 import 'package:mentora/foundation/design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import 'package:mentora/foundation/design_kit/structure/split_view/mentora_split_view.dart';
 import 'package:mentora/foundation/design_kit/structure/split_view/mentora_split_view_style.dart';
+import 'package:mentora/foundation/design_kit/structure/tabs/mentora_tabs.dart';
+import 'package:mentora/foundation/design_kit/structure/tabs/mentora_tabs_style.dart';
 import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace.dart';
 import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace_style.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
@@ -201,7 +204,7 @@ Map<MentoraLayoutKind, Widget> _layouts({
       pageSemanticLabel: 'Page courante',
       listId: 'transactions',
       listSemanticLabel: 'Les transactions',
-      items: const [MentoraListItem(id: 'premier', content: _content)],
+      items: const [MentoraIdentifiedContent(id: 'premier', content: _content)],
     ),
     MentoraLayoutKind.grid: MentoraGridLayout(
       frame: plain,
@@ -218,6 +221,27 @@ Map<MentoraLayoutKind, Widget> _layouts({
           ),
         ],
       ),
+    ),
+    MentoraLayoutKind.tabbedContent: MentoraTabbedContentLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      facets: MentoraTabs(
+        controller: MentoraTabsController('operations'),
+        // A set of facets reveals another side of the same context:
+        // the Tabs refuse a single one, and they are right.
+        tabs: const [
+          MentoraTab(id: 'operations', label: 'Opérations'),
+          MentoraTab(id: 'moyens', label: 'Moyens'),
+        ],
+        onTabSelected: (_) {},
+      ),
+      contextId: 'portefeuille',
+      contextSemanticLabel: 'Le portefeuille',
+      revealedContentId: 'operations',
+      contents: const [
+        MentoraIdentifiedContent(id: 'operations', content: _content),
+        MentoraIdentifiedContent(id: 'moyens', content: SizedBox.shrink()),
+      ],
     ),
     MentoraLayoutKind.masterDetail: MentoraMasterDetailLayout(
       frame: plain,
@@ -327,6 +351,11 @@ void main() {
       await _pump(tester, layouts[MentoraLayoutKind.grid]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byKey(const Key('grid-indicateurs')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.tabbedContent]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byType(MentoraTabs), findsOneWidget);
+      expect(find.byKey(const Key('tabbed-portefeuille')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.splitWorkspace]!);
       expect(find.byType(MentoraSplitView), findsOneWidget);
@@ -835,6 +864,7 @@ void main() {
         'MentoraSectionLayout',
         'MentoraListLayout',
         'MentoraGridLayout',
+        'MentoraTabbedContentLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

@@ -301,9 +301,10 @@ void main() {
       );
       expect(
         words.style?.color,
-        services
-            .get<ColorTokenEngine>()
-            .colorOf(ColorRole.unavailable, ThemeVariantId.light),
+        services.get<ColorTokenEngine>().colorOf(
+          ColorRole.unavailable,
+          ThemeVariantId.light,
+        ),
       );
 
       await tester.tap(
@@ -324,9 +325,7 @@ void main() {
       );
 
       expect(
-        tester
-            .widget<Opacity>(find.byKey(const Key('tabs-presence')))
-            .opacity,
+        tester.widget<Opacity>(find.byKey(const Key('tabs-presence'))).opacity,
         tabsDisabledVeilOpacity,
       );
       await tester.tap(
@@ -380,9 +379,7 @@ void main() {
     });
 
     testWidgets('the four theme variants, both directions and every '
-        'reading comfort are served without special handling', (
-      tester,
-    ) async {
+        'reading comfort are served without special handling', (tester) async {
       for (final variant in ThemeVariantId.values) {
         final services = await _pump(
           tester,
@@ -420,7 +417,8 @@ void main() {
           facets: const [
             MentoraTab(
               id: 'overview',
-              label: 'Vue d’ensemble des consultations et des documents '
+              label:
+                  'Vue d’ensemble des consultations et des documents '
                   'partagés avec les experts partenaires',
             ),
             MentoraTab(id: 'sessions', label: 'Séances'),
@@ -439,9 +437,10 @@ void main() {
         tester
             .widget<AnimatedContainer>(find.byKey(const Key('tabs-surface')))
             .duration,
-        services
-            .get<MotionEngine>()
-            .durationFor(MotionIntention.montrerLaContinuite, appearance),
+        services.get<MotionEngine>().durationFor(
+          MotionIntention.montrerLaContinuite,
+          appearance,
+        ),
       );
 
       await _pump(
@@ -483,13 +482,17 @@ void main() {
 
     test('no framework tab widget or controller survives in the '
         'foundation: Flutter stays a primitive', () {
+      // Structural, never lexical: a type USED carries a constructor,
+      // a member or a type argument behind it. The living
+      // documentation must be able to NAME what the code may not
+      // carry — that is what documenting a prohibition means.
       final forbidden = <String, RegExp>{
-        'TabBar': RegExp(r'(?<![A-Za-z])TabBar(?![A-Za-z])'),
-        'TabBarView': RegExp(r'(?<![A-Za-z])TabBarView(?![A-Za-z])'),
+        'TabBar': RegExp(r'(?<![A-Za-z])TabBar\s*[(.<]'),
+        'TabBarView': RegExp(r'(?<![A-Za-z])TabBarView\s*[(.<]'),
         'Tab': RegExp(r'(?<![A-Za-z])Tab\('),
-        'TabController': RegExp(r'(?<![A-Za-z])TabController(?![A-Za-z])'),
+        'TabController': RegExp(r'(?<![A-Za-z])TabController\s*[(.<]'),
         'DefaultTabController': RegExp(
-          r'(?<![A-Za-z])DefaultTabController(?![A-Za-z])',
+          r'(?<![A-Za-z])DefaultTabController\s*[(.<]',
         ),
       };
       for (final file in dartFilesOf('lib/foundation')) {

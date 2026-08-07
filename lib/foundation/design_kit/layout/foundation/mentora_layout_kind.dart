@@ -38,4 +38,8 @@ enum MentoraLayoutKind {
   /// A spatial collection, already decided: cells placed exactly where
   /// the application announced them.
   grid,
+
+  /// Several contents of one context, of which exactly one is
+  /// revealed — the one the application announced.
+  tabbedContent,
 }

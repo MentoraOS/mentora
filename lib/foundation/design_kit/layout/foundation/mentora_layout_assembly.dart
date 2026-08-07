@@ -61,7 +61,7 @@ sealed class MentoraLayoutSurface {
     required String semanticLabel,
     required String collectionId,
     required String collectionSemanticLabel,
-    required List<MentoraListItem> items,
+    required List<MentoraIdentifiedContent> items,
     MentoraAppBar? place,
     MentoraTabs? facets,
     MentoraSearchBar? intention,
@@ -83,6 +83,23 @@ sealed class MentoraLayoutSurface {
     MentoraSearchBar? intention,
     List<MentoraButton> acts,
   }) = MentoraLayoutGridSurface;
+
+  /// One page whose content is one of SEVERAL contents of the same
+  /// context — the one the application announced as revealed.
+  ///
+  /// The contents that are not revealed do not exist: they are not
+  /// built, so nothing of them is placed, focusable or spoken.
+  const factory MentoraLayoutSurface.revealed({
+    required String semanticLabel,
+    required String contextId,
+    required String contextSemanticLabel,
+    required List<MentoraIdentifiedContent> contents,
+    required String revealedContentId,
+    MentoraAppBar? place,
+    MentoraTabs? facets,
+    MentoraSearchBar? intention,
+    List<MentoraButton> acts,
+  }) = MentoraLayoutRevealedSurface;
 
   /// A room shared between regions, already built by the structure
   /// that owns it.
@@ -142,7 +159,7 @@ final class MentoraLayoutCollectionSurface
     extends MentoraLayoutPageLikeSurface {
   final String collectionId;
   final String collectionSemanticLabel;
-  final List<MentoraListItem> items;
+  final List<MentoraIdentifiedContent> items;
 
   const MentoraLayoutCollectionSurface({
     required super.semanticLabel,
@@ -166,6 +183,25 @@ final class MentoraLayoutGridSurface extends MentoraLayoutPageLikeSurface {
     required this.gridId,
     required this.gridSemanticLabel,
     required this.disposition,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
+  });
+}
+
+final class MentoraLayoutRevealedSurface extends MentoraLayoutPageLikeSurface {
+  final String contextId;
+  final String contextSemanticLabel;
+  final List<MentoraIdentifiedContent> contents;
+  final String revealedContentId;
+
+  const MentoraLayoutRevealedSurface({
+    required super.semanticLabel,
+    required this.contextId,
+    required this.contextSemanticLabel,
+    required this.contents,
+    required this.revealedContentId,
     super.place,
     super.facets,
     super.intention,
@@ -269,6 +305,10 @@ final class MentoraLayoutAssembly extends StatelessWidget {
       case MentoraLayoutGridSurface():
         return MentoraWorkspaceSurface.page(
           _page(asked, content: _grid(asked, theme)),
+        );
+      case MentoraLayoutRevealedSurface():
+        return MentoraWorkspaceSurface.page(
+          _page(asked, content: _revealed(asked)),
         );
       case MentoraLayoutSharedSurface(:final workspace):
         return MentoraWorkspaceSurface.shared(workspace);
@@ -378,6 +418,35 @@ final class MentoraLayoutAssembly extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// The one content that was announced as revealed.
+  ///
+  /// The context is announced once; the content revealed keeps its own
+  /// voice. What is not revealed is never built, so it is not placed,
+  /// not focusable and not spoken — it does not exist.
+  Widget _revealed(MentoraLayoutRevealedSurface asked) {
+    for (final content in asked.contents) {
+      if (content.id != asked.revealedContentId) continue;
+      return Semantics(
+        key: Key('tabbed-${asked.contextId}'),
+        container: true,
+        explicitChildNodes: true,
+        label: asked.contextSemanticLabel,
+        // A context travels as one focus group: moving through it
+        // follows what is revealed, and never wanders out of it.
+        child: FocusTraversalGroup(
+          child: KeyedSubtree(
+            key: Key('tabbed-content-${content.id}'),
+            child: content.content,
+          ),
+        ),
+      );
+    }
+    throw StateError(
+      'The content announced as revealed is not one this context '
+      'holds: a context never guesses what to show.',
     );
   }
 

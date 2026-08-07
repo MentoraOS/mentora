@@ -53,7 +53,7 @@ final class MentoraListLayout extends MentoraLayout {
   final String listSemanticLabel;
 
   /// The elements, in the order they are to be read.
-  final List<MentoraListItem> items;
+  final List<MentoraIdentifiedContent> items;
 
   /// What the screen reader hears about the page itself.
   final String pageSemanticLabel;

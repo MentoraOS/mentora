@@ -189,6 +189,49 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String tabbedLayoutGalleryTitle = 'Layouts — Tabbed content';
+const String tabbedLayoutDocHeading =
+    'MentoraTabbedContentLayout — official contract';
+const String tabbedContextLabel = 'Le contexte courant';
+const List<String> tabbedLayoutDocArchitecture = [
+  'A specialization of the Layout Foundation, like every other shape',
+  'One CONTEXT, several contents already decided, exactly one revealed',
+  'The facets belong to MentoraTabs: composed, never recreated',
+  'The revealed content is announced by identity — never chosen here',
+  'Two contents never share one identity; a missing identity fails',
+];
+const List<String> tabbedLayoutDocResponsibilities = [
+  'It expresses. It never decides.',
+  'It changes no tab, navigates nowhere, computes nothing',
+  'What is not revealed is not built: not in the tree, not for the',
+  'focus, not for a screen reader',
+  'Only the context is announced: what is revealed keeps its own voice',
+];
+const List<String> tabbedLayoutDocComponents = [
+  'MentoraTabs — owns the facets of the context',
+  'The Layout Assembly — which alone reveals what it was told to',
+  'Every official component may be a content: the context knows none',
+];
+const List<String> tabbedLayoutDocForbidden = [
+  'TabBar, TabBarView, TabController, DefaultTabController, PageView',
+  'IndexedStack, Offstage, Visibility — what is hidden is not built',
+  'Padding, SafeArea, Expanded, Flexible, Spacer, scroll views',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, business, data, dynamic, Object?',
+];
+const List<String> tabbedLayoutDocTokens = [
+  'Layout: the room the layer adds around what it reveals — none',
+];
+const List<String> tabbedLayoutDocEngines = [
+  'The facets consume their own engines; the context consumes none',
+];
+const List<String> tabbedLayoutDocScans = [
+  'No framework tab, no page view, no way of hiding, no scroll view',
+  'No navigation, no measure, no platform, no business, no data',
+  'No ambient theme and no coded value',
+  'One MentoraTabbedContentLayout, extending the foundation, building',
+  'nothing — and one unit designating content in the whole layer',
+];
 const String gridLayoutGalleryTitle = 'Layouts — Grid';
 const String gridLayoutDocHeading = 'MentoraGridLayout — official contract';
 const String gridCollectionLabel = 'Les indicateurs du mois';

@@ -18,6 +18,7 @@ import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.d
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
 import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
+import '../design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import '../design_kit/layout/section_layout/mentora_section_layout.dart';
@@ -3267,6 +3268,159 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
   }
 }
 
+/// The official Tabbed Content catalogue - one context, several
+/// contents, exactly one revealed.
+final class TabbedContentLayoutGallery extends StatefulWidget {
+  const TabbedContentLayoutGallery({super.key});
+
+  @override
+  State<TabbedContentLayoutGallery> createState() =>
+      _TabbedContentLayoutGalleryState();
+}
+
+final class _TabbedContentLayoutGalleryState
+    extends State<TabbedContentLayoutGallery> {
+  static Widget content(String heading) => MentoraCard(
+    variant: MentoraCardVariant.surface,
+    child: MentoraText(heading, role: MentoraTextRole.subtitle),
+  );
+
+  static List<MentoraIdentifiedContent> get contents => [
+    MentoraIdentifiedContent(
+      id: 'overview',
+      content: content(layoutFirstPanel),
+    ),
+    MentoraIdentifiedContent(
+      id: 'sessions',
+      content: content(layoutSecondPanel),
+    ),
+  ];
+
+  /// Which content the catalogue reveals. The gallery is the
+  /// application here: the context only expresses what it is told.
+  String _revealed = 'overview';
+
+  MentoraTabbedContentLayout shape({Key? key, String? revealed}) {
+    final shown = revealed ?? _revealed;
+    return MentoraTabbedContentLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      facets: MentoraTabs(
+        controller: MentoraTabsController(shown),
+        tabs: _TabsGalleryState.facets,
+        onTabSelected: (facet) => setState(() => _revealed = facet),
+      ),
+      contextId: 'contexte',
+      contextSemanticLabel: tabbedContextLabel,
+      contents: contents,
+      revealedContentId: shown,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: tabbedLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // The live context: the facets report, the catalogue decides,
+          // and the context reveals what it was told.
+          _LayoutScene.framed(shape(key: const Key('layout-shape-tabbed'))),
+          // The other content, announced directly.
+          _LayoutScene.framed(
+            shape(key: const Key('layout-tabbed-other'), revealed: 'sessions'),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-tabbed-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-tabbed-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-tabbed-${direction.name}')),
+              ),
+            ),
+          const _TabbedContentLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Tabbed Content Layout's living documentation - built only with
+/// Mentora components.
+final class _TabbedContentLayoutDocumentation extends StatelessWidget {
+  const _TabbedContentLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('tabbed-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(tabbedLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: tabbedLayoutDocArchitecture,
+            keyPrefix: 'tabbed-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: tabbedLayoutDocResponsibilities,
+            keyPrefix: 'tabbed-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: tabbedLayoutDocComponents,
+            keyPrefix: 'tabbed-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: tabbedLayoutDocTokens,
+            keyPrefix: 'tabbed-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: tabbedLayoutDocEngines,
+            keyPrefix: 'tabbed-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: tabbedLayoutDocForbidden,
+            keyPrefix: 'tabbed-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: tabbedLayoutDocScans,
+            keyPrefix: 'tabbed-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// The official Grid Layout catalogue - cells standing exactly where
 /// the catalogue announced them, and nowhere else.
 final class GridLayoutGallery extends StatelessWidget {
@@ -3426,7 +3580,7 @@ final class ListLayoutGallery extends StatelessWidget {
       listSemanticLabel: listCollectionLabel,
       items: [
         for (var element = 1; element <= elements; element++)
-          MentoraListItem(
+          MentoraIdentifiedContent(
             id: 'entite-$element',
             content: ListTileGallery.entity(
               key: Key('list-entity-$element'),

@@ -94,23 +94,28 @@ final class MentoraSection {
   });
 }
 
-/// One element of a collection.
+/// An identity, and what it is.
 ///
-/// An element is an IDENTITY and what it is. It is not a position: the
-/// application announces the elements in the order it wants them read,
-/// and the identity is what the product refers to forever.
+/// This is the unit of the whole layer wherever content is designated
+/// rather than named: an element of a collection, a content of a
+/// context, and every unit a future family will need. There is ONE
+/// type for that concept, and there will never be a second.
+///
+/// It is not a position: the application announces the units in the
+/// order it wants them read, and the identity is what the product
+/// refers to forever.
 ///
 /// What it is, is already built. It is handed on strictly intact: the
 /// layer never modifies it, never rebuilds it, never styles it — and
-/// never speaks in its place. An element keeps its own voice.
-final class MentoraListItem {
-  /// What this element IS — stable forever, never a position.
+/// never speaks in its place. A unit keeps its own voice.
+final class MentoraIdentifiedContent {
+  /// What this unit IS — stable forever, never a position.
   final String id;
 
-  /// What the element is, already built by the application.
+  /// What the unit is, already built by the application.
   final Widget content;
 
-  const MentoraListItem({required this.id, required this.content});
+  const MentoraIdentifiedContent({required this.id, required this.content});
 }
 
 /// One cell of a grid.
