@@ -17,6 +17,7 @@ import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
+import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import '../design_kit/layout/section_layout/mentora_section_layout.dart';
 import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
@@ -3258,6 +3259,133 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official List Layout catalogue - a sequence of elements, in the
+/// order announced, with nothing added between them.
+final class ListLayoutGallery extends StatelessWidget {
+  const ListLayoutGallery({super.key});
+
+  static MentoraListLayout shape({Key? key, int elements = 3}) {
+    return MentoraListLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      listId: 'entites',
+      listSemanticLabel: listCollectionLabel,
+      items: [
+        for (var element = 1; element <= elements; element++)
+          MentoraListItem(
+            id: 'entite-$element',
+            content: ListTileGallery.entity(
+              key: Key('list-entity-$element'),
+              composed: false,
+              onTap: () {},
+            ),
+          ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: listLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(shape(key: const Key('layout-shape-list'))),
+          // A collection of one element is a collection.
+          _LayoutScene.framed(
+            shape(key: const Key('layout-list-single'), elements: 1),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-list-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-list-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-list-${direction.name}')),
+              ),
+            ),
+          const _ListLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The List Layout's living documentation - built only with Mentora
+/// components.
+final class _ListLayoutDocumentation extends StatelessWidget {
+  const _ListLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('list-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(listLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: listLayoutDocArchitecture,
+            keyPrefix: 'list-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: listLayoutDocResponsibilities,
+            keyPrefix: 'list-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: listLayoutDocComponents,
+            keyPrefix: 'list-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: listLayoutDocTokens,
+            keyPrefix: 'list-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: listLayoutDocEngines,
+            keyPrefix: 'list-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: listLayoutDocForbidden,
+            keyPrefix: 'list-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: listLayoutDocScans,
+            keyPrefix: 'list-layout-doc-scan',
           ),
         ],
       ),

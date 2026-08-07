@@ -26,6 +26,7 @@ import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_a
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_context.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_kind.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_style.dart';
+import 'package:mentora/foundation/design_kit/layout/list_layout/mentora_list_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
@@ -194,6 +195,13 @@ Map<MentoraLayoutKind, Widget> _layouts({
         ),
       ],
     ),
+    MentoraLayoutKind.list: MentoraListLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      listId: 'transactions',
+      listSemanticLabel: 'Les transactions',
+      items: const [MentoraListItem(id: 'premier', content: _content)],
+    ),
     MentoraLayoutKind.masterDetail: MentoraMasterDetailLayout(
       frame: plain,
       master: const SizedBox.shrink(),
@@ -294,6 +302,10 @@ void main() {
       await _pump(tester, layouts[MentoraLayoutKind.section]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byKey(const Key('section-resume')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.list]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('list-transactions')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.splitWorkspace]!);
       expect(find.byType(MentoraSplitView), findsOneWidget);
@@ -800,6 +812,7 @@ void main() {
         'MentoraMasterDetailLayout',
         'MentoraContentLayout',
         'MentoraSectionLayout',
+        'MentoraListLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

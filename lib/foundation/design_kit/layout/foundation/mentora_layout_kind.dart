@@ -30,4 +30,8 @@ enum MentoraLayoutKind {
   /// Sections: logical units of content, each with its own identity,
   /// its own name and what it gathers.
   section,
+
+  /// A collection: a logical sequence of elements, in the order the
+  /// application announced them, each keeping its own voice.
+  list,
 }

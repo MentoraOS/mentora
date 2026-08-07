@@ -189,6 +189,48 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String listLayoutGalleryTitle = 'Layouts — List';
+const String listLayoutDocHeading = 'MentoraListLayout — official contract';
+const String listCollectionLabel = 'Les entites du mois';
+const List<String> listLayoutDocArchitecture = [
+  'A specialization of the Layout Foundation, like every other shape',
+  'A list is a logical SEQUENCE: identity, elements, order, announcement',
+  'It describes the collection — the assembly alone places it',
+  'An element is an IDENTITY and what it is, already built',
+  'Two elements never share one identity; a missing identity fails',
+];
+const List<String> listLayoutDocResponsibilities = [
+  'It expresses. It never decides.',
+  'No scroll, no virtualization, no pagination, no lazy loading',
+  'No padding, no spacing, no separation, no grid, no column',
+  'The order is announced — never sorted, filtered, reversed or grouped',
+  'Only the collection is announced: an element keeps its own voice',
+];
+const List<String> listLayoutDocComponents = [
+  'MentoraListTile, MentoraCard — what an element usually is',
+  'The Layout Assembly — which alone places the collection',
+  'Every official component may be an element: the list knows none',
+];
+const List<String> listLayoutDocForbidden = [
+  'ListView, CustomScrollView, slivers, scrollbars, ListBody',
+  'Padding, SafeArea, Expanded, Flexible, Spacer, dividers, grids',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, business, data, dynamic, Object?',
+  'A coded colour, size, padding, radius, voice or duration',
+];
+const List<String> listLayoutDocTokens = [
+  'Layout: the room the layer adds between the elements — none',
+];
+const List<String> listLayoutDocEngines = [
+  'Spacing Token Engine — through the shared Layout adapter, only',
+  'Every other engine is consumed by the elements themselves',
+];
+const List<String> listLayoutDocScans = [
+  'No scroll view, no sliver, no separation, no grid, no lazy build',
+  'No room of its own, no measure, no platform, no address',
+  'No order of its own: nothing sorted, filtered, reversed or grouped',
+  'One MentoraListLayout, extending the foundation, building nothing',
+];
 const String sectionLayoutGalleryTitle = 'Layouts — Section';
 const String sectionLayoutDocHeading =
     'MentoraSectionLayout — official contract';

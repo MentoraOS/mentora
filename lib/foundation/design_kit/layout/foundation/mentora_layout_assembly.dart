@@ -50,6 +50,24 @@ sealed class MentoraLayoutSurface {
     List<MentoraButton> acts,
   }) = MentoraLayoutRegionsSurface;
 
+  /// One page whose content is a COLLECTION: a logical sequence of
+  /// elements, read in the order they were announced, with nothing
+  /// added between them.
+  ///
+  /// Only the collection is announced. Each element keeps its own
+  /// voice, its own identity and its own semantics: the layer never
+  /// speaks in their place.
+  const factory MentoraLayoutSurface.collection({
+    required String semanticLabel,
+    required String collectionId,
+    required String collectionSemanticLabel,
+    required List<MentoraListItem> items,
+    MentoraAppBar? place,
+    MentoraTabs? facets,
+    MentoraSearchBar? intention,
+    List<MentoraButton> acts,
+  }) = MentoraLayoutCollectionSurface;
+
   /// A room shared between regions, already built by the structure
   /// that owns it.
   const factory MentoraLayoutSurface.shared(MentoraSplitView workspace) =
@@ -97,6 +115,24 @@ final class MentoraLayoutRegionsSurface extends MentoraLayoutPageLikeSurface {
   const MentoraLayoutRegionsSurface({
     required super.semanticLabel,
     required this.regions,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
+  });
+}
+
+final class MentoraLayoutCollectionSurface
+    extends MentoraLayoutPageLikeSurface {
+  final String collectionId;
+  final String collectionSemanticLabel;
+  final List<MentoraListItem> items;
+
+  const MentoraLayoutCollectionSurface({
+    required super.semanticLabel,
+    required this.collectionId,
+    required this.collectionSemanticLabel,
+    required this.items,
     super.place,
     super.facets,
     super.intention,
@@ -193,6 +229,10 @@ final class MentoraLayoutAssembly extends StatelessWidget {
             ),
           ),
         );
+      case MentoraLayoutCollectionSurface():
+        return MentoraWorkspaceSurface.page(
+          _page(asked, content: _collection(asked, theme)),
+        );
       case MentoraLayoutSharedSurface(:final workspace):
         return MentoraWorkspaceSurface.shared(workspace);
       case MentoraLayoutRelationSurface(:final relation):
@@ -218,6 +258,43 @@ final class MentoraLayoutAssembly extends StatelessWidget {
       intention: asked.intention,
       acts: asked.acts,
       content: content,
+    );
+  }
+
+  /// One collection: a single landmark, one focus group, and the
+  /// elements in the order they were announced.
+  ///
+  /// Nothing is added between them, nothing separates them, and
+  /// nothing is said about them: an element keeps its own voice.
+  Widget _collection(
+    MentoraLayoutCollectionSurface asked,
+    MentoraLayoutTheme theme,
+  ) {
+    return Semantics(
+      key: Key('list-${asked.collectionId}'),
+      container: true,
+      explicitChildNodes: true,
+      label: asked.collectionSemanticLabel,
+      // A collection travels as one focus group: moving through it
+      // follows its elements, and never wanders out of it.
+      child: FocusTraversalGroup(
+        child: Column(
+          key: Key('list-items-${asked.collectionId}'),
+          // The room the layer adds between the elements it was
+          // handed: none, and it is a Token so that the none is
+          // opposable rather than assumed.
+          spacing: theme.contentGap,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final item in asked.items)
+              KeyedSubtree(
+                key: Key('list-item-${item.id}'),
+                child: item.content,
+              ),
+          ],
+        ),
+      ),
     );
   }
 
