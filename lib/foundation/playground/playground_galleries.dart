@@ -12,6 +12,7 @@ import '../design_kit/structure/split_view/mentora_split_view.dart';
 import '../design_kit/structure/split_view/mentora_split_view_style.dart';
 import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
+import '../design_kit/layout/content_layout/mentora_content_layout.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
@@ -3256,6 +3257,145 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Content Layout catalogue - the same regions, disposed
+/// the official way, with nothing added between them.
+final class ContentLayoutGallery extends StatelessWidget {
+  const ContentLayoutGallery({super.key});
+
+  static MentoraContentRegion region(String id, String heading) {
+    return MentoraContentRegion(
+      id: id,
+      semanticLabel: heading,
+      content: MentoraCard(
+        variant: MentoraCardVariant.surface,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            MentoraText(heading, role: MentoraTextRole.subtitle),
+            MentoraText(layoutContentBody, role: MentoraTextRole.body),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static MentoraContentLayout shape({Key? key, int regions = 2}) {
+    const headings = [
+      contentFirstRegion,
+      contentSecondRegion,
+      contentThirdRegion,
+    ];
+    return MentoraContentLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      regions: [
+        for (final heading in headings.take(regions))
+          region(heading.toLowerCase(), heading),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: contentLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(shape(key: const Key('layout-shape-content'))),
+          _LayoutScene.framed(
+            shape(key: const Key('layout-content-three'), regions: 3),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-content-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-content-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-content-${direction.name}')),
+              ),
+            ),
+          const _ContentLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Content Layout's living documentation - built only with Mentora
+/// components.
+final class _ContentLayoutDocumentation extends StatelessWidget {
+  const _ContentLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('content-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(contentLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: contentLayoutDocArchitecture,
+            keyPrefix: 'content-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: contentLayoutDocResponsibilities,
+            keyPrefix: 'content-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: contentLayoutDocComponents,
+            keyPrefix: 'content-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: contentLayoutDocTokens,
+            keyPrefix: 'content-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: contentLayoutDocEngines,
+            keyPrefix: 'content-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: contentLayoutDocForbidden,
+            keyPrefix: 'content-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: contentLayoutDocScans,
+            keyPrefix: 'content-layout-doc-scan',
           ),
         ],
       ),

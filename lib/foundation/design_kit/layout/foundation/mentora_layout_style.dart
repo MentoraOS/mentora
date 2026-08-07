@@ -33,3 +33,30 @@ final class MentoraDashboardPanel {
     this.acts = const [],
   });
 }
+
+/// One region of content.
+///
+/// A region is an IDENTITY, a name and what it carries. It is not a
+/// position: the application announces the regions in the order it
+/// wants them read, and the identity is what the product refers to
+/// forever.
+///
+/// What it carries is already built. It is handed on strictly intact:
+/// nothing is wrapped around it, nothing is added beside it.
+final class MentoraContentRegion {
+  /// What this region IS — stable forever, never a position.
+  final String id;
+
+  /// What the screen reader hears about the region: a landmark name.
+  /// The application owns every string; the layer composes none.
+  final String semanticLabel;
+
+  /// What the region carries, already built by the application.
+  final Widget content;
+
+  const MentoraContentRegion({
+    required this.id,
+    required this.semanticLabel,
+    required this.content,
+  });
+}

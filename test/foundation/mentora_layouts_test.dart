@@ -18,6 +18,7 @@ import 'package:mentora/foundation/design_kit/components/snackbar/mentora_snackb
 import 'package:mentora/foundation/design_kit/components/snackbar/mentora_snackbar_service.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.dart';
+import 'package:mentora/foundation/design_kit/layout/content_layout/mentora_content_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout.dart';
@@ -50,7 +51,7 @@ const String _home = 'home';
 /// by the layout that carries it.
 const Widget _content = MentoraText(
   'Le contenu appartient à l’application.',
-  key: Key('layout-content'),
+  key: Key('layout-surface'),
   role: MentoraTextRole.body,
 );
 
@@ -169,6 +170,17 @@ Map<MentoraLayoutKind, Widget> _layouts({
       regions: _regions,
       specification: _specification,
     ),
+    MentoraLayoutKind.content: MentoraContentLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      regions: [
+        MentoraContentRegion(
+          id: 'resume',
+          semanticLabel: 'Résumé',
+          content: _content,
+        ),
+      ],
+    ),
     MentoraLayoutKind.masterDetail: MentoraMasterDetailLayout(
       frame: plain,
       master: const SizedBox.shrink(),
@@ -262,6 +274,10 @@ void main() {
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byType(MentoraBottomNavigation), findsOneWidget);
 
+      await _pump(tester, layouts[MentoraLayoutKind.content]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('content-regions')), findsOneWidget);
+
       await _pump(tester, layouts[MentoraLayoutKind.splitWorkspace]!);
       expect(find.byType(MentoraSplitView), findsOneWidget);
       expect(find.byType(MentoraPageScaffold), findsNothing);
@@ -285,7 +301,7 @@ void main() {
       // The place carries the content and nothing else, so the content
       // starts exactly where the page starts.
       expect(
-        tester.getTopLeft(find.byKey(const Key('layout-content'))),
+        tester.getTopLeft(find.byKey(const Key('layout-surface'))),
         tester.getTopLeft(find.byType(MentoraPageScaffold)),
         reason: 'a layout adds nothing around what it was handed',
       );
@@ -765,6 +781,7 @@ void main() {
         'MentoraNavigationLayout',
         'MentoraSplitWorkspaceLayout',
         'MentoraMasterDetailLayout',
+        'MentoraContentLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

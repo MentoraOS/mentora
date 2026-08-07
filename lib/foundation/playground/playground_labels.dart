@@ -189,6 +189,51 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String contentLayoutGalleryTitle = 'Layouts — Content';
+const String contentLayoutDocHeading =
+    'MentoraContentLayout — official contract';
+const String contentFirstRegion = 'Resume';
+const String contentSecondRegion = 'Details';
+const String contentThirdRegion = 'Historique';
+const List<String> contentLayoutDocArchitecture = [
+  'A specialization of the Layout Foundation, like every other shape',
+  'It disposes content that is ALREADY BUILT — it produces none',
+  'A region is an IDENTITY, a name, and what it carries',
+  'The regions are read in the order the application announced them',
+  'What it owns is the order and the announcement, never the room',
+];
+const List<String> contentLayoutDocResponsibilities = [
+  'It creates no padding, no spacing, no scroll view — ever',
+  'It adds nothing between the regions: the absence is a Token',
+  'It hands every region on strictly intact — proven geometrically',
+  'Each region is a landmark of its own and its own focus group',
+  'It measures nothing, decides nothing, and refuses what is ambiguous',
+];
+const List<String> contentLayoutDocComponents = [
+  'The Layout Assembly — which alone builds the working context and page',
+  'Every official component may live inside a region: the layout',
+  'knows none of them, and touches none of them',
+];
+const List<String> contentLayoutDocForbidden = [
+  'Scaffold, SafeArea, Padding, Expanded, Flexible, Spacer',
+  'Any scroll view, any container or box of its own',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, business, data, dynamic, Object?',
+  'A coded colour, size, padding, radius, opacity or duration',
+];
+const List<String> contentLayoutDocTokens = [
+  'Layout: the room it adds between the regions — which is none',
+];
+const List<String> contentLayoutDocEngines = [
+  'Spacing Token Engine — through the shared Layout adapter, only',
+  'Every other engine is consumed by what the regions carry',
+];
+const List<String> contentLayoutDocScans = [
+  'No framework layout, no room of its own, no scroll view',
+  'No measure, no platform, no address, no business, no data',
+  'No ambient theme and no coded value',
+  'One MentoraContentLayout, extending the foundation, building nothing',
+];
 const String layoutFamilyTitle = 'Layouts — The five official shapes';
 const String workspaceLayoutGalleryTitle = 'Layouts — Workspace';
 const String dashboardLayoutGalleryTitle = 'Layouts — Dashboard';

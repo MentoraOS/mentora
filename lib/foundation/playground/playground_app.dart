@@ -229,6 +229,7 @@ final class _PlaygroundShell extends StatelessWidget {
               const SplitViewGallery(),
               const WorkspaceGallery(),
               const WorkspaceLayoutGallery(),
+              const ContentLayoutGallery(),
               const DashboardLayoutGallery(),
               const NavigationLayoutGallery(),
               const SplitWorkspaceLayoutGallery(),

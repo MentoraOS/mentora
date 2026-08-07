@@ -22,4 +22,8 @@ enum MentoraLayoutKind {
 
   /// Two spaces in relation, in the working context.
   masterDetail,
+
+  /// Content, disposed the official way: named regions, in the order
+  /// the application announced them, and nothing added between them.
+  content,
 }
