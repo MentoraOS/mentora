@@ -12,6 +12,12 @@ import '../design_kit/structure/split_view/mentora_split_view.dart';
 import '../design_kit/structure/split_view/mentora_split_view_style.dart';
 import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
+import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
+import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
+import '../design_kit/layout/mentora_layout_style.dart';
+import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
+import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
+import '../design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import '../design_kit/tokens/split_view_tokens.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
@@ -3249,6 +3255,266 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Layouts catalogue - the five shapes a screen of
+/// Mentora may take, each assembled by the family's single assembly.
+final class _LayoutScene {
+  const _LayoutScene();
+
+  static const MentoraWorkspaceNavigationState where =
+      MentoraWorkspaceNavigationState(destinationId: 'home');
+
+  static MentoraLayoutContext frame({bool withNavigation = false}) {
+    return MentoraLayoutContext(
+      semanticLabel: layoutContextLabel,
+      navigation: where,
+      configuration: MentoraWorkspaceConfiguration(
+        navigation: withNavigation
+            ? MentoraWorkspaceNavigationChannel.base
+            : MentoraWorkspaceNavigationChannel.none,
+      ),
+      base: withNavigation
+          ? MentoraBottomNavigation(
+              destinations: _BottomNavigationGalleryState.places(5),
+              selectedDestinationId: 'home',
+              semanticLabel: 'Navigation principale',
+              onDestinationRequested: (_) {},
+            )
+          : null,
+    );
+  }
+
+  static Widget get content =>
+      MentoraText(layoutContentBody, role: MentoraTextRole.body);
+
+  static Widget framed(Widget layout) =>
+      SizedBox(height: kMinInteractiveDimension * 6, child: layout);
+}
+
+final class WorkspaceLayoutGallery extends StatelessWidget {
+  const WorkspaceLayoutGallery({super.key});
+
+  static MentoraWorkspaceLayout shape({Key? key}) => MentoraWorkspaceLayout(
+    key: key,
+    frame: _LayoutScene.frame(),
+    pageSemanticLabel: layoutPageLabel,
+    place: const MentoraAppBar(title: layoutPageLabel),
+    content: _LayoutScene.content,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: workspaceLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(shape(key: const Key('layout-shape-workspace'))),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-workspace-${variant.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _LayoutScene.framed(
+                shape(key: Key('layout-workspace-${direction.name}')),
+              ),
+            ),
+          const _LayoutFamilyDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+final class DashboardLayoutGallery extends StatelessWidget {
+  const DashboardLayoutGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    Widget shape(Key key) => MentoraDashboardLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      panels: [
+        MentoraDashboardPanel(
+          title: layoutFirstPanel,
+          content: _LayoutScene.content,
+          acts: [
+            MentoraButton(
+              label: layoutPanelAct,
+              onPressed: () {},
+              variant: MentoraButtonVariant.text,
+              size: MentoraButtonSize.small,
+            ),
+          ],
+        ),
+        MentoraDashboardPanel(
+          title: layoutSecondPanel,
+          content: _LayoutScene.content,
+        ),
+      ],
+    );
+
+    return GallerySection(
+      title: dashboardLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(shape(const Key('layout-shape-dashboard'))),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _LayoutScene.framed(
+                shape(Key('layout-dashboard-${comfort.name}')),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+final class NavigationLayoutGallery extends StatelessWidget {
+  const NavigationLayoutGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GallerySection(
+      title: navigationLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(
+            MentoraNavigationLayout(
+              key: const Key('layout-shape-navigation'),
+              frame: _LayoutScene.frame(withNavigation: true),
+              pageSemanticLabel: layoutPageLabel,
+              content: _LayoutScene.content,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+final class SplitWorkspaceLayoutGallery extends StatelessWidget {
+  const SplitWorkspaceLayoutGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GallerySection(
+      title: splitWorkspaceLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(
+            MentoraSplitWorkspaceLayout(
+              key: const Key('layout-shape-split-workspace'),
+              frame: _LayoutScene.frame(),
+              regions: _SplitViewGalleryState.regions(),
+              specification: _SplitViewGalleryState.specification(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+final class MasterDetailLayoutGallery extends StatelessWidget {
+  const MasterDetailLayoutGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GallerySection(
+      title: masterDetailLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _LayoutScene.framed(
+            MentoraMasterDetailLayout(
+              key: const Key('layout-shape-master-detail'),
+              frame: _LayoutScene.frame(),
+              master: _MasterDetailGalleryState.master,
+              detail: _MasterDetailGalleryState.detail,
+              specification: _MasterDetailGalleryState.layout,
+              masterSemanticLabel: masterDetailMasterLabel,
+              detailSemanticLabel: masterDetailDetailLabel,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Layout family's living documentation - built only with Mentora
+/// components.
+final class _LayoutFamilyDocumentation extends StatelessWidget {
+  const _LayoutFamilyDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(layoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: layoutDocArchitecture,
+            keyPrefix: 'layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: layoutDocResponsibilities,
+            keyPrefix: 'layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: layoutDocComponents,
+            keyPrefix: 'layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: layoutDocTokens,
+            keyPrefix: 'layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: layoutDocEngines,
+            keyPrefix: 'layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: layoutDocForbidden,
+            keyPrefix: 'layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: layoutDocScans,
+            keyPrefix: 'layout-doc-scan',
           ),
         ],
       ),

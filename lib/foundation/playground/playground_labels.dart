@@ -189,6 +189,64 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String layoutFamilyTitle = 'Layouts — The five official shapes';
+const String workspaceLayoutGalleryTitle = 'Layouts — Workspace';
+const String dashboardLayoutGalleryTitle = 'Layouts — Dashboard';
+const String navigationLayoutGalleryTitle = 'Layouts — Navigation';
+const String splitWorkspaceLayoutGalleryTitle = 'Layouts — Split workspace';
+const String masterDetailLayoutGalleryTitle = 'Layouts — Master detail';
+const String layoutDocHeading = 'The Layout family — official contract';
+
+/// The words of the catalogue scenes. A layout composes none of them:
+/// the application owns every string it carries.
+const String layoutContextLabel = 'Contexte de travail';
+const String layoutPageLabel = 'Page courante';
+const String layoutContentBody =
+    'Le contenu appartient entierement a l application.';
+const String layoutFirstPanel = 'Premier sujet';
+const String layoutSecondPanel = 'Second sujet';
+const String layoutPanelAct = 'Ouvrir';
+const List<String> layoutDocArchitecture = [
+  'Five shapes, and no sixth: a product speaks this vocabulary alone',
+  'One assembly for the five of them — the working context, once',
+  'Every layout is handed the SAME contract: name, state, disposition',
+  'A layout declares only what makes it that layout',
+  'The surface is sealed: the compiler admits exactly one',
+];
+const List<String> layoutDocResponsibilities = [
+  'A layout composes official components; it owns none of them',
+  'It creates no business, no data, no decision and no rule',
+  'It never measures, never routes, never styles what it composes',
+  'It hands the content on untouched — no padding of its own',
+  'It refuses a contract it cannot honour, and says why',
+];
+const List<String> layoutDocComponents = [
+  'MentoraWorkspace — the working context every shape is assembled in',
+  'MentoraPageScaffold, MentoraSplitView, MentoraMasterDetail — surfaces',
+  'MentoraCard, MentoraText, MentoraButton — the panels of a dashboard',
+  'The navigation channels and the three official hosts',
+];
+const List<String> layoutDocForbidden = [
+  'The framework scaffold, app bar, drawer and navigation bars',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Expanded, Flexible, Navigator, Route, Theme.of',
+  'A Widget? where an official type exists, dynamic, Object?',
+  'A coded colour, size, padding, radius, opacity or duration',
+];
+const List<String> layoutDocTokens = [
+  'Layout: how the panels of a dashboard breathe, and the room a',
+  'layout adds around what it was handed — which is none',
+];
+const List<String> layoutDocEngines = [
+  'Spacing Token Engine — the only engine a layout consumes itself',
+  'Every other engine is consumed by the components it composes',
+];
+const List<String> layoutDocScans = [
+  'No framework widget, no measure, no platform, no address',
+  'No business, no data, no untyped zone, no coded value',
+  'The working context is assembled in exactly one place',
+  'Each official shape exists exactly once in the product',
+];
 const String narrowAdaptationGalleryTitle =
     'List Tiles — Narrow adaptation (180 to 480 dp)';
 const String workspaceGalleryTitle =
