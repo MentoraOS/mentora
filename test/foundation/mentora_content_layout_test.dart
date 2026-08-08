@@ -490,11 +490,17 @@ void main() {
       expect(declarations.single, contains('layout/content_layout/'));
 
       final source = File(declarations.single).readAsStringSync();
+      // It extends the REGIONED foundation: it therefore owns no
+      // region, no order, no refusal and no surface — it owns its
+      // official kind, and nothing else at all.
       expect(
-        RegExp(r'extends\s+MentoraPageLikeLayout(?![A-Za-z])').hasMatch(source),
+        RegExp(r'extends\s+MentoraRegionedLayout(?![A-Za-z])').hasMatch(source),
         isTrue,
       );
       expect(RegExp(r'Widget\s+build\(').hasMatch(source), isFalse);
+      expect(RegExp(r'void\s+verify\(').hasMatch(source), isFalse);
+      expect(RegExp(r'surfaceOf\(').hasMatch(source), isFalse);
+      expect(RegExp(r'final\s+[\w<>?, ]+\s+\w+\s*;').hasMatch(source), isFalse);
       // It never assembles: no working context, no page, no layer.
       for (final built in const [
         'MentoraWorkspace(',

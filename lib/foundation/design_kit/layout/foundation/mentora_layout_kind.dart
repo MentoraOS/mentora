@@ -62,4 +62,8 @@ enum MentoraLayoutKind {
   /// A space where a person configures a system: categories, each
   /// announced, each open or closed as the application says.
   settings,
+
+  /// A space where a person observes a system: views, each an identity
+  /// the application announced, read in the announced order.
+  analytics,
 }

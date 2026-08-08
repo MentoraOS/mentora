@@ -18,6 +18,7 @@ import 'package:mentora/foundation/design_kit/components/snackbar/mentora_snackb
 import 'package:mentora/foundation/design_kit/components/snackbar/mentora_snackbar_service.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.dart';
+import 'package:mentora/foundation/design_kit/layout/analytics_layout/mentora_analytics_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/content_layout/mentora_content_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/detail_layout/mentora_detail_layout.dart';
@@ -272,6 +273,22 @@ Map<MentoraLayoutKind, Widget> _layouts({
         content: _content,
       ),
     ),
+    MentoraLayoutKind.analytics: MentoraAnalyticsLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      views: const [
+        MentoraContentRegion(
+          id: 'revenu',
+          semanticLabel: 'Le revenu observe',
+          content: _content,
+        ),
+        MentoraContentRegion(
+          id: 'activite',
+          semanticLabel: 'L activite observee',
+          content: SizedBox.shrink(),
+        ),
+      ],
+    ),
     MentoraLayoutKind.settings: MentoraSettingsLayout(
       frame: plain,
       pageSemanticLabel: 'Page courante',
@@ -428,6 +445,10 @@ void main() {
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byType(MentoraTabs), findsOneWidget);
       expect(find.byKey(const Key('tabbed-portefeuille')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.analytics]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('content-region-revenu')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.settings]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
@@ -937,6 +958,7 @@ void main() {
         'MentoraPageLikeLayout': 'mentora_page_like_layout.dart',
         'MentoraZonedLayout': 'mentora_zoned_layout.dart',
         'MentoraRevealedLayout': 'mentora_revealed_layout.dart',
+        'MentoraRegionedLayout': 'mentora_regioned_layout.dart',
         'MentoraPrincipalLayout': 'mentora_principal_layout.dart',
       };
       for (final entry in singletons.entries) {
@@ -1024,6 +1046,7 @@ void main() {
         'MentoraFeedLayout',
         'MentoraWizardLayout',
         'MentoraSettingsLayout',
+        'MentoraAnalyticsLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

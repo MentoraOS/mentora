@@ -12,6 +12,7 @@ import '../design_kit/structure/split_view/mentora_split_view.dart';
 import '../design_kit/structure/split_view/mentora_split_view_style.dart';
 import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
+import '../design_kit/layout/analytics_layout/mentora_analytics_layout.dart';
 import '../design_kit/layout/content_layout/mentora_content_layout.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
@@ -3266,6 +3267,159 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Analytics Layout catalogue - a space where a system is
+/// observed. The views are announced; nothing is computed, compared or
+/// rearranged.
+final class AnalyticsLayoutGallery extends StatelessWidget {
+  const AnalyticsLayoutGallery({super.key});
+
+  static const Map<String, String> _names = {
+    analyticsRevenueId: analyticsRevenueLabel,
+    analyticsActivityId: analyticsActivityLabel,
+    analyticsQualityId: analyticsQualityLabel,
+  };
+
+  // Three observed views and their cards: the frame is sized by what
+  // it shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  static MentoraAnalyticsLayout shape({Key? key, bool complete = true}) {
+    return MentoraAnalyticsLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      views: [
+        for (final entry in _names.entries)
+          if (complete || entry.key == analyticsRevenueId)
+            MentoraContentRegion(
+              id: entry.key,
+              semanticLabel: entry.value,
+              // What there is to observe belongs to the components:
+              // the layout places it and understands none of it.
+              content: MentoraCard(
+                key: Key('analytics-view-${entry.key}'),
+                variant: MentoraCardVariant.surface,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MentoraText(entry.value, role: MentoraTextRole.subtitle),
+                    const MentoraText(
+                      analyticsObservationBody,
+                      role: MentoraTextRole.body,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: analyticsLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-analytics'))),
+          // One view alone: a space observes from the first view on.
+          _scene(
+            shape(key: const Key('layout-analytics-bare'), complete: false),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(
+                shape(key: Key('layout-analytics-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(
+                shape(key: Key('layout-analytics-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(key: Key('layout-analytics-${direction.name}')),
+              ),
+            ),
+          const _AnalyticsLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Analytics Layout's living documentation - built only with
+/// Mentora components.
+final class _AnalyticsLayoutDocumentation extends StatelessWidget {
+  const _AnalyticsLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('analytics-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(
+            analyticsLayoutDocHeading,
+            role: MentoraTextRole.subtitle,
+          ),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: analyticsLayoutDocArchitecture,
+            keyPrefix: 'analytics-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: analyticsLayoutDocResponsibilities,
+            keyPrefix: 'analytics-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: analyticsLayoutDocComponents,
+            keyPrefix: 'analytics-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: analyticsLayoutDocTokens,
+            keyPrefix: 'analytics-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: analyticsLayoutDocEngines,
+            keyPrefix: 'analytics-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: analyticsLayoutDocForbidden,
+            keyPrefix: 'analytics-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: analyticsLayoutDocScans,
+            keyPrefix: 'analytics-layout-doc-scan',
           ),
         ],
       ),

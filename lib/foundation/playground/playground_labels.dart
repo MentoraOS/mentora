@@ -189,6 +189,60 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String analyticsLayoutGalleryTitle = 'Layouts — Analytics';
+const String analyticsLayoutDocHeading =
+    'MentoraAnalyticsLayout — official contract';
+const String analyticsRevenueId = 'revenu';
+const String analyticsActivityId = 'activite';
+const String analyticsQualityId = 'qualite';
+const String analyticsRevenueLabel = 'Le revenu observé';
+const String analyticsActivityLabel = 'L’activité observée';
+const String analyticsQualityLabel = 'La qualité observée';
+const String analyticsObservationBody =
+    'Ce que le système montre — déjà compris par l’application.';
+const List<String> analyticsLayoutDocArchitecture = [
+  'A specialization of the REGIONED foundation, like the Content Layout',
+  'A view is an IDENTITY: never an index, never a position',
+  'The views are read in the announced order — all of them, every time',
+  'It declares two things: its official kind, and the word "views"',
+  'One machinery for every shape whose regions the application names',
+];
+const List<String> analyticsLayoutDocResponsibilities = [
+  'It shows no numbers: it shows a person observing a system',
+  'It counts nothing, sums nothing, averages nothing, projects nothing',
+  'It filters nothing, sorts nothing, compares nothing, remembers nothing',
+  'A view is handed, never interpreted — the components own it',
+  'Each view is announced exactly once and is its own focus group',
+];
+const List<String> analyticsLayoutDocComponents = [
+  'MentoraCard — owns the container of an observation',
+  'MentoraBadge — owns a mention; MentoraText — owns the words',
+  'MentoraButton — owns the acts kept at hand',
+  'The Regioned Layout — which alone holds the views and the refusals',
+  'The Layout Assembly — which alone places them, once per screen',
+];
+const List<String> analyticsLayoutDocForbidden = [
+  'Chart, Graph, PieChart, BarChart, LineChart, Sparkline, CustomPaint',
+  'DataTable, Table, any grid of the framework, any scroll view',
+  'count, sum, avg, min, max, median, percent, ratio, delta, trend',
+  'Any filter, sort, aggregation, comparison, period or date',
+  'Navigator, MediaQuery, Theme.of, Padding, Expanded, dynamic, Object?',
+];
+const List<String> analyticsLayoutDocTokens = [
+  'Layout: the room the layer adds between the views — none',
+];
+const List<String> analyticsLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> analyticsLayoutDocScans = [
+  'No statistic, no extremum, no arithmetic, no comparison',
+  'No sort, no filter, no aggregation of any kind',
+  'No chart and no table — observation belongs to the components',
+  'No data, no network, no period, no memory of its own',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraAnalyticsLayout, extending the regioned foundation',
+  'No shape that speaks in regions owns how they are expressed',
+];
 const String settingsLayoutGalleryTitle = 'Layouts — Settings';
 const String settingsLayoutDocHeading =
     'MentoraSettingsLayout — official contract';
