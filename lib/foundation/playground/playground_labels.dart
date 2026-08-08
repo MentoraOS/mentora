@@ -189,6 +189,61 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String catalogLayoutGalleryTitle = 'Layouts — Catalog';
+const String catalogLayoutDocHeading =
+    'MentoraCatalogLayout — official contract';
+const String catalogId = 'offre';
+const String catalogLabel = 'L’offre';
+const String catalogAdviceId = 'conseil';
+const String catalogTrainingId = 'formation';
+const String catalogSupportId = 'accompagnement';
+const String catalogEntryName = 'Awa Diallo';
+const String catalogEntryInitials = 'AD';
+const String catalogEntrySupporting = 'Ce que l’entrée propose';
+const String catalogMentionLabel = 'Vérifié';
+const List<String> catalogLayoutDocArchitecture = [
+  'A specialization of the COLLECTED foundation, like the List Layout',
+  'An entry is an IDENTITY: never an index, never a position',
+  'The entries are read in the announced order — all of them, every time',
+  'It declares two things: its official kind, and the words of an offer',
+  'catalogId and entries are aliases over the one holder — no second field',
+];
+const List<String> catalogLayoutDocResponsibilities = [
+  'It shows no article: it shows a person going through an offer',
+  'It knows no amount, no availability, no promotion, no commerce',
+  'It selects nothing, rearranges nothing, pages nothing',
+  'An entry is handed, never interpreted — the components own it',
+  'Only the catalog is announced: every entry keeps its own voice',
+];
+const List<String> catalogLayoutDocComponents = [
+  'MentoraCard — owns the container of an entry',
+  'MentoraListTile — owns what an entry says of itself',
+  'MentoraAvatar — owns the face; MentoraBadge — owns the mention',
+  'The Collected Layout — which alone holds the collection',
+  'The Layout Assembly — which alone places it, once per screen',
+];
+const List<String> catalogLayoutDocForbidden = [
+  'Any article, amount, currency, availability, promotion or commerce',
+  'Any filter, sort, search, paging or count',
+  'ListView, GridView, any scroll view, any refresh, any virtualization',
+  'Any model, network, promise or state of the offer',
+  'Navigator, MediaQuery, Theme.of, Padding, Expanded, dynamic, Object?',
+];
+const List<String> catalogLayoutDocTokens = [
+  'Layout: the room the layer adds between the entries — none',
+];
+const List<String> catalogLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> catalogLayoutDocScans = [
+  'No commerce: no article, no amount, no availability understood',
+  'No selection, no order of its own, no paging, no arithmetic',
+  'No data, no network, no promise, no memory of its own',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraCatalogLayout, extending the collected foundation',
+  'No shape that presents a collection owns how it is presented',
+  'One identified content across the layer: no entry twin was opened',
+];
 const String analyticsLayoutGalleryTitle = 'Layouts — Analytics';
 const String analyticsLayoutDocHeading =
     'MentoraAnalyticsLayout — official contract';

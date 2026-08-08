@@ -66,4 +66,8 @@ enum MentoraLayoutKind {
   /// A space where a person observes a system: views, each an identity
   /// the application announced, read in the announced order.
   analytics,
+
+  /// A space where a person goes through an offer: a collection of
+  /// entries announced by the application, each keeping its own voice.
+  catalog,
 }

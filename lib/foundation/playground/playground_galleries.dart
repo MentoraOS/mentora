@@ -13,6 +13,7 @@ import '../design_kit/structure/split_view/mentora_split_view_style.dart';
 import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
 import '../design_kit/layout/analytics_layout/mentora_analytics_layout.dart';
+import '../design_kit/layout/catalog_layout/mentora_catalog_layout.dart';
 import '../design_kit/layout/content_layout/mentora_content_layout.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
@@ -3267,6 +3268,157 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Catalog Layout catalogue - an offer gone through, its
+/// entries announced by the application and never interpreted.
+final class CatalogLayoutGallery extends StatelessWidget {
+  const CatalogLayoutGallery({super.key});
+
+  static const List<String> _entries = [
+    catalogAdviceId,
+    catalogTrainingId,
+    catalogSupportId,
+  ];
+
+  // Three entries and their cards: the frame is sized by what it
+  // shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  /// What an entry of an offer is - built by components, never by the
+  /// layout, and never understood by it.
+  static MentoraIdentifiedContent entry(String id) => MentoraIdentifiedContent(
+    id: id,
+    content: MentoraCard(
+      key: Key('catalog-entry-$id'),
+      variant: MentoraCardVariant.surface,
+      child: const MentoraListTile(
+        headline: catalogEntryName,
+        supporting: catalogEntrySupporting,
+        semanticLabel: catalogEntryName,
+        leading: MentoraAvatar(
+          identity: MentoraAvatarIdentity.initials,
+          name: catalogEntryName,
+          initials: catalogEntryInitials,
+        ),
+        badges: [
+          MentoraBadge(
+            variant: MentoraBadgeVariant.verified,
+            label: catalogMentionLabel,
+            semanticLabel: catalogMentionLabel,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  static MentoraCatalogLayout shape({Key? key, bool complete = true}) {
+    return MentoraCatalogLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      catalogId: catalogId,
+      catalogSemanticLabel: catalogLabel,
+      entries: [
+        for (final id in _entries)
+          if (complete || id == catalogAdviceId) entry(id),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: catalogLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-catalog'))),
+          // One entry alone: an offer stands from the first entry on.
+          _scene(shape(key: const Key('layout-catalog-bare'), complete: false)),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(shape(key: Key('layout-catalog-${variant.name}'))),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(shape(key: Key('layout-catalog-${comfort.name}'))),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(key: Key('layout-catalog-${direction.name}')),
+              ),
+            ),
+          const _CatalogLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Catalog Layout's living documentation - built only with Mentora
+/// components.
+final class _CatalogLayoutDocumentation extends StatelessWidget {
+  const _CatalogLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('catalog-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(catalogLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: catalogLayoutDocArchitecture,
+            keyPrefix: 'catalog-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: catalogLayoutDocResponsibilities,
+            keyPrefix: 'catalog-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: catalogLayoutDocComponents,
+            keyPrefix: 'catalog-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: catalogLayoutDocTokens,
+            keyPrefix: 'catalog-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: catalogLayoutDocEngines,
+            keyPrefix: 'catalog-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: catalogLayoutDocForbidden,
+            keyPrefix: 'catalog-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: catalogLayoutDocScans,
+            keyPrefix: 'catalog-layout-doc-scan',
           ),
         ],
       ),

@@ -578,11 +578,30 @@ void main() {
       expect(declarations.single, contains('layout/list_layout/'));
 
       final source = File(declarations.single).readAsStringSync();
+      // It extends the COLLECTED foundation: it therefore owns no
+      // identity, no refusal and no surface — it owns its official
+      // kind, and the words it calls its collection by, which are
+      // aliases over the one holder and never second fields.
       expect(
-        RegExp(r'extends\s+MentoraPageLikeLayout(?![A-Za-z])').hasMatch(source),
+        RegExp(
+          r'extends\s+MentoraCollectedLayout(?![A-Za-z])',
+        ).hasMatch(source),
         isTrue,
       );
       expect(RegExp(r'Widget\s+build\(').hasMatch(source), isFalse);
+      expect(RegExp(r'void\s+verify\(').hasMatch(source), isFalse);
+      expect(RegExp(r'surfaceOf\(').hasMatch(source), isFalse);
+      expect(RegExp(r'final\s+[\w<>?, ]+\s+\w+\s*;').hasMatch(source), isFalse);
+      expect(
+        RegExp(r'String\s+get\s+listId\s*=>\s*collectionId;').hasMatch(source),
+        isTrue,
+      );
+      expect(
+        RegExp(
+          r'List<MentoraIdentifiedContent>\s+get\s+items\s*=>\s*contents;',
+        ).hasMatch(source),
+        isTrue,
+      );
       // It describes: it never composes a widget of any kind.
       expect(
         RegExp(r'return\s+\w+\(\s*$', multiLine: true).hasMatch(source),

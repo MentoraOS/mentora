@@ -1,7 +1,4 @@
-import 'package:flutter/widgets.dart';
-
-import '../foundation/mentora_layout_assembly.dart';
-import '../foundation/mentora_page_like_layout.dart';
+import '../foundation/mentora_collected_layout.dart';
 import '../foundation/mentora_layout_kind.dart';
 import '../foundation/mentora_layout_style.dart';
 
@@ -16,80 +13,43 @@ import '../foundation/mentora_layout_style.dart';
 /// It expresses. It never decides.
 ///
 /// It scrolls nothing, paginates nothing, loads nothing lazily,
-/// separates nothing, measures nothing and adds no room. The order is
-/// announced - never computed, never sorted, never filtered, never
-/// reversed, never grouped. And it never speaks in an element's place:
-/// each of them keeps its own voice, its own identity and its own
-/// semantics.
+/// separates nothing, measures nothing and adds no room. And it never
+/// speaks in an element's place: each of them keeps its own voice, its
+/// own identity and its own semantics.
 ///
-/// It builds nothing at all: it describes the collection, and the
-/// assembly of the layer is what places it.
-final class MentoraListLayout extends MentoraPageLikeLayout {
-  /// What this collection IS - stable forever, never a position.
-  final String listId;
-
-  /// What the screen reader hears about the collection itself, and
-  /// about it alone.
-  final String listSemanticLabel;
-
-  /// The elements, in the order they are to be read.
-  final List<MentoraIdentifiedContent> items;
-
+/// It builds nothing at all, and it owns no identity, no refusal and
+/// no surface: the collected foundation owns them, once, for every
+/// shape that presents a collection. What this shape declares is its
+/// official kind, and the words a list uses for what it presents -
+/// aliases over the one holder, never second fields.
+final class MentoraListLayout extends MentoraCollectedLayout {
   const MentoraListLayout({
     super.key,
     required super.frame,
-    required this.listId,
-    required this.listSemanticLabel,
-    required this.items,
     required super.pageSemanticLabel,
+    required String listId,
+    required String listSemanticLabel,
+    required List<MentoraIdentifiedContent> items,
     super.place,
     super.facets,
     super.intention,
     super.acts,
-  });
+  }) : super(
+         collectionId: listId,
+         collectionSemanticLabel: listSemanticLabel,
+         contents: items,
+       );
 
   @override
   MentoraLayoutKind get kind => MentoraLayoutKind.list;
 
-  @override
-  void verify() {
-    if (listId.isEmpty) {
-      throw StateError('A collection without an identity is not one.');
-    }
-    if (listSemanticLabel.isEmpty) {
-      throw StateError(
-        'A collection without a name is not a landmark: a person '
-        'always knows which collection they are reading.',
-      );
-    }
-    if (items.isEmpty) {
-      throw StateError(
-        'A collection presents elements: without one it presents '
-        'nothing, and nothing is not a collection.',
-      );
-    }
-    final identities = <String>{};
-    for (final item in items) {
-      if (item.id.isEmpty) {
-        throw StateError('An element without an identity is not one.');
-      }
-      if (!identities.add(item.id)) {
-        throw StateError('Two elements never share one identity.');
-      }
-    }
-  }
+  /// What this list IS - the word this shape calls its collection by.
+  /// It is an alias, never a second field.
+  String get listId => collectionId;
 
-  @override
-  MentoraLayoutSurface surfaceOf(BuildContext context) {
-    return MentoraLayoutSurface.collection(
-      semanticLabel: pageSemanticLabel,
-      place: place,
-      facets: facets,
-      intention: intention,
-      acts: acts,
-      collectionId: listId,
-      collectionSemanticLabel: listSemanticLabel,
-      items: items,
-    );
-  }
+  /// What the screen reader hears about the list itself.
+  String get listSemanticLabel => collectionSemanticLabel;
+
+  /// The elements, in the order they were announced.
+  List<MentoraIdentifiedContent> get items => contents;
 }

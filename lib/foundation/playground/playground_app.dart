@@ -240,6 +240,7 @@ final class _PlaygroundShell extends StatelessWidget {
               const WizardLayoutGallery(),
               const SettingsLayoutGallery(),
               const AnalyticsLayoutGallery(),
+              const CatalogLayoutGallery(),
               const DashboardLayoutGallery(),
               const NavigationLayoutGallery(),
               const SplitWorkspaceLayoutGallery(),
