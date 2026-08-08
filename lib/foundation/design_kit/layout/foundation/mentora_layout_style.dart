@@ -231,13 +231,59 @@ enum MentoraFormRegion {
   footer,
 }
 
-/// One region of a form: what it is called, and what it holds.
+/// The official regions of a detail, in the official order.
 ///
-/// It carries no identity of its own: the identity of a region of a
-/// form IS the official region it is. What it does carry is its
-/// announcement — one per region, exactly once — and the content,
-/// already built, which is handed on strictly intact.
-final class MentoraFormZone {
+/// A detail is what a person sees when they consult ONE thing. The
+/// vocabulary is CLOSED: a product never invents a region of a detail,
+/// and the order below IS the order they are read in.
+///
+/// Three of them inform about the thing itself, and the vocabulary says
+/// which — so the rule "a detail informs about something" is carried by
+/// the words themselves, never by a rule written beside them.
+enum MentoraDetailRegion {
+  /// What one sees first of the thing consulted.
+  hero(carriesInformation: false),
+
+  /// What the thing IS: its name, and what designates it.
+  identity(carriesInformation: true),
+
+  /// What is essential about it, said shortly.
+  summary(carriesInformation: true),
+
+  /// Everything that is known about it, at length.
+  details(carriesInformation: true),
+
+  /// What helps beside it, without being about it.
+  supportingContent(carriesInformation: false),
+
+  /// What can be done about it — the acts remain the Button's own.
+  actions(carriesInformation: false),
+
+  /// What is said under everything: the conditions, the recourse.
+  footer(carriesInformation: false);
+
+  /// Whether this region is one of those that inform about the thing.
+  ///
+  /// A detail that informs about nothing is not a detail, and the
+  /// shape refuses to build — fail closed.
+  final bool carriesInformation;
+
+  const MentoraDetailRegion({required this.carriesInformation});
+}
+
+/// One region of an official vocabulary: what it is called, and what it
+/// holds.
+///
+/// This is the unit of the whole layer wherever a part is NAMED rather
+/// than designated: a region of a form, a region of a detail, and every
+/// part a future closed vocabulary will need. There is ONE type for
+/// that concept, and there will never be a second.
+///
+/// It carries no identity of its own: the identity of such a region IS
+/// the official region it is. What it does carry is its announcement —
+/// one per region, exactly once — and the content, already built, which
+/// is handed on strictly intact.
+final class MentoraLayoutZone {
   /// What the screen reader hears about the region. The application
   /// owns every string; the layer composes none.
   final String semanticLabel;
@@ -245,5 +291,5 @@ final class MentoraFormZone {
   /// What the region holds, already built by the application.
   final Widget content;
 
-  const MentoraFormZone({required this.semanticLabel, required this.content});
+  const MentoraLayoutZone({required this.semanticLabel, required this.content});
 }

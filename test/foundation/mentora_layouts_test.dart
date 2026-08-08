@@ -20,6 +20,7 @@ import 'package:mentora/foundation/design_kit/components/text/mentora_text.dart'
 import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.dart';
 import 'package:mentora/foundation/design_kit/layout/content_layout/mentora_content_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/detail_layout/mentora_detail_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_assembly.dart';
@@ -247,13 +248,25 @@ Map<MentoraLayoutKind, Widget> _layouts({
     MentoraLayoutKind.form: MentoraFormLayout(
       frame: plain,
       pageSemanticLabel: 'Page courante',
-      header: const MentoraFormZone(
+      header: const MentoraLayoutZone(
         semanticLabel: 'Ce que vous allez faire',
         content: _content,
       ),
-      form: const MentoraFormZone(
+      form: const MentoraLayoutZone(
         semanticLabel: 'Vos informations',
         content: _content,
+      ),
+    ),
+    MentoraLayoutKind.detail: MentoraDetailLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      identity: const MentoraLayoutZone(
+        semanticLabel: 'Ce que c’est',
+        content: _content,
+      ),
+      actions: const MentoraLayoutZone(
+        semanticLabel: 'Ce que l’on peut faire',
+        content: SizedBox.shrink(),
       ),
     ),
     MentoraLayoutKind.masterDetail: MentoraMasterDetailLayout(
@@ -771,12 +784,27 @@ void main() {
               '$normalized: a specialization declares its kind, its '
               'context and the surface it asks for — never a build',
         );
+        // Every layout extends the foundation — either directly, or
+        // through the zoned foundation, which is itself one of its
+        // specializations and is verified as such below.
         expect(
-          RegExp(r'extends\s+MentoraLayout(?![A-Za-z])').hasMatch(source),
+          RegExp(
+            r'extends\s+Mentora(Layout(?![A-Za-z])|ZonedLayout<)',
+          ).hasMatch(source),
           isTrue,
           reason: '$normalized: every layout extends the foundation',
         );
       }
+      // The chain has no missing link: the zoned foundation is a
+      // specialization of the one foundation, and it builds nothing.
+      final zoned = File(
+        'lib/foundation/design_kit/layout/foundation/mentora_zoned_layout.dart',
+      ).readAsStringSync();
+      expect(
+        RegExp(r'extends\s+MentoraLayout(?![A-Za-z])').hasMatch(zoned),
+        isTrue,
+      );
+      expect(RegExp(r'Widget\s+build\(').hasMatch(zoned), isFalse);
     });
 
     test('the foundation depends on no particular layout', () {
@@ -801,6 +829,7 @@ void main() {
         'MentoraLayoutContext': 'mentora_layout_context.dart',
         'MentoraLayoutTheme': 'mentora_layout_theme.dart',
         'MentoraLayout': 'mentora_layout.dart',
+        'MentoraZonedLayout': 'mentora_zoned_layout.dart',
       };
       for (final entry in singletons.entries) {
         final declarations = <String>[];
@@ -883,6 +912,7 @@ void main() {
         'MentoraGridLayout',
         'MentoraTabbedContentLayout',
         'MentoraFormLayout',
+        'MentoraDetailLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

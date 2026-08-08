@@ -17,6 +17,7 @@ import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
+import '../design_kit/layout/detail_layout/mentora_detail_layout.dart';
 import '../design_kit/layout/form_layout/mentora_form_layout.dart';
 import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import '../design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
@@ -3269,13 +3270,180 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
   }
 }
 
+/// The official Detail Layout catalogue - the seven regions of a
+/// consultation, in the official order, and nothing else.
+final class DetailLayoutGallery extends StatelessWidget {
+  const DetailLayoutGallery({super.key});
+
+  // Seven regions ask for more room than a single one: the frame is
+  // sized by what it shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 14);
+
+  static MentoraLayoutZone zone(String label, Widget content) =>
+      MentoraLayoutZone(semanticLabel: label, content: content);
+
+  static Widget words(String heading) =>
+      MentoraText(heading, role: MentoraTextRole.body);
+
+  static MentoraDetailLayout shape({Key? key, bool complete = true}) {
+    return MentoraDetailLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      hero: complete
+          ? zone(
+              detailHeroLabel,
+              const MentoraAvatar(
+                identity: MentoraAvatarIdentity.initials,
+                name: detailIdentityName,
+                initials: detailIdentityInitials,
+              ),
+            )
+          : null,
+      // What the thing IS: the only region kept when everything else
+      // is taken away - a detail always informs.
+      identity: zone(
+        detailIdentityLabel,
+        const MentoraBadge(
+          variant: MentoraBadgeVariant.verified,
+          label: detailMentionLabel,
+          semanticLabel: detailMentionLabel,
+        ),
+      ),
+      summary: complete
+          ? zone(
+              detailSummaryLabel,
+              const MentoraCard(
+                variant: MentoraCardVariant.surface,
+                child: MentoraText(
+                  layoutContentBody,
+                  role: MentoraTextRole.body,
+                ),
+              ),
+            )
+          : null,
+      details: complete
+          ? zone(detailDetailsLabel, words(layoutContentBody))
+          : null,
+      supportingContent: complete
+          ? zone(detailSupportingLabel, words(layoutContentBody))
+          : null,
+      actions: complete
+          ? zone(
+              detailActionsLabel,
+              MentoraButton(
+                label: detailActLabel,
+                onPressed: () {},
+                size: MentoraButtonSize.small,
+              ),
+            )
+          : null,
+      footer: complete
+          ? zone(detailFooterLabel, words(layoutContentBody))
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: detailLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-detail'))),
+          // What the thing is, alone: every other region is optional.
+          _scene(shape(key: const Key('layout-detail-bare'), complete: false)),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(shape(key: Key('layout-detail-${variant.name}'))),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(shape(key: Key('layout-detail-${comfort.name}'))),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(shape(key: Key('layout-detail-${direction.name}'))),
+            ),
+          const _DetailLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Detail Layout's living documentation - built only with Mentora
+/// components.
+final class _DetailLayoutDocumentation extends StatelessWidget {
+  const _DetailLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('detail-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(detailLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: detailLayoutDocArchitecture,
+            keyPrefix: 'detail-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: detailLayoutDocResponsibilities,
+            keyPrefix: 'detail-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: detailLayoutDocComponents,
+            keyPrefix: 'detail-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: detailLayoutDocTokens,
+            keyPrefix: 'detail-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: detailLayoutDocEngines,
+            keyPrefix: 'detail-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: detailLayoutDocForbidden,
+            keyPrefix: 'detail-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: detailLayoutDocScans,
+            keyPrefix: 'detail-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// The official Form Layout catalogue - the six regions of the work,
 /// in the official order, and the work alone.
 final class FormLayoutGallery extends StatelessWidget {
   const FormLayoutGallery({super.key});
 
-  static MentoraFormZone zone(String label, Widget content) =>
-      MentoraFormZone(semanticLabel: label, content: content);
+  static MentoraLayoutZone zone(String label, Widget content) =>
+      MentoraLayoutZone(semanticLabel: label, content: content);
 
   // Six regions ask for more room than a single one: the frame is
   // sized by what it shows.

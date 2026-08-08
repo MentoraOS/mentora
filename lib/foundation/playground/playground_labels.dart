@@ -189,6 +189,63 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String detailLayoutGalleryTitle = 'Layouts — Detail';
+const String detailLayoutDocHeading = 'MentoraDetailLayout — official contract';
+const String detailHeroLabel = 'Ce que l’on voit d’abord';
+const String detailIdentityLabel = 'Ce que c’est';
+const String detailSummaryLabel = 'L’essentiel';
+const String detailDetailsLabel = 'Tout ce que l’on sait';
+const String detailSupportingLabel = 'Ce qui aide à côté';
+const String detailActionsLabel = 'Ce que l’on peut faire';
+const String detailFooterLabel = 'Ce qui est dit en dessous';
+const String detailIdentityName = 'Awa Diallo';
+const String detailIdentityInitials = 'AD';
+const String detailMentionLabel = 'Vérifié';
+const String detailActLabel = 'Continuer';
+const List<String> detailLayoutDocArchitecture = [
+  'A specialization of the ZONED foundation: it owns no order at all',
+  'Seven official regions, in a CLOSED vocabulary that IS their order',
+  'The identity of a region is the official region: none is named here',
+  'Three regions inform, and the vocabulary itself says which',
+  'Every region is optional — informing about nothing is refused',
+];
+const List<String> detailLayoutDocResponsibilities = [
+  'It shows no thing: it shows a person consulting one',
+  'It represents no domain: the same shape carries whatever is consulted',
+  'It knows no data, no logic, no network and no state of the subject',
+  'It knows no platform, no measure and no breakpoint',
+  'Each region is announced exactly once and is its own focus group',
+];
+const List<String> detailLayoutDocComponents = [
+  'MentoraAvatar — owns the face; MentoraBadge — owns the mention',
+  'MentoraCard, MentoraSection — own what they gather',
+  'MentoraButton — owns the acts; MentoraText — owns the words',
+  'The Zoned Layout — which alone turns a vocabulary into regions',
+  'The Layout Assembly — which alone places them',
+];
+const List<String> detailLayoutDocForbidden = [
+  'Any model, any domain, any source of data, any promise',
+  'A calculation, an ordering, a selection, a transformation',
+  'Padding, SafeArea, Expanded, Flexible, Spacer, scroll views',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, dynamic, Object?, a coded value',
+];
+const List<String> detailLayoutDocTokens = [
+  'Layout: the room the layer adds between the regions — none',
+];
+const List<String> detailLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> detailLayoutDocScans = [
+  'No model, no domain of the company, no serialization',
+  'No logic: nothing calculated, sorted, filtered or transformed',
+  'No network, no source of data, no promise, no state of the subject',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraDetailLayout, extending the zoned foundation, building nothing',
+  'One closed vocabulary of seven regions, recognised by what it speaks',
+  'One type names a region across the layer: no second twin of it',
+  'No zoned shape owns the order, the identities or the refusals',
+];
 const String formLayoutGalleryTitle = 'Layouts — Form';
 const String formLayoutDocHeading = 'MentoraFormLayout — official contract';
 const String formHeaderLabel = 'Ce que vous allez faire';

@@ -46,4 +46,8 @@ enum MentoraLayoutKind {
   /// The work of a person filling information in: the official regions
   /// of a form, in the official order.
   form,
+
+  /// A person consulting ONE thing: the official regions of a detail,
+  /// in the official order.
+  detail,
 }

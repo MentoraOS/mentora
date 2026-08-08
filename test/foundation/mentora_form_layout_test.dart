@@ -36,8 +36,8 @@ Widget _content(String id) => MentoraText(
   role: MentoraTextRole.body,
 );
 
-MentoraFormZone _zone(String id, {String? semanticLabel, Widget? content}) =>
-    MentoraFormZone(
+MentoraLayoutZone _zone(String id, {String? semanticLabel, Widget? content}) =>
+    MentoraLayoutZone(
       semanticLabel: semanticLabel ?? 'Région $id',
       content: content ?? _content(id),
     );
@@ -50,13 +50,13 @@ const MentoraLayoutContext _frame = MentoraLayoutContext(
 MentoraFormLayout _layout({
   MentoraLayoutContext frame = _frame,
   String pageSemanticLabel = 'Page courante',
-  MentoraFormZone? form,
+  MentoraLayoutZone? form,
   bool complete = true,
-  MentoraFormZone? header,
-  MentoraFormZone? introduction,
-  MentoraFormZone? supportingContent,
-  MentoraFormZone? actions,
-  MentoraFormZone? footer,
+  MentoraLayoutZone? header,
+  MentoraLayoutZone? introduction,
+  MentoraLayoutZone? supportingContent,
+  MentoraLayoutZone? actions,
+  MentoraLayoutZone? footer,
   MentoraAppBar? place,
   List<MentoraButton> acts = const [],
 }) {
@@ -623,10 +623,11 @@ void main() {
       expect(declarations.single, contains('layout/form_layout/'));
 
       final source = File(declarations.single).readAsStringSync();
-      expect(
-        RegExp(r'extends\s+MentoraLayout(?![A-Za-z])').hasMatch(source),
-        isTrue,
-      );
+      // It extends the ZONED foundation: it therefore owns no order,
+      // no identity, no surface and no shared refusal at all.
+      expect(RegExp(r'extends\s+MentoraZonedLayout<').hasMatch(source), isTrue);
+      expect(RegExp(r'void\s+verify\(').hasMatch(source), isFalse);
+      expect(RegExp(r'surfaceOf\(').hasMatch(source), isFalse);
       expect(RegExp(r'Widget\s+build\(').hasMatch(source), isFalse);
       for (final built in const [
         'MentoraWorkspace(',
