@@ -205,3 +205,45 @@ final class MentoraGridDisposition {
     }
   }
 }
+
+/// The official regions of a form, in the official order.
+///
+/// The vocabulary is CLOSED: a product never invents a region of a
+/// form, and the order below IS the order they are read in — it is the
+/// declaration itself, so it cannot drift.
+enum MentoraFormRegion {
+  /// What the person is about to do.
+  header,
+
+  /// What must be known before filling anything in.
+  introduction,
+
+  /// The work itself. It is the only region a form cannot do without.
+  form,
+
+  /// What helps while filling it in, beside the work.
+  supportingContent,
+
+  /// What closes the work — the acts remain the Button's own.
+  actions,
+
+  /// What is said under everything: the conditions, the recourse.
+  footer,
+}
+
+/// One region of a form: what it is called, and what it holds.
+///
+/// It carries no identity of its own: the identity of a region of a
+/// form IS the official region it is. What it does carry is its
+/// announcement — one per region, exactly once — and the content,
+/// already built, which is handed on strictly intact.
+final class MentoraFormZone {
+  /// What the screen reader hears about the region. The application
+  /// owns every string; the layer composes none.
+  final String semanticLabel;
+
+  /// What the region holds, already built by the application.
+  final Widget content;
+
+  const MentoraFormZone({required this.semanticLabel, required this.content});
+}

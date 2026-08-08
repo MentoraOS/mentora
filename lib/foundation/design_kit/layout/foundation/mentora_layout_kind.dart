@@ -42,4 +42,8 @@ enum MentoraLayoutKind {
   /// Several contents of one context, of which exactly one is
   /// revealed — the one the application announced.
   tabbedContent,
+
+  /// The work of a person filling information in: the official regions
+  /// of a form, in the official order.
+  form,
 }

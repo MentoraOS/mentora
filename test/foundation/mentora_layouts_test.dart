@@ -26,6 +26,7 @@ import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_a
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_context.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_kind.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_style.dart';
+import 'package:mentora/foundation/design_kit/layout/form_layout/mentora_form_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/list_layout/mentora_list_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
@@ -243,6 +244,18 @@ Map<MentoraLayoutKind, Widget> _layouts({
         MentoraIdentifiedContent(id: 'moyens', content: SizedBox.shrink()),
       ],
     ),
+    MentoraLayoutKind.form: MentoraFormLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      header: const MentoraFormZone(
+        semanticLabel: 'Ce que vous allez faire',
+        content: _content,
+      ),
+      form: const MentoraFormZone(
+        semanticLabel: 'Vos informations',
+        content: _content,
+      ),
+    ),
     MentoraLayoutKind.masterDetail: MentoraMasterDetailLayout(
       frame: plain,
       master: const SizedBox.shrink(),
@@ -356,6 +369,10 @@ void main() {
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byType(MentoraTabs), findsOneWidget);
       expect(find.byKey(const Key('tabbed-portefeuille')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.form]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('content-region-form')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.splitWorkspace]!);
       expect(find.byType(MentoraSplitView), findsOneWidget);
@@ -865,6 +882,7 @@ void main() {
         'MentoraListLayout',
         'MentoraGridLayout',
         'MentoraTabbedContentLayout',
+        'MentoraFormLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

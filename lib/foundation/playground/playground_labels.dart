@@ -189,6 +189,56 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String formLayoutGalleryTitle = 'Layouts — Form';
+const String formLayoutDocHeading = 'MentoraFormLayout — official contract';
+const String formHeaderLabel = 'Ce que vous allez faire';
+const String formIntroductionLabel = 'Avant de commencer';
+const String formWorkLabel = 'Vos informations';
+const String formSupportingLabel = 'Ce qui aide en chemin';
+const String formActionsLabel = 'Ce qui conclut';
+const String formFooterLabel = 'Ce qui est dit en dessous';
+const String formFieldLabel = 'Adresse electronique';
+const String formActLabel = 'Continuer';
+const List<String> formLayoutDocArchitecture = [
+  'A specialization of the Layout Foundation, like every other shape',
+  'Six official regions, in a CLOSED vocabulary that IS their order',
+  'The identity of a region is the official region: none is named here',
+  'It asks the assembly for the single disposition — it arranges nothing',
+  'The work itself is required by the TYPE, not by a run-time check',
+];
+const List<String> formLayoutDocResponsibilities = [
+  'A form layout is not a form: the form belongs to the components',
+  'It validates nothing, submits nothing, and sees no value typed',
+  'It knows no field, no data, no model, no network, no platform',
+  'It knows no state of the work: no loading, no error, no success',
+  'Each region is announced exactly once and is its own focus group',
+];
+const List<String> formLayoutDocComponents = [
+  'MentoraInput — owns what is typed, and what it refuses',
+  'MentoraButton — owns the acts; MentoraText — owns the words',
+  'MentoraSection, MentoraCard — own what they gather',
+  'The Layout Assembly — which alone places the regions',
+];
+const List<String> formLayoutDocForbidden = [
+  'Form, FormField, TextFormField, FormState, AutovalidateMode',
+  'validator, validate, save, autovalidate, InputDecoration',
+  'Padding, SafeArea, Expanded, Flexible, Spacer, scroll views',
+  'MediaQuery, LayoutBuilder, the Responsive Engine, the platform',
+  'Navigator, Route, Theme.of, models, business, dynamic, Object?',
+];
+const List<String> formLayoutDocTokens = [
+  'Layout: the room the layer adds between the regions — none',
+];
+const List<String> formLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> formLayoutDocScans = [
+  'No framework form, no validation, no submission, no network',
+  'No model, no business, no state of the work, no untyped value',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraFormLayout, extending the foundation, building nothing',
+  'One closed vocabulary of six regions, declared once',
+];
 const String tabbedLayoutGalleryTitle = 'Layouts — Tabbed content';
 const String tabbedLayoutDocHeading =
     'MentoraTabbedContentLayout — official contract';

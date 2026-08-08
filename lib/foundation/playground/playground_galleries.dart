@@ -17,6 +17,7 @@ import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
+import '../design_kit/layout/form_layout/mentora_form_layout.dart';
 import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import '../design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
@@ -3268,6 +3269,150 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
   }
 }
 
+/// The official Form Layout catalogue - the six regions of the work,
+/// in the official order, and the work alone.
+final class FormLayoutGallery extends StatelessWidget {
+  const FormLayoutGallery({super.key});
+
+  static MentoraFormZone zone(String label, Widget content) =>
+      MentoraFormZone(semanticLabel: label, content: content);
+
+  // Six regions ask for more room than a single one: the frame is
+  // sized by what it shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  static Widget words(String heading) =>
+      MentoraText(heading, role: MentoraTextRole.body);
+
+  static MentoraFormLayout shape({Key? key, bool complete = true}) {
+    return MentoraFormLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      header: complete ? zone(formHeaderLabel, words(formHeaderLabel)) : null,
+      introduction: complete
+          ? zone(formIntroductionLabel, words(layoutContentBody))
+          : null,
+      form: zone(
+        formWorkLabel,
+        MentoraCard(
+          variant: MentoraCardVariant.surface,
+          child: const MentoraInput(
+            label: formFieldLabel,
+            semanticLabel: formFieldLabel,
+          ),
+        ),
+      ),
+      supportingContent: complete
+          ? zone(formSupportingLabel, words(layoutContentBody))
+          : null,
+      actions: complete
+          ? zone(
+              formActionsLabel,
+              MentoraButton(
+                label: formActLabel,
+                onPressed: () {},
+                size: MentoraButtonSize.small,
+              ),
+            )
+          : null,
+      footer: complete ? zone(formFooterLabel, words(layoutContentBody)) : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: formLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-form'))),
+          // The work alone: every other region is optional.
+          _scene(shape(key: const Key('layout-form-bare'), complete: false)),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(shape(key: Key('layout-form-${variant.name}'))),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(shape(key: Key('layout-form-${comfort.name}'))),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(shape(key: Key('layout-form-${direction.name}'))),
+            ),
+          const _FormLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Form Layout's living documentation - built only with Mentora
+/// components.
+final class _FormLayoutDocumentation extends StatelessWidget {
+  const _FormLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('form-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(formLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: formLayoutDocArchitecture,
+            keyPrefix: 'form-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: formLayoutDocResponsibilities,
+            keyPrefix: 'form-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: formLayoutDocComponents,
+            keyPrefix: 'form-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: formLayoutDocTokens,
+            keyPrefix: 'form-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: formLayoutDocEngines,
+            keyPrefix: 'form-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: formLayoutDocForbidden,
+            keyPrefix: 'form-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: formLayoutDocScans,
+            keyPrefix: 'form-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// The official Tabbed Content catalogue - one context, several
 /// contents, exactly one revealed.
 final class TabbedContentLayoutGallery extends StatefulWidget {
@@ -4000,8 +4145,11 @@ final class _LayoutScene {
   static Widget get content =>
       MentoraText(layoutContentBody, role: MentoraTextRole.body);
 
-  static Widget framed(Widget layout) =>
-      SizedBox(height: kMinInteractiveDimension * 6, child: layout);
+  // A demonstration frame is sized by the number of bands the shape
+  // shows, never by a single constant: a shape with six regions needs
+  // more room than a shape with one, at every font scale.
+  static Widget framed(Widget layout, {int bands = 6}) =>
+      SizedBox(height: kMinInteractiveDimension * bands, child: layout);
 }
 
 final class WorkspaceLayoutGallery extends StatelessWidget {
