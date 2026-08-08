@@ -58,4 +58,8 @@ enum MentoraLayoutKind {
   /// A work cut into steps, of which exactly one is revealed — the one
   /// the application announced.
   wizard,
+
+  /// A space where a person configures a system: categories, each
+  /// announced, each open or closed as the application says.
+  settings,
 }

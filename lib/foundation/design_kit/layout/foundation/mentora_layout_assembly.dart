@@ -101,6 +101,24 @@ sealed class MentoraLayoutSurface {
     List<MentoraButton> acts,
   }) = MentoraLayoutRevealedSurface;
 
+  /// One page whose content is a CONFIGURATION SPACE: categories, each
+  /// announced, each holding what is always there and what is there
+  /// only while the application says that category is open.
+  ///
+  /// The `regions` disposition places ONE content per named part, so it
+  /// cannot say what a configuration space says: that a part is
+  /// announced whether it is open or not, and that what it holds does
+  /// not exist while it is closed. That is why this description exists,
+  /// and it is the only reason it does.
+  const factory MentoraLayoutSurface.settings({
+    required String semanticLabel,
+    required List<MentoraSettingsCategory> categories,
+    MentoraAppBar? place,
+    MentoraTabs? facets,
+    MentoraSearchBar? intention,
+    List<MentoraButton> acts,
+  }) = MentoraLayoutSettingsSurface;
+
   /// A room shared between regions, already built by the structure
   /// that owns it.
   const factory MentoraLayoutSurface.shared(MentoraSplitView workspace) =
@@ -209,6 +227,19 @@ final class MentoraLayoutRevealedSurface extends MentoraLayoutPageLikeSurface {
   });
 }
 
+final class MentoraLayoutSettingsSurface extends MentoraLayoutPageLikeSurface {
+  final List<MentoraSettingsCategory> categories;
+
+  const MentoraLayoutSettingsSurface({
+    required super.semanticLabel,
+    required this.categories,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
+  });
+}
+
 final class MentoraLayoutSharedSurface extends MentoraLayoutSurface {
   final MentoraSplitView workspace;
 
@@ -301,14 +332,9 @@ final class MentoraLayoutAssembly extends StatelessWidget {
         return MentoraWorkspaceSurface.page(
           _page(
             asked,
-            content: Column(
+            content: _stacked(
               key: const Key('content-regions'),
-              // The room the layer adds between the regions it was
-              // handed: none, and it is a Token so that the none is
-              // opposable rather than assumed.
-              spacing: theme.contentGap,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              theme: theme,
               children: [for (final region in asked.regions) _region(region)],
             ),
           ),
@@ -324,6 +350,10 @@ final class MentoraLayoutAssembly extends StatelessWidget {
       case MentoraLayoutRevealedSurface():
         return MentoraWorkspaceSurface.page(
           _page(asked, content: _revealed(asked)),
+        );
+      case MentoraLayoutSettingsSurface():
+        return MentoraWorkspaceSurface.page(
+          _page(asked, content: _settings(asked, theme)),
         );
       case MentoraLayoutSharedSurface(:final workspace):
         return MentoraWorkspaceSurface.shared(workspace);
@@ -362,30 +392,16 @@ final class MentoraLayoutAssembly extends StatelessWidget {
     MentoraLayoutCollectionSurface asked,
     MentoraLayoutTheme theme,
   ) {
-    return Semantics(
+    return _announced(
       key: Key('list-${asked.collectionId}'),
-      container: true,
-      explicitChildNodes: true,
       label: asked.collectionSemanticLabel,
-      // A collection travels as one focus group: moving through it
-      // follows its elements, and never wanders out of it.
-      child: FocusTraversalGroup(
-        child: Column(
-          key: Key('list-items-${asked.collectionId}'),
-          // The room the layer adds between the elements it was
-          // handed: none, and it is a Token so that the none is
-          // opposable rather than assumed.
-          spacing: theme.contentGap,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final item in asked.items)
-              KeyedSubtree(
-                key: Key('list-item-${item.id}'),
-                child: item.content,
-              ),
-          ],
-        ),
+      child: _stacked(
+        key: Key('list-items-${asked.collectionId}'),
+        theme: theme,
+        children: [
+          for (final item in asked.items)
+            KeyedSubtree(key: Key('list-item-${item.id}'), child: item.content),
+        ],
       ),
     );
   }
@@ -397,41 +413,31 @@ final class MentoraLayoutAssembly extends StatelessWidget {
   /// the rows are the rows that were given, and every cell takes the
   /// room that was announced for it.
   Widget _grid(MentoraLayoutGridSurface asked, MentoraLayoutTheme theme) {
-    return Semantics(
+    return _announced(
       key: Key('grid-${asked.gridId}'),
-      container: true,
-      explicitChildNodes: true,
       label: asked.gridSemanticLabel,
-      // A grid travels as one focus group: moving through it follows
-      // its cells, and never wanders out of it.
-      child: FocusTraversalGroup(
-        child: Column(
-          key: Key('grid-rows-${asked.gridId}'),
-          // The room the layer adds between what it was handed: none,
-          // and it is a Token so that the none is opposable.
-          spacing: theme.contentGap,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final row in asked.disposition.rows)
-              Row(
-                key: Key('grid-row-${row.id}'),
-                spacing: theme.contentGap,
-                mainAxisSize: MainAxisSize.min,
-                // A cell keeps the height it has: a row never stretches
-                // what it places beside something taller.
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final cell in row.cells)
-                    SizedBox(
-                      key: Key('grid-cell-${cell.id}'),
-                      width: cell.extent,
-                      child: cell.content,
-                    ),
-                ],
-              ),
-          ],
-        ),
+      child: _stacked(
+        key: Key('grid-rows-${asked.gridId}'),
+        theme: theme,
+        children: [
+          for (final row in asked.disposition.rows)
+            Row(
+              key: Key('grid-row-${row.id}'),
+              spacing: theme.contentGap,
+              mainAxisSize: MainAxisSize.min,
+              // A cell keeps the height it has: a row never stretches
+              // what it places beside something taller.
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final cell in row.cells)
+                  SizedBox(
+                    key: Key('grid-cell-${cell.id}'),
+                    width: cell.extent,
+                    child: cell.content,
+                  ),
+              ],
+            ),
+        ],
       ),
     );
   }
@@ -444,18 +450,12 @@ final class MentoraLayoutAssembly extends StatelessWidget {
   Widget _revealed(MentoraLayoutRevealedSurface asked) {
     for (final content in asked.contents) {
       if (content.id != asked.revealedContentId) continue;
-      return Semantics(
+      return _announced(
         key: Key('tabbed-${asked.contextId}'),
-        container: true,
-        explicitChildNodes: true,
         label: asked.contextSemanticLabel,
-        // A context travels as one focus group: moving through it
-        // follows what is revealed, and never wanders out of it.
-        child: FocusTraversalGroup(
-          child: KeyedSubtree(
-            key: Key('tabbed-content-${content.id}'),
-            child: content.content,
-          ),
+        child: KeyedSubtree(
+          key: Key('tabbed-content-${content.id}'),
+          child: content.content,
         ),
       );
     }
@@ -467,15 +467,81 @@ final class MentoraLayoutAssembly extends StatelessWidget {
 
   /// One region: a named landmark, its own focus group, and what it
   /// carries — handed on exactly as it was given.
-  Widget _region(MentoraContentRegion region) {
+  Widget _region(MentoraContentRegion region) => _announced(
+    key: Key('content-region-${region.id}'),
+    label: region.semanticLabel,
+    child: region.content,
+  );
+
+  /// One configuration space: every category announced, in the order
+  /// they were given, and what a category holds built ONLY while the
+  /// application says that category is open.
+  ///
+  /// A category that is closed is announced all the same: it keeps its
+  /// landmark and what is always there. What it holds simply does not
+  /// exist — it is not placed, not focusable and not spoken.
+  Widget _settings(
+    MentoraLayoutSettingsSurface asked,
+    MentoraLayoutTheme theme,
+  ) => _stacked(
+    key: const Key('settings-categories'),
+    theme: theme,
+    children: [
+      for (final category in asked.categories)
+        _announced(
+          key: Key('settings-category-${category.id}'),
+          label: category.semanticLabel,
+          child: _stacked(
+            key: Key('settings-category-content-${category.id}'),
+            theme: theme,
+            children: [
+              category.summary,
+              if (category.unfolded) category.options,
+            ],
+          ),
+        ),
+    ],
+  );
+
+  /// What every landmark of this layer IS.
+  ///
+  /// A named part of a page is announced once, travels as its own
+  /// focus group, and carries what it was handed — strictly intact.
+  /// It is written here once: a region, a collection, a grid, a
+  /// revealed context and a category are announced the very same way,
+  /// so none of them can ever come to be announced differently.
+  Widget _announced({
+    required Key key,
+    required String label,
+    required Widget child,
+  }) {
     return Semantics(
-      key: Key('content-region-${region.id}'),
+      key: key,
       container: true,
       explicitChildNodes: true,
-      label: region.semanticLabel,
-      // Each region travels as its own focus group: reading a page
-      // follows its regions, and never wanders between them.
-      child: FocusTraversalGroup(child: region.content),
+      label: label,
+      // What is announced travels as one focus group: moving through
+      // it follows what it holds, and never wanders out of it.
+      child: FocusTraversalGroup(child: child),
+    );
+  }
+
+  /// What the layer adds between the things it was handed: NOTHING.
+  ///
+  /// The absence is a Token, so that it is opposable rather than
+  /// assumed, and it is applied here once for every disposition of the
+  /// layer — regions, elements, rows and categories alike.
+  Widget _stacked({
+    required Key key,
+    required MentoraLayoutTheme theme,
+    required List<Widget> children,
+  }) {
+    return Column(
+      key: key,
+      spacing: theme.contentGap,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: children,
     );
   }
 }

@@ -26,6 +26,7 @@ import '../design_kit/layout/wizard_layout/mentora_wizard_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import '../design_kit/layout/section_layout/mentora_section_layout.dart';
+import '../design_kit/layout/settings_layout/mentora_settings_layout.dart';
 import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import '../design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import '../design_kit/tokens/split_view_tokens.dart';
@@ -3265,6 +3266,185 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Settings Layout catalogue - a space where a system is
+/// configured. The laboratory announces which categories are open: the
+/// layout opens none of them by itself.
+final class SettingsLayoutGallery extends StatefulWidget {
+  const SettingsLayoutGallery({super.key});
+
+  @override
+  State<SettingsLayoutGallery> createState() => _SettingsLayoutGalleryState();
+}
+
+final class _SettingsLayoutGalleryState extends State<SettingsLayoutGallery> {
+  /// Which categories the APPLICATION announces as open. They are
+  /// identities, and the laboratory is what changes them.
+  Set<String> _open = const {settingsAccountId};
+
+  static const Map<String, String> _names = {
+    settingsAccountId: settingsAccountLabel,
+    settingsSecurityId: settingsSecurityLabel,
+    settingsNoticesId: settingsNoticesLabel,
+  };
+
+  // Three categories, all open, hold three ways in and three sets of
+  // options: the frame is sized by the most it can ever show.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 16);
+
+  void _ask(String id) {
+    setState(() {
+      _open = _open.contains(id)
+          ? {
+              for (final open in _open)
+                if (open != id) open,
+            }
+          : {..._open, id};
+    });
+  }
+
+  MentoraSettingsLayout shape({Key? key, required Set<String> open}) {
+    return MentoraSettingsLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      categories: [
+        for (final entry in _names.entries)
+          MentoraSettingsCategory(
+            id: entry.key,
+            semanticLabel: entry.value,
+            // The way in belongs to the components: the layout builds
+            // no header, and reports nothing in their place.
+            summary: MentoraListTile(
+              key: Key('settings-summary-${entry.key}'),
+              headline: entry.value,
+              semanticLabel: entry.value,
+              onTap: () => _ask(entry.key),
+            ),
+            options: MentoraCard(
+              key: Key('settings-options-${entry.key}'),
+              variant: MentoraCardVariant.surface,
+              child: const MentoraInput(
+                label: settingsOptionLabel,
+                semanticLabel: settingsOptionLabel,
+              ),
+            ),
+            unfolded: open.contains(entry.key),
+          ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: settingsLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-settings'), open: _open)),
+          // Every category closed, then every one of them open: what is
+          // closed is not hidden - it is not there.
+          _scene(
+            shape(key: const Key('layout-settings-closed'), open: const {}),
+          ),
+          _scene(
+            shape(
+              key: const Key('layout-settings-open'),
+              open: _names.keys.toSet(),
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(
+                shape(key: Key('layout-settings-${variant.name}'), open: _open),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(
+                shape(key: Key('layout-settings-${comfort.name}'), open: _open),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(
+                  key: Key('layout-settings-${direction.name}'),
+                  open: _open,
+                ),
+              ),
+            ),
+          const _SettingsLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Settings Layout's living documentation - built only with Mentora
+/// components.
+final class _SettingsLayoutDocumentation extends StatelessWidget {
+  const _SettingsLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('settings-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(settingsLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: settingsLayoutDocArchitecture,
+            keyPrefix: 'settings-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: settingsLayoutDocResponsibilities,
+            keyPrefix: 'settings-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: settingsLayoutDocComponents,
+            keyPrefix: 'settings-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: settingsLayoutDocTokens,
+            keyPrefix: 'settings-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: settingsLayoutDocEngines,
+            keyPrefix: 'settings-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: settingsLayoutDocForbidden,
+            keyPrefix: 'settings-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: settingsLayoutDocScans,
+            keyPrefix: 'settings-layout-doc-scan',
           ),
         ],
       ),

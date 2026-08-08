@@ -32,6 +32,7 @@ import 'package:mentora/foundation/design_kit/layout/form_layout/mentora_form_la
 import 'package:mentora/foundation/design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/list_layout/mentora_list_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/settings_layout/mentora_settings_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
@@ -271,6 +272,26 @@ Map<MentoraLayoutKind, Widget> _layouts({
         content: _content,
       ),
     ),
+    MentoraLayoutKind.settings: MentoraSettingsLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      categories: const [
+        MentoraSettingsCategory(
+          id: 'compte',
+          semanticLabel: 'Le compte',
+          summary: _content,
+          options: SizedBox.shrink(),
+          unfolded: true,
+        ),
+        MentoraSettingsCategory(
+          id: 'securite',
+          semanticLabel: 'La securite',
+          summary: SizedBox.shrink(),
+          options: SizedBox.shrink(),
+          unfolded: false,
+        ),
+      ],
+    ),
     MentoraLayoutKind.wizard: MentoraWizardLayout(
       frame: plain,
       pageSemanticLabel: 'Page courante',
@@ -407,6 +428,11 @@ void main() {
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byType(MentoraTabs), findsOneWidget);
       expect(find.byKey(const Key('tabbed-portefeuille')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.settings]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('settings-categories')), findsOneWidget);
+      expect(find.byKey(const Key('settings-category-compte')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.wizard]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
@@ -644,6 +670,20 @@ void main() {
     Iterable<File> layoutFiles() =>
         dartFilesOf('lib/foundation/design_kit/layout');
 
+    /// What a file COMMITS.
+    ///
+    /// A scan opposes code, and a comment is not code: documenting a
+    /// prohibition has never been committing it. The rules below keep
+    /// every word they forbid — they simply stop reading the prose
+    /// that names them.
+    String codeOf(File file) => file
+        .readAsLinesSync()
+        .map((line) {
+          final comment = line.indexOf('//');
+          return comment == -1 ? line : line.substring(0, comment);
+        })
+        .join('\n');
+
     test('a layout builds no framework widget of its own', () {
       final forbidden = <String, RegExp>{
         'Scaffold': RegExp(r'(?<![A-Za-z])Scaffold\('),
@@ -664,7 +704,7 @@ void main() {
       final files = layoutFiles();
       expect(files, isNotEmpty);
       for (final file in files) {
-        final source = file.readAsStringSync();
+        final source = codeOf(file);
         for (final entry in forbidden.entries) {
           expect(
             entry.value.hasMatch(source),
@@ -695,7 +735,7 @@ void main() {
         'a route type': RegExp(r'(?<![A-Za-z])Route<'),
       };
       for (final file in layoutFiles()) {
-        final source = file.readAsStringSync();
+        final source = codeOf(file);
         for (final entry in forbidden.entries) {
           expect(
             entry.value.hasMatch(source),
@@ -728,7 +768,7 @@ void main() {
         'an untyped zone': RegExp(r'final\s+Widget\?\s'),
       };
       for (final file in layoutFiles()) {
-        final source = file.readAsStringSync();
+        final source = codeOf(file);
         for (final entry in forbidden.entries) {
           expect(
             entry.value.hasMatch(source),
@@ -750,7 +790,7 @@ void main() {
         'a coded opacity': RegExp(r'opacity:\s*[0-9]'),
       };
       for (final file in layoutFiles()) {
-        final source = file.readAsStringSync();
+        final source = codeOf(file);
         for (final entry in forbidden.entries) {
           expect(
             entry.value.hasMatch(source),
@@ -772,7 +812,7 @@ void main() {
       );
       for (final file in layoutFiles()) {
         expect(
-          mounts.hasMatch(file.readAsStringSync()),
+          mounts.hasMatch(codeOf(file)),
           isFalse,
           reason: '${file.path}: a layout never mounts a layer itself',
         );
@@ -785,7 +825,7 @@ void main() {
       for (final entry in built.entries) {
         final places = <String>[];
         for (final file in layoutFiles()) {
-          if (entry.value.hasMatch(file.readAsStringSync())) {
+          if (entry.value.hasMatch(codeOf(file))) {
             places.add(file.path.replaceAll(r'\', '/'));
           }
         }
@@ -807,7 +847,7 @@ void main() {
       for (final file in layoutFiles()) {
         final normalized = file.path.replaceAll(r'\', '/');
         if (normalized.contains('layout/foundation/')) continue;
-        final source = file.readAsStringSync();
+        final source = codeOf(file);
         expect(
           RegExp(r'Widget\s+build\(').hasMatch(source),
           isFalse,
@@ -824,7 +864,7 @@ void main() {
       for (final file in layoutFiles()) {
         for (final match in RegExp(
           r'class\s+(Mentora\w+)(?:<[^>]*>)?\s+extends\s+(Mentora\w+)',
-        ).allMatches(file.readAsStringSync())) {
+        ).allMatches(codeOf(file))) {
           parents[match.group(1)!] = match.group(2)!;
         }
       }
@@ -833,7 +873,7 @@ void main() {
         if (normalized.contains('layout/foundation/')) continue;
         final shape = RegExp(
           r'class\s+(Mentora\w+Layout)(?![A-Za-z])',
-        ).firstMatch(file.readAsStringSync())!.group(1)!;
+        ).firstMatch(codeOf(file))!.group(1)!;
 
         final chain = <String>[shape];
         var current = shape;
@@ -851,9 +891,8 @@ void main() {
         );
         for (final link in chain.skip(1)) {
           final declaration = layoutFiles().singleWhere(
-            (file) => RegExp(
-              'class\\s+$link(?![A-Za-z])',
-            ).hasMatch(file.readAsStringSync()),
+            (file) =>
+                RegExp('class\\s+$link(?![A-Za-z])').hasMatch(codeOf(file)),
           );
           expect(
             declaration.path.replaceAll(r'\', '/'),
@@ -863,9 +902,7 @@ void main() {
           // Exactly one link builds, and it is the last one: the
           // foundation. Everything between a shape and it describes.
           expect(
-            RegExp(
-              r'Widget\s+build\(',
-            ).hasMatch(declaration.readAsStringSync()),
+            RegExp(r'Widget\s+build\(').hasMatch(codeOf(declaration)),
             link == 'MentoraLayout',
             reason:
                 '$link: the one foundation is the only link that builds '
@@ -881,7 +918,7 @@ void main() {
         'lib/foundation/design_kit/layout/foundation',
       )) {
         expect(
-          specialization.hasMatch(file.readAsStringSync()),
+          specialization.hasMatch(codeOf(file)),
           isFalse,
           reason:
               '${file.path}: the foundation carries the contracts, the '
@@ -907,7 +944,7 @@ void main() {
         for (final file in dartFilesOf('lib')) {
           if (RegExp(
             'class\\s+${entry.key}(?![A-Za-z])',
-          ).hasMatch(file.readAsStringSync())) {
+          ).hasMatch(codeOf(file))) {
             declarations.add(file.path.replaceAll(r'\', '/'));
           }
         }
@@ -924,7 +961,7 @@ void main() {
       for (final file in dartFilesOf('lib')) {
         if (RegExp(
           r'enum\s+\w*LayoutKind(?![A-Za-z])',
-        ).hasMatch(file.readAsStringSync())) {
+        ).hasMatch(codeOf(file))) {
           registries.add(file.path.replaceAll(r'\', '/'));
         }
       }
@@ -986,13 +1023,12 @@ void main() {
         'MentoraDetailLayout',
         'MentoraFeedLayout',
         'MentoraWizardLayout',
+        'MentoraSettingsLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];
         for (final file in dartFilesOf('lib')) {
-          if (RegExp(
-            'class\\s+$shape(?![A-Za-z])',
-          ).hasMatch(file.readAsStringSync())) {
+          if (RegExp('class\\s+$shape(?![A-Za-z])').hasMatch(codeOf(file))) {
             declarations.add(file.path.replaceAll(r'\', '/'));
           }
         }

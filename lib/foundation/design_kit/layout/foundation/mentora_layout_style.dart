@@ -283,6 +283,48 @@ enum MentoraDetailRegion {
   const MentoraDetailRegion({required this.carriesInformation});
 }
 
+/// One category of a configuration space.
+///
+/// A category is an IDENTITY, a name, what is always there of it, and
+/// what it holds. It is not a position: the application announces the
+/// categories in the order it wants them read, and the identity is what
+/// the product refers to forever.
+///
+/// Whether it is OPEN is announced too. A category never decides that
+/// for itself, and nothing here remembers it: the state of a
+/// configuration space belongs to the application, always.
+///
+/// Both parts are already built, and both are handed on strictly
+/// intact: the layer wraps nothing around them, changes nothing about
+/// them, and never speaks in their place.
+final class MentoraSettingsCategory {
+  /// What this category IS — stable forever, never a position.
+  final String id;
+
+  /// What the screen reader hears about the category: a landmark name.
+  /// The application owns every string; the layer composes none.
+  final String semanticLabel;
+
+  /// What is there whether the category is open or not — the way in.
+  /// The components remain its owners.
+  final Widget summary;
+
+  /// What the category holds. It exists only while the category is
+  /// open: closed, it is not built at all.
+  final Widget options;
+
+  /// Whether the category is open. It is ANNOUNCED, never decided.
+  final bool unfolded;
+
+  const MentoraSettingsCategory({
+    required this.id,
+    required this.semanticLabel,
+    required this.summary,
+    required this.options,
+    required this.unfolded,
+  });
+}
+
 /// One region of an official vocabulary: what it is called, and what it
 /// holds.
 ///

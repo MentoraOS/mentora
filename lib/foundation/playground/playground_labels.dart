@@ -189,6 +189,58 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String settingsLayoutGalleryTitle = 'Layouts — Settings';
+const String settingsLayoutDocHeading =
+    'MentoraSettingsLayout — official contract';
+const String settingsAccountId = 'compte';
+const String settingsSecurityId = 'securite';
+const String settingsNoticesId = 'notifications';
+const String settingsAccountLabel = 'Votre compte';
+const String settingsSecurityLabel = 'Votre sécurité';
+const String settingsNoticesLabel = 'Ce dont on vous avertit';
+const String settingsOptionLabel = 'Adresse electronique';
+const List<String> settingsLayoutDocArchitecture = [
+  'A specialization of the page-like foundation, like every page shape',
+  'A category is an IDENTITY: never an index, never a position',
+  'Open or closed is ANNOUNCED by the application, never decided here',
+  'A category keeps what is always there, and what it holds when open',
+  'What a closed category holds is not built: nothing is hidden',
+];
+const List<String> settingsLayoutDocResponsibilities = [
+  'It opens nothing and closes nothing, and it remembers nothing',
+  'It knows no preference, no value, no persistence, no storage',
+  'It validates nothing, judges nothing, and reads no permission',
+  'An option is handed, never interpreted — the controls own it',
+  'Each category is announced exactly once and is its own focus group',
+];
+const List<String> settingsLayoutDocComponents = [
+  'MentoraListTile, MentoraCard — own the way into a category',
+  'MentoraInput — owns what is set; MentoraButton — owns the acts',
+  'MentoraText — owns the words; MentoraBadge — owns the mentions',
+  'The Layout Assembly — which alone places the categories',
+];
+const List<String> settingsLayoutDocForbidden = [
+  'ExpansionTile, ExpansionPanel, Accordion, Stepper, AnimatedSize',
+  'ListView, Scrollbar, ScrollView, Sliver, any collection surface',
+  'Any storage, persistence, validation, permission or model',
+  'Any state of its own: no StatefulWidget, no setState, no notifier',
+  'Navigator, Route, MediaQuery, Theme.of, Padding, Expanded, dynamic',
+];
+const List<String> settingsLayoutDocTokens = [
+  'Layout: the room the layer adds between the categories — none',
+];
+const List<String> settingsLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> settingsLayoutDocScans = [
+  'No storage, no persistence, no state of its own, no promise',
+  'No validation and no judgement of a value',
+  'No framework disclosure, no scroll view, no rank, no calculation',
+  'No model, no measure, no platform, no address, no coded value',
+  'One MentoraSettingsLayout, extending the page-like foundation',
+  'One category type in the whole product, declared in the style file',
+  'One announcement and one disposition in the whole assembly',
+];
 const String wizardLayoutGalleryTitle = 'Layouts — Wizard';
 const String wizardLayoutDocHeading = 'MentoraWizardLayout — official contract';
 const String wizardWorkLabel = 'Le travail à faire';
