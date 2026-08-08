@@ -252,20 +252,35 @@ final class MentoraLayoutAssembly extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A layout is a WHOLE SCREEN: it composes the working context, the
+    // way through the product and the temporary layers. Placing one
+    // inside another would open a second working context, a second set
+    // of layers and a second landmark — so it is refused here, once,
+    // rather than left to fail as a measure deep in the framework.
+    if (context.dependOnInheritedWidgetOfExactType<_MentoraAssembledScreen>() !=
+        null) {
+      throw StateError(
+        'A layout is a whole screen: it is never placed inside another. '
+        'A region carries components, never a second screen.',
+      );
+    }
+
     final theme = MentoraLayoutTheme.fromScope(DesignKitScope.of(context));
 
-    return MentoraWorkspace(
-      key: Key('layout-${kind.name}'),
-      semanticLabel: frame.semanticLabel,
-      configuration: frame.configuration,
-      navigation: frame.navigation,
-      orientation: frame.orientation,
-      rail: frame.rail,
-      base: frame.base,
-      dialogs: frame.dialogs,
-      sheets: frame.sheets,
-      messages: frame.messages,
-      surface: _surfaceOf(surface, theme),
+    return _MentoraAssembledScreen(
+      child: MentoraWorkspace(
+        key: Key('layout-${kind.name}'),
+        semanticLabel: frame.semanticLabel,
+        configuration: frame.configuration,
+        navigation: frame.navigation,
+        orientation: frame.orientation,
+        rail: frame.rail,
+        base: frame.base,
+        dialogs: frame.dialogs,
+        sheets: frame.sheets,
+        messages: frame.messages,
+        surface: _surfaceOf(surface, theme),
+      ),
     );
   }
 
@@ -463,4 +478,17 @@ final class MentoraLayoutAssembly extends StatelessWidget {
       child: FocusTraversalGroup(child: region.content),
     );
   }
+}
+
+/// The mark a screen leaves behind it, so that a second one can be
+/// recognised — and refused — the moment it is attempted.
+///
+/// It carries nothing and never notifies: its whole existence is to
+/// make "a layout is a whole screen" an opposable rule rather than a
+/// convention nobody can check.
+final class _MentoraAssembledScreen extends InheritedWidget {
+  const _MentoraAssembledScreen({required super.child});
+
+  @override
+  bool updateShouldNotify(_MentoraAssembledScreen oldWidget) => false;
 }

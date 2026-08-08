@@ -206,25 +206,37 @@ final class MentoraGridDisposition {
   }
 }
 
-/// The official regions of a form, in the official order.
+/// The official regions of a page built around ONE principal matter,
+/// in the official order.
 ///
-/// The vocabulary is CLOSED: a product never invents a region of a
-/// form, and the order below IS the order they are read in — it is the
-/// declaration itself, so it cannot drift.
-enum MentoraFormRegion {
-  /// What the person is about to do.
+/// Several shapes of the product are that page: a person filling
+/// information in, a person going through a flow, and every shape a
+/// future family will need where one matter is the reason the page
+/// exists and everything else stands around it.
+///
+/// Those shapes speak the SAME words, so they speak ONE vocabulary: a
+/// vocabulary is shared when the words are the same, never merely when
+/// the machinery is. What distinguishes them is what they call their
+/// principal matter, and the official kind they are — nothing else.
+///
+/// The vocabulary is CLOSED: a product never invents one of these
+/// regions, and the order below IS the order they are read in — it is
+/// the declaration itself, so it cannot drift.
+enum MentoraPrincipalRegion {
+  /// What the person is about to do, or about to go through.
   header,
 
-  /// What must be known before filling anything in.
+  /// What must be known before anything else.
   introduction,
 
-  /// The work itself. It is the only region a form cannot do without.
-  form,
+  /// The matter itself: the reason the page exists. It is the only
+  /// region such a page cannot do without.
+  principal,
 
-  /// What helps while filling it in, beside the work.
+  /// What helps beside the matter, without being it.
   supportingContent,
 
-  /// What closes the work — the acts remain the Button's own.
+  /// What concludes — the acts remain the Button's own.
   actions,
 
   /// What is said under everything: the conditions, the recourse.

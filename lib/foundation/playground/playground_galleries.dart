@@ -18,6 +18,7 @@ import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.d
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
 import '../design_kit/layout/detail_layout/mentora_detail_layout.dart';
+import '../design_kit/layout/feed_layout/mentora_feed_layout.dart';
 import '../design_kit/layout/form_layout/mentora_form_layout.dart';
 import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import '../design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
@@ -3263,6 +3264,163 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Feed Layout catalogue - the six regions of a page
+/// built around a flow, and the flow made of components alone.
+final class FeedLayoutGallery extends StatelessWidget {
+  const FeedLayoutGallery({super.key});
+
+  // Six regions ask for more room than a single one: the frame is
+  // sized by what it shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  static MentoraLayoutZone zone(String label, Widget content) =>
+      MentoraLayoutZone(semanticLabel: label, content: content);
+
+  static Widget words(String heading) =>
+      MentoraText(heading, role: MentoraTextRole.body);
+
+  /// What an element of a flow is - built by components, never by the
+  /// layout, and never counted by it.
+  static Widget element(String id) => MentoraListTile(
+    key: Key('feed-element-$id'),
+    headline: feedElementName,
+    supporting: feedElementSupporting,
+    semanticLabel: feedElementName,
+    leading: const MentoraAvatar(
+      identity: MentoraAvatarIdentity.initials,
+      name: feedElementName,
+      initials: feedElementInitials,
+    ),
+  );
+
+  static MentoraFeedLayout shape({Key? key, bool complete = true}) {
+    return MentoraFeedLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      header: complete ? zone(feedHeaderLabel, words(feedHeaderLabel)) : null,
+      introduction: complete
+          ? zone(feedIntroductionLabel, words(layoutContentBody))
+          : null,
+      // The flow itself: a succession the application already decided,
+      // handed on whole.
+      feed: zone(
+        feedFlowLabel,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [element('premier'), element('second')],
+        ),
+      ),
+      supportingContent: complete
+          ? zone(feedSupportingLabel, words(layoutContentBody))
+          : null,
+      actions: complete
+          ? zone(
+              feedActionsLabel,
+              MentoraButton(
+                label: feedActLabel,
+                onPressed: () {},
+                size: MentoraButtonSize.small,
+              ),
+            )
+          : null,
+      footer: complete ? zone(feedFooterLabel, words(layoutContentBody)) : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: feedLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-feed'))),
+          // The flow alone: every other region is optional.
+          _scene(shape(key: const Key('layout-feed-bare'), complete: false)),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(shape(key: Key('layout-feed-${variant.name}'))),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(shape(key: Key('layout-feed-${comfort.name}'))),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(shape(key: Key('layout-feed-${direction.name}'))),
+            ),
+          const _FeedLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Feed Layout's living documentation - built only with Mentora
+/// components.
+final class _FeedLayoutDocumentation extends StatelessWidget {
+  const _FeedLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('feed-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(feedLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: feedLayoutDocArchitecture,
+            keyPrefix: 'feed-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: feedLayoutDocResponsibilities,
+            keyPrefix: 'feed-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: feedLayoutDocComponents,
+            keyPrefix: 'feed-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: feedLayoutDocTokens,
+            keyPrefix: 'feed-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: feedLayoutDocEngines,
+            keyPrefix: 'feed-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: feedLayoutDocForbidden,
+            keyPrefix: 'feed-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: feedLayoutDocScans,
+            keyPrefix: 'feed-layout-doc-scan',
           ),
         ],
       ),

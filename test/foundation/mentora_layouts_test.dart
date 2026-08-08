@@ -21,6 +21,7 @@ import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.
 import 'package:mentora/foundation/design_kit/layout/content_layout/mentora_content_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/detail_layout/mentora_detail_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/feed_layout/mentora_feed_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_assembly.dart';
@@ -257,6 +258,18 @@ Map<MentoraLayoutKind, Widget> _layouts({
         content: _content,
       ),
     ),
+    MentoraLayoutKind.feed: MentoraFeedLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      header: const MentoraLayoutZone(
+        semanticLabel: 'Ce que vous allez parcourir',
+        content: _content,
+      ),
+      feed: const MentoraLayoutZone(
+        semanticLabel: 'Le flux',
+        content: _content,
+      ),
+    ),
     MentoraLayoutKind.detail: MentoraDetailLayout(
       frame: plain,
       pageSemanticLabel: 'Page courante',
@@ -385,7 +398,7 @@ void main() {
 
       await _pump(tester, layouts[MentoraLayoutKind.form]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
-      expect(find.byKey(const Key('content-region-form')), findsOneWidget);
+      expect(find.byKey(const Key('content-region-principal')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.splitWorkspace]!);
       expect(find.byType(MentoraSplitView), findsOneWidget);
@@ -784,27 +797,64 @@ void main() {
               '$normalized: a specialization declares its kind, its '
               'context and the surface it asks for — never a build',
         );
-        // Every layout extends the foundation — either directly, or
-        // through the zoned foundation, which is itself one of its
-        // specializations and is verified as such below.
-        expect(
-          RegExp(
-            r'extends\s+Mentora(Layout(?![A-Za-z])|ZonedLayout<)',
-          ).hasMatch(source),
-          isTrue,
-          reason: '$normalized: every layout extends the foundation',
-        );
       }
-      // The chain has no missing link: the zoned foundation is a
-      // specialization of the one foundation, and it builds nothing.
-      final zoned = File(
-        'lib/foundation/design_kit/layout/foundation/mentora_zoned_layout.dart',
-      ).readAsStringSync();
-      expect(
-        RegExp(r'extends\s+MentoraLayout(?![A-Za-z])').hasMatch(zoned),
-        isTrue,
-      );
-      expect(RegExp(r'Widget\s+build\(').hasMatch(zoned), isFalse);
+
+      // Every layout reaches the one foundation, and the chain is
+      // WALKED rather than named: a foundation may grow another link
+      // without the rule being rewritten, and no link may be missing.
+      final parents = <String, String>{};
+      for (final file in layoutFiles()) {
+        for (final match in RegExp(
+          r'class\s+(Mentora\w+)(?:<[^>]*>)?\s+extends\s+(Mentora\w+)',
+        ).allMatches(file.readAsStringSync())) {
+          parents[match.group(1)!] = match.group(2)!;
+        }
+      }
+      for (final file in layoutFiles()) {
+        final normalized = file.path.replaceAll(r'\', '/');
+        if (normalized.contains('layout/foundation/')) continue;
+        final shape = RegExp(
+          r'class\s+(Mentora\w+Layout)(?![A-Za-z])',
+        ).firstMatch(file.readAsStringSync())!.group(1)!;
+
+        final chain = <String>[shape];
+        var current = shape;
+        while (parents[current] != null && chain.length < 8) {
+          current = parents[current]!;
+          chain.add(current);
+        }
+        expect(
+          chain.last,
+          'MentoraLayout',
+          reason:
+              '$normalized: $shape reaches the one foundation through '
+              '${chain.join(' > ')} — every link is a layout of the '
+              'foundation, and none of them builds',
+        );
+        for (final link in chain.skip(1)) {
+          final declaration = layoutFiles().singleWhere(
+            (file) => RegExp(
+              'class\\s+$link(?![A-Za-z])',
+            ).hasMatch(file.readAsStringSync()),
+          );
+          expect(
+            declaration.path.replaceAll(r'\', '/'),
+            contains('layout/foundation/'),
+            reason: '$link: a link of the chain belongs to the foundation',
+          );
+          // Exactly one link builds, and it is the last one: the
+          // foundation. Everything between a shape and it describes.
+          expect(
+            RegExp(
+              r'Widget\s+build\(',
+            ).hasMatch(declaration.readAsStringSync()),
+            link == 'MentoraLayout',
+            reason:
+                '$link: the one foundation is the only link that builds '
+                '— every link above it only describes',
+          );
+        }
+      }
     });
 
     test('the foundation depends on no particular layout', () {
@@ -830,6 +880,7 @@ void main() {
         'MentoraLayoutTheme': 'mentora_layout_theme.dart',
         'MentoraLayout': 'mentora_layout.dart',
         'MentoraZonedLayout': 'mentora_zoned_layout.dart',
+        'MentoraPrincipalLayout': 'mentora_principal_layout.dart',
       };
       for (final entry in singletons.entries) {
         final declarations = <String>[];
@@ -913,6 +964,7 @@ void main() {
         'MentoraTabbedContentLayout',
         'MentoraFormLayout',
         'MentoraDetailLayout',
+        'MentoraFeedLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

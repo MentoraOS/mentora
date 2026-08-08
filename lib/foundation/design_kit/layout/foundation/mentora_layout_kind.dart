@@ -50,4 +50,8 @@ enum MentoraLayoutKind {
   /// A person consulting ONE thing: the official regions of a detail,
   /// in the official order.
   detail,
+
+  /// A person going through a succession of elements: a page built
+  /// around the flow itself.
+  feed,
 }

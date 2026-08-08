@@ -67,7 +67,7 @@ MentoraFormLayout _layout({
     acts: acts,
     header: header ?? (complete ? _zone('header') : null),
     introduction: introduction ?? (complete ? _zone('introduction') : null),
-    form: form ?? _zone('form'),
+    form: form ?? _zone('principal'),
     supportingContent:
         supportingContent ?? (complete ? _zone('supportingContent') : null),
     actions: actions ?? (complete ? _zone('actions') : null),
@@ -110,7 +110,7 @@ Future<FoundationServices> _pump(
   return services;
 }
 
-Finder _regionOf(MentoraFormRegion region) =>
+Finder _regionOf(MentoraPrincipalRegion region) =>
     find.byKey(Key('content-region-${region.name}'));
 
 void main() {
@@ -131,7 +131,7 @@ void main() {
       await _pump(tester, _layout());
 
       expect(find.byKey(const Key('content-regions')), findsOneWidget);
-      for (final region in MentoraFormRegion.values) {
+      for (final region in MentoraPrincipalRegion.values) {
         expect(_regionOf(region), findsOneWidget, reason: region.name);
       }
     });
@@ -140,21 +140,26 @@ void main() {
         'vocabulary itself', (tester) async {
       await _pump(tester, _layout());
 
-      var previous = tester.getRect(_regionOf(MentoraFormRegion.header)).top;
-      for (final region in MentoraFormRegion.values.skip(1)) {
+      var previous = tester
+          .getRect(_regionOf(MentoraPrincipalRegion.header))
+          .top;
+      for (final region in MentoraPrincipalRegion.values.skip(1)) {
         final top = tester.getRect(_regionOf(region)).top;
         expect(top, greaterThan(previous), reason: region.name);
         previous = top;
       }
       // The vocabulary is closed, and it is the order.
-      expect(MentoraFormRegion.values.map((region) => region.name).toList(), [
-        'header',
-        'introduction',
-        'form',
-        'supportingContent',
-        'actions',
-        'footer',
-      ]);
+      expect(
+        MentoraPrincipalRegion.values.map((region) => region.name).toList(),
+        [
+          'header',
+          'introduction',
+          'principal',
+          'supportingContent',
+          'actions',
+          'footer',
+        ],
+      );
     });
 
     testWidgets('a form is the only region the work cannot do without', (
@@ -162,15 +167,15 @@ void main() {
     ) async {
       await _pump(tester, _layout(complete: false));
 
-      expect(_regionOf(MentoraFormRegion.form), findsOneWidget);
-      for (final region in MentoraFormRegion.values) {
-        if (region == MentoraFormRegion.form) continue;
+      expect(_regionOf(MentoraPrincipalRegion.principal), findsOneWidget);
+      for (final region in MentoraPrincipalRegion.values) {
+        if (region == MentoraPrincipalRegion.principal) continue;
         expect(_regionOf(region), findsNothing, reason: region.name);
       }
       // What was not given is not there at all, and what remains still
       // starts at the very edge of the page.
       expect(
-        tester.getTopLeft(_regionOf(MentoraFormRegion.form)),
+        tester.getTopLeft(_regionOf(MentoraPrincipalRegion.principal)),
         tester.getTopLeft(find.byType(MentoraPageScaffold)),
       );
     });
@@ -179,7 +184,7 @@ void main() {
         'product never names one', (tester) async {
       await _pump(tester, _layout());
 
-      expect(find.byKey(const Key('content-region-form')), findsOneWidget);
+      expect(find.byKey(const Key('content-region-principal')), findsOneWidget);
       expect(find.byKey(const Key('content-region-ailleurs')), findsNothing);
     });
 
@@ -187,7 +192,7 @@ void main() {
         'intact', (tester) async {
       await _pump(tester, _layout());
 
-      for (final region in MentoraFormRegion.values) {
+      for (final region in MentoraPrincipalRegion.values) {
         expect(
           tester.getTopLeft(find.byKey(Key('zone-${region.name}'))),
           tester.getTopLeft(_regionOf(region)),
@@ -201,8 +206,8 @@ void main() {
     ) async {
       await _pump(tester, _layout());
 
-      var previous = tester.getRect(_regionOf(MentoraFormRegion.header));
-      for (final region in MentoraFormRegion.values.skip(1)) {
+      var previous = tester.getRect(_regionOf(MentoraPrincipalRegion.header));
+      for (final region in MentoraPrincipalRegion.values.skip(1)) {
         final rect = tester.getRect(_regionOf(region));
         expect(rect.top, previous.bottom, reason: region.name);
         previous = rect;
@@ -216,7 +221,7 @@ void main() {
         tester,
         _layout(
           form: _zone(
-            'form',
+            'principal',
             content: const MentoraInput(
               key: Key('zone-form'),
               label: 'Adresse électronique',
@@ -247,7 +252,7 @@ void main() {
         tester,
         _layout(
           form: _zone(
-            'form',
+            'principal',
             content: MentoraInput(
               key: const Key('zone-form'),
               label: 'Adresse électronique',
@@ -282,7 +287,7 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsNothing);
 
       final page = tester.getRect(find.byType(MentoraPageScaffold));
-      final header = tester.getRect(_regionOf(MentoraFormRegion.header));
+      final header = tester.getRect(_regionOf(MentoraPrincipalRegion.header));
       expect(header.left, page.left);
       expect(header.width, page.width);
       expect(header.top, page.top);
@@ -294,7 +299,7 @@ void main() {
       final handle = tester.ensureSemantics();
       await _pump(tester, _layout());
 
-      for (final region in MentoraFormRegion.values) {
+      for (final region in MentoraPrincipalRegion.values) {
         expect(
           tester.getSemantics(_regionOf(region)).label,
           'Région ${region.name}',
@@ -315,7 +320,7 @@ void main() {
         tester,
         _layout(
           form: _zone(
-            'form',
+            'principal',
             semanticLabel: 'Vos informations',
             content: const MentoraInput(
               key: Key('zone-form'),
@@ -337,7 +342,7 @@ void main() {
     testWidgets('every region travels as its own focus group', (tester) async {
       await _pump(tester, _layout());
 
-      for (final region in MentoraFormRegion.values) {
+      for (final region in MentoraPrincipalRegion.values) {
         expect(
           find.descendant(
             of: _regionOf(region),
@@ -358,8 +363,8 @@ void main() {
         tester,
         _layout(
           form: _zone(
-            'form',
-            content: Focus(focusNode: inside, child: _content('form')),
+            'principal',
+            content: Focus(focusNode: inside, child: _content('principal')),
           ),
         ),
       );
@@ -402,7 +407,7 @@ void main() {
       }
 
       // A region without a name, wherever it stands.
-      await refuses(_layout(form: _zone('form', semanticLabel: '')));
+      await refuses(_layout(form: _zone('principal', semanticLabel: '')));
       await refuses(_layout(header: _zone('header', semanticLabel: '')));
       await refuses(_layout(footer: _zone('footer', semanticLabel: '')));
       // A page that announces nothing, and a context that does not
@@ -422,7 +427,7 @@ void main() {
       for (final variant in ThemeVariantId.values) {
         await _pump(tester, _layout(), variant: variant);
         expect(tester.takeException(), isNull, reason: variant.name);
-        expect(_regionOf(MentoraFormRegion.form), findsOneWidget);
+        expect(_regionOf(MentoraPrincipalRegion.principal), findsOneWidget);
       }
     });
 
@@ -434,7 +439,7 @@ void main() {
           appearance: AppearanceState(fontScale: scale),
         );
         expect(tester.takeException(), isNull, reason: scale.name);
-        expect(_regionOf(MentoraFormRegion.form), findsOneWidget);
+        expect(_regionOf(MentoraPrincipalRegion.principal), findsOneWidget);
       }
     });
 
@@ -455,7 +460,7 @@ void main() {
         await _pump(tester, _layout(), direction: direction);
         expect(tester.takeException(), isNull, reason: direction.name);
         expect(
-          tester.getRect(_regionOf(MentoraFormRegion.form)).width,
+          tester.getRect(_regionOf(MentoraPrincipalRegion.principal)).width,
           tester.getRect(find.byType(MentoraPageScaffold)).width,
           reason: direction.name,
         );
@@ -623,12 +628,23 @@ void main() {
       expect(declarations.single, contains('layout/form_layout/'));
 
       final source = File(declarations.single).readAsStringSync();
-      // It extends the ZONED foundation: it therefore owns no order,
-      // no identity, no surface and no shared refusal at all.
-      expect(RegExp(r'extends\s+MentoraZonedLayout<').hasMatch(source), isTrue);
+      // It extends the PRINCIPAL foundation: it therefore owns no
+      // region, no order, no identity, no surface and no refusal — it
+      // owns its official kind, and the word it calls its matter by.
+      expect(
+        RegExp(
+          r'extends\s+MentoraPrincipalLayout(?![A-Za-z])',
+        ).hasMatch(source),
+        isTrue,
+      );
       expect(RegExp(r'void\s+verify\(').hasMatch(source), isFalse);
       expect(RegExp(r'surfaceOf\(').hasMatch(source), isFalse);
       expect(RegExp(r'Widget\s+build\(').hasMatch(source), isFalse);
+      expect(RegExp(r'get\s+zones(?![A-Za-z])').hasMatch(source), isFalse);
+      expect(RegExp(r'get\s+vocabulary(?![A-Za-z])').hasMatch(source), isFalse);
+      // The word it calls its matter by is an ALIAS, never a second
+      // field: there is one matter, held in one place.
+      expect(RegExp(r'final\s+MentoraLayoutZone').hasMatch(source), isFalse);
       for (final built in const [
         'MentoraWorkspace(',
         'MentoraPageScaffold(',
@@ -642,11 +658,12 @@ void main() {
       }
     });
 
-    test('the official regions are a closed vocabulary, declared once', () {
+    test('the official regions are a closed vocabulary, declared once, '
+        'and shared by every shape built around one matter', () {
       final registries = <String>[];
       for (final file in dartFilesOf('lib')) {
         if (RegExp(
-          r'enum\s+\w*FormRegion(?![A-Za-z])',
+          r'enum\s+\w*PrincipalRegion(?![A-Za-z])',
         ).hasMatch(file.readAsStringSync())) {
           registries.add(file.path.replaceAll(r'\', '/'));
         }
@@ -656,7 +673,21 @@ void main() {
         registries.single,
         endsWith('layout/foundation/mentora_layout_style.dart'),
       );
-      expect(MentoraFormRegion.values, hasLength(6));
+      expect(MentoraPrincipalRegion.values, hasLength(6));
+
+      // More than one shape speaks it, and not one of them declares a
+      // vocabulary of its own: the same words are never written twice.
+      final shapes = <String>[];
+      for (final file in dartFilesOf('lib')) {
+        final source = file.readAsStringSync();
+        if (RegExp(
+          r'extends\s+MentoraPrincipalLayout(?![A-Za-z])',
+        ).hasMatch(source)) {
+          shapes.add(file.path.replaceAll(r'\', '/'));
+          expect(RegExp(r'enum\s+\w+').hasMatch(source), isFalse);
+        }
+      }
+      expect(shapes.length, greaterThan(1));
     });
   });
 }

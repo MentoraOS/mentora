@@ -189,6 +189,62 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String feedLayoutGalleryTitle = 'Layouts — Feed';
+const String feedLayoutDocHeading = 'MentoraFeedLayout — official contract';
+const String feedHeaderLabel = 'Ce que vous allez parcourir';
+const String feedIntroductionLabel = 'Avant de commencer';
+const String feedFlowLabel = 'Le flux';
+const String feedSupportingLabel = 'Ce qui aide en chemin';
+const String feedActionsLabel = 'Ce qui vaut pour tout le flux';
+const String feedFooterLabel = 'Ce qui est dit en dessous';
+const String feedElementName = 'Awa Diallo';
+const String feedElementInitials = 'AD';
+const String feedElementSupporting = 'Il y a un instant';
+const String feedActLabel = 'Continuer';
+const List<String> feedLayoutDocArchitecture = [
+  'A shape built around ONE principal matter, like the Form Layout',
+  'Six official regions, in a CLOSED vocabulary shared by both shapes',
+  'The identity of a region is the official region: none is named here',
+  'It declares two things: its official kind, and the word "feed"',
+  'The flow is required by the TYPE — never by a run-time check',
+];
+const List<String> feedLayoutDocResponsibilities = [
+  'It shows no element: it shows a person going through a succession',
+  'It represents no domain: the same shape carries any succession',
+  'It counts nothing, pages nothing, groups nothing, sorts nothing',
+  'It makes no way through anything: no scroll, no refresh, no paging',
+  'Each region is announced exactly once and is its own focus group',
+];
+const List<String> feedLayoutDocComponents = [
+  'MentoraCard, MentoraListTile — own what an element is',
+  'MentoraAvatar — owns the face; MentoraBadge — owns the mention',
+  'MentoraButton — owns the acts; MentoraText — owns the words',
+  'The Principal Layout — which alone holds the six parts',
+  'The Layout Assembly — which alone places them, once per screen',
+];
+const List<String> feedLayoutDocForbidden = [
+  'Any collection, sliver, scroll view, refresh or paged surface',
+  'Any model of a flow, any source of data, any promise, any state',
+  'A calculation, an ordering, a grouping, a paging, a virtualization',
+  'Padding, SafeArea, Expanded, Flexible, Spacer, MediaQuery',
+  'Navigator, Route, Theme.of, dynamic, Object?, a coded value',
+];
+const List<String> feedLayoutDocTokens = [
+  'Layout: the room the layer adds between the regions — none',
+];
+const List<String> feedLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> feedLayoutDocScans = [
+  'No element of a flow, no model, no serialization',
+  'No logic: nothing calculated, sorted, grouped, paged, virtualized',
+  'No network, no source of data, no promise, no state of the flow',
+  'No way through anything, no measure, no address, no coded value',
+  'One MentoraFeedLayout, extending the principal foundation',
+  'One vocabulary for every shape built around one matter',
+  'One holder of the matter: the word "feed" is an alias, not a field',
+  'A layout is a whole screen: a second one inside is refused',
+];
 const String detailLayoutGalleryTitle = 'Layouts — Detail';
 const String detailLayoutDocHeading = 'MentoraDetailLayout — official contract';
 const String detailHeroLabel = 'Ce que l’on voit d’abord';

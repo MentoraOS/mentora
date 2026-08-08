@@ -807,8 +807,10 @@ void main() {
         'identities and the refusals live in exactly one place', () {
       final zoned = <String>[];
       for (final file in dartFilesOf('lib')) {
+        // Zoned directly, or through the foundation built on it: what
+        // is proved here follows the chain, never a single name.
         if (RegExp(
-          r'extends\s+MentoraZonedLayout<',
+          r'extends\s+Mentora(ZonedLayout<|PrincipalLayout(?![A-Za-z]))',
         ).hasMatch(file.readAsStringSync())) {
           zoned.add(file.path.replaceAll(r'\', '/'));
         }
