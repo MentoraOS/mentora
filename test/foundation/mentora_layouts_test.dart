@@ -35,6 +35,7 @@ import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_n
 import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/wizard_layout/mentora_wizard_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
@@ -270,6 +271,17 @@ Map<MentoraLayoutKind, Widget> _layouts({
         content: _content,
       ),
     ),
+    MentoraLayoutKind.wizard: MentoraWizardLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      wizardId: 'travail',
+      wizardSemanticLabel: 'Le travail',
+      revealedStepId: 'premiere',
+      steps: const [
+        MentoraIdentifiedContent(id: 'premiere', content: _content),
+        MentoraIdentifiedContent(id: 'seconde', content: SizedBox.shrink()),
+      ],
+    ),
     MentoraLayoutKind.detail: MentoraDetailLayout(
       frame: plain,
       pageSemanticLabel: 'Page courante',
@@ -395,6 +407,12 @@ void main() {
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
       expect(find.byType(MentoraTabs), findsOneWidget);
       expect(find.byKey(const Key('tabbed-portefeuille')), findsOneWidget);
+
+      await _pump(tester, layouts[MentoraLayoutKind.wizard]!);
+      expect(find.byType(MentoraPageScaffold), findsOneWidget);
+      expect(find.byKey(const Key('tabbed-travail')), findsOneWidget);
+      // A step that is not revealed is not there at all.
+      expect(find.byKey(const Key('layout-surface')), findsOneWidget);
 
       await _pump(tester, layouts[MentoraLayoutKind.form]!);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
@@ -879,7 +897,9 @@ void main() {
         'MentoraLayoutContext': 'mentora_layout_context.dart',
         'MentoraLayoutTheme': 'mentora_layout_theme.dart',
         'MentoraLayout': 'mentora_layout.dart',
+        'MentoraPageLikeLayout': 'mentora_page_like_layout.dart',
         'MentoraZonedLayout': 'mentora_zoned_layout.dart',
+        'MentoraRevealedLayout': 'mentora_revealed_layout.dart',
         'MentoraPrincipalLayout': 'mentora_principal_layout.dart',
       };
       for (final entry in singletons.entries) {
@@ -965,6 +985,7 @@ void main() {
         'MentoraFormLayout',
         'MentoraDetailLayout',
         'MentoraFeedLayout',
+        'MentoraWizardLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

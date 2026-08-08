@@ -4,10 +4,8 @@ import '../../components/card/mentora_card.dart';
 import '../../components/card/mentora_card_style.dart';
 import '../../components/design_kit_scope.dart';
 import '../../components/text/mentora_text.dart';
-import '../../structure/app_bar/mentora_app_bar.dart';
-import '../foundation/mentora_layout.dart';
 import '../foundation/mentora_layout_assembly.dart';
-import '../foundation/mentora_layout_context.dart';
+import '../foundation/mentora_page_like_layout.dart';
 import '../foundation/mentora_layout_kind.dart';
 import '../foundation/mentora_layout_style.dart';
 import '../foundation/mentora_layout_theme.dart';
@@ -25,25 +23,19 @@ import '../foundation/mentora_layout_theme.dart';
 /// It is a specialization: the only thing it builds is the set of
 /// panels, from the official container, the official words and the
 /// official acts - and it styles none of them.
-final class MentoraDashboardLayout extends MentoraLayout {
-  @override
-  final MentoraLayoutContext frame;
-
-  /// Where the person is - the App Bar remains its owner.
-  final MentoraAppBar? place;
-
+final class MentoraDashboardLayout extends MentoraPageLikeLayout {
   /// The subjects the dashboard shows.
   final List<MentoraDashboardPanel> panels;
 
-  /// What the screen reader hears about the page itself.
-  final String pageSemanticLabel;
-
   const MentoraDashboardLayout({
     super.key,
-    required this.frame,
+    required super.frame,
     required this.panels,
-    required this.pageSemanticLabel,
-    this.place,
+    required super.pageSemanticLabel,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
   });
 
   @override
@@ -71,6 +63,9 @@ final class MentoraDashboardLayout extends MentoraLayout {
     return MentoraLayoutSurface.page(
       semanticLabel: pageSemanticLabel,
       place: place,
+      facets: facets,
+      intention: intention,
+      acts: acts,
       content: Wrap(
         key: const Key('dashboard-panels'),
         spacing: theme.panelGap,

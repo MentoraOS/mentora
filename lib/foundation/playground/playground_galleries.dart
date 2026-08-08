@@ -22,6 +22,7 @@ import '../design_kit/layout/feed_layout/mentora_feed_layout.dart';
 import '../design_kit/layout/form_layout/mentora_form_layout.dart';
 import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import '../design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
+import '../design_kit/layout/wizard_layout/mentora_wizard_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import '../design_kit/layout/section_layout/mentora_section_layout.dart';
@@ -3264,6 +3265,180 @@ final class _BottomNavigationDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: bottomNavigationDocScans,
             keyPrefix: 'bottom-navigation-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Wizard Layout catalogue - a work cut into steps, of
+/// which exactly one is revealed. The laboratory announces the step:
+/// the layout never moves to another on its own.
+final class WizardLayoutGallery extends StatefulWidget {
+  const WizardLayoutGallery({super.key});
+
+  @override
+  State<WizardLayoutGallery> createState() => _WizardLayoutGalleryState();
+}
+
+final class _WizardLayoutGalleryState extends State<WizardLayoutGallery> {
+  /// Which step the APPLICATION announces. It is an identity, and the
+  /// laboratory is the one that changes it.
+  String _revealed = wizardStepIdentity;
+
+  static const List<String> _steps = [
+    wizardStepIdentity,
+    wizardStepReach,
+    wizardStepConfirmation,
+  ];
+
+  static const Map<String, String> _names = {
+    wizardStepIdentity: wizardIdentityLabel,
+    wizardStepReach: wizardReachLabel,
+    wizardStepConfirmation: wizardConfirmationLabel,
+  };
+
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 8);
+
+  MentoraWizardLayout shape({Key? key, required String revealed}) {
+    return MentoraWizardLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      wizardId: 'travail',
+      wizardSemanticLabel: wizardWorkLabel,
+      revealedStepId: revealed,
+      steps: [
+        for (final step in _steps)
+          MentoraIdentifiedContent(
+            id: step,
+            content: MentoraCard(
+              key: Key('wizard-step-$step'),
+              variant: MentoraCardVariant.surface,
+              child: MentoraText(_names[step]!, role: MentoraTextRole.body),
+            ),
+          ),
+      ],
+      acts: [
+        for (final step in _steps)
+          MentoraButton(
+            key: Key('wizard-ask-$step'),
+            label: _names[step]!,
+            // The act reports an intention; the answer is the
+            // laboratory's, never the layout's.
+            onPressed: () => setState(() => _revealed = step),
+            size: MentoraButtonSize.small,
+          ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: wizardLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(
+            shape(key: const Key('layout-shape-wizard'), revealed: _revealed),
+          ),
+          // Every step, announced one by one: the shape reveals what it
+          // was told, and hides nothing - the others are not there.
+          for (final step in _steps)
+            _scene(shape(key: Key('layout-wizard-$step'), revealed: step)),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(
+                shape(
+                  key: Key('layout-wizard-${variant.name}'),
+                  revealed: _revealed,
+                ),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(
+                shape(
+                  key: Key('layout-wizard-${comfort.name}'),
+                  revealed: _revealed,
+                ),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(
+                  key: Key('layout-wizard-${direction.name}'),
+                  revealed: _revealed,
+                ),
+              ),
+            ),
+          const _WizardLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Wizard Layout's living documentation - built only with Mentora
+/// components.
+final class _WizardLayoutDocumentation extends StatelessWidget {
+  const _WizardLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('wizard-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(wizardLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: wizardLayoutDocArchitecture,
+            keyPrefix: 'wizard-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: wizardLayoutDocResponsibilities,
+            keyPrefix: 'wizard-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: wizardLayoutDocComponents,
+            keyPrefix: 'wizard-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: wizardLayoutDocTokens,
+            keyPrefix: 'wizard-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: wizardLayoutDocEngines,
+            keyPrefix: 'wizard-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: wizardLayoutDocForbidden,
+            keyPrefix: 'wizard-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: wizardLayoutDocScans,
+            keyPrefix: 'wizard-layout-doc-scan',
           ),
         ],
       ),

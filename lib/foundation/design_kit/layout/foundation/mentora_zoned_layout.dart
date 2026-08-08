@@ -1,13 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import '../../components/button/mentora_button.dart';
-import '../../structure/app_bar/mentora_app_bar.dart';
-import '../../structure/search_bar/mentora_search_bar.dart';
-import '../../structure/tabs/mentora_tabs.dart';
-import 'mentora_layout.dart';
 import 'mentora_layout_assembly.dart';
-import 'mentora_layout_context.dart';
 import 'mentora_layout_style.dart';
+import 'mentora_page_like_layout.dart';
 
 /// What a layout whose parts are a CLOSED VOCABULARY IS.
 ///
@@ -32,33 +27,15 @@ import 'mentora_layout_style.dart';
 /// identity, no surface and no build — so two zoned shapes can never
 /// drift apart, because there is nothing left for them to drift on.
 abstract base class MentoraZonedLayout<TRegion extends Enum>
-    extends MentoraLayout {
-  @override
-  final MentoraLayoutContext frame;
-
-  /// What the screen reader hears about the page itself.
-  final String pageSemanticLabel;
-
-  /// Where the person is — the App Bar remains its owner.
-  final MentoraAppBar? place;
-
-  /// The facets of the page — the Tabs remain their owner.
-  final MentoraTabs? facets;
-
-  /// The intention of finding — the Search Bar remains its owner.
-  final MentoraSearchBar? intention;
-
-  /// The acts the page keeps at hand — the Button remains their owner.
-  final List<MentoraButton> acts;
-
+    extends MentoraPageLikeLayout {
   const MentoraZonedLayout({
     super.key,
-    required this.frame,
-    required this.pageSemanticLabel,
-    this.place,
-    this.facets,
-    this.intention,
-    this.acts = const [],
+    required super.frame,
+    required super.pageSemanticLabel,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
   });
 
   /// The closed vocabulary of this shape, in the official order.

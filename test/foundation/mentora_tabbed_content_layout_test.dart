@@ -622,7 +622,7 @@ void main() {
 
       final source = File(declarations.single).readAsStringSync();
       expect(
-        RegExp(r'extends\s+MentoraLayout(?![A-Za-z])').hasMatch(source),
+        RegExp(r'extends\s+MentoraRevealedLayout(?![A-Za-z])').hasMatch(source),
         isTrue,
       );
       expect(RegExp(r'Widget\s+build\(').hasMatch(source), isFalse);

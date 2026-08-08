@@ -1,12 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import '../../components/button/mentora_button.dart';
-import '../../structure/app_bar/mentora_app_bar.dart';
-import '../../structure/search_bar/mentora_search_bar.dart';
-import '../../structure/tabs/mentora_tabs.dart';
-import '../foundation/mentora_layout.dart';
 import '../foundation/mentora_layout_assembly.dart';
-import '../foundation/mentora_layout_context.dart';
+import '../foundation/mentora_page_like_layout.dart';
 import '../foundation/mentora_layout_kind.dart';
 import '../foundation/mentora_layout_style.dart';
 
@@ -27,22 +22,7 @@ import '../foundation/mentora_layout_style.dart';
 ///
 /// It builds nothing at all: it describes the grid, and the assembly
 /// of the layer is what places it.
-final class MentoraGridLayout extends MentoraLayout {
-  @override
-  final MentoraLayoutContext frame;
-
-  /// Where the person is - the App Bar remains its owner.
-  final MentoraAppBar? place;
-
-  /// The facets of the page - the Tabs remain their owner.
-  final MentoraTabs? facets;
-
-  /// The intention of finding - the Search Bar remains its owner.
-  final MentoraSearchBar? intention;
-
-  /// The acts the page keeps at hand - the Button remains their owner.
-  final List<MentoraButton> acts;
-
+final class MentoraGridLayout extends MentoraPageLikeLayout {
   /// What this grid IS - stable forever, never a position.
   final String gridId;
 
@@ -53,20 +33,17 @@ final class MentoraGridLayout extends MentoraLayout {
   /// Where every cell stands, already decided by the application.
   final MentoraGridDisposition disposition;
 
-  /// What the screen reader hears about the page itself.
-  final String pageSemanticLabel;
-
   const MentoraGridLayout({
     super.key,
-    required this.frame,
+    required super.frame,
     required this.gridId,
     required this.gridSemanticLabel,
     required this.disposition,
-    required this.pageSemanticLabel,
-    this.place,
-    this.facets,
-    this.intention,
-    this.acts = const [],
+    required super.pageSemanticLabel,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
   });
 
   @override

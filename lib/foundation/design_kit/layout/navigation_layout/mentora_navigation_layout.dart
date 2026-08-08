@@ -1,8 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import '../foundation/mentora_layout.dart';
 import '../foundation/mentora_layout_assembly.dart';
-import '../foundation/mentora_layout_context.dart';
+import '../foundation/mentora_page_like_layout.dart';
 import '../foundation/mentora_layout_kind.dart';
 
 /// The official Navigation Layout - the context whose whole point is
@@ -16,21 +15,19 @@ import '../foundation/mentora_layout_kind.dart';
 ///
 /// One thing it refuses, and it is what makes it this layout: a
 /// navigation layout without a way through the product is not one.
-final class MentoraNavigationLayout extends MentoraLayout {
-  @override
-  final MentoraLayoutContext frame;
-
+final class MentoraNavigationLayout extends MentoraPageLikeLayout {
   /// What the place carries. It belongs entirely to the application.
   final Widget content;
 
-  /// What the screen reader hears about the place itself.
-  final String pageSemanticLabel;
-
   const MentoraNavigationLayout({
     super.key,
-    required this.frame,
+    required super.frame,
     required this.content,
-    required this.pageSemanticLabel,
+    required super.pageSemanticLabel,
+    super.place,
+    super.facets,
+    super.intention,
+    super.acts,
   });
 
   @override
@@ -51,6 +48,10 @@ final class MentoraNavigationLayout extends MentoraLayout {
     return MentoraLayoutSurface.page(
       semanticLabel: pageSemanticLabel,
       content: content,
+      place: place,
+      facets: facets,
+      intention: intention,
+      acts: acts,
     );
   }
 }

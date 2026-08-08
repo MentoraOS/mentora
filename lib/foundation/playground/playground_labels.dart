@@ -189,6 +189,60 @@ const List<String> bottomNavigationDocScans = [
   'No official navigation component left in the application shell',
   'No Core Component rebuilt, and no coded value outside the Tokens',
 ];
+const String wizardLayoutGalleryTitle = 'Layouts — Wizard';
+const String wizardLayoutDocHeading = 'MentoraWizardLayout — official contract';
+const String wizardWorkLabel = 'Le travail à faire';
+const String wizardStepIdentity = 'identite';
+const String wizardStepReach = 'coordonnees';
+const String wizardStepConfirmation = 'confirmation';
+const String wizardIdentityLabel = 'Qui vous êtes';
+const String wizardReachLabel = 'Où vous joindre';
+const String wizardConfirmationLabel = 'Ce que vous confirmez';
+const String wizardActLabel = 'Continuer';
+const List<String> wizardLayoutDocArchitecture = [
+  'A shape built on the REVEALING foundation, like the Tabbed Content',
+  'A step is an IDENTITY: never an index, a number or a position',
+  'The revealed step is ANNOUNCED by the application, never chosen here',
+  'It declares its official kind, and the words a work uses — aliases',
+  'What is not revealed is not built: nothing is hidden, nothing is there',
+];
+const List<String> wizardLayoutDocResponsibilities = [
+  'It shows no process: it shows a work already cut into steps',
+  'It holds no current step, no next one and no previous one',
+  'It counts nothing: no total, no remaining, no completed, no ratio',
+  'It validates nothing, knows no data, no network and no state',
+  'The acts report an intention; the application answers it',
+];
+const List<String> wizardLayoutDocComponents = [
+  'MentoraButton — owns the acts, and reports what was asked',
+  'MentoraInput, MentoraCard — own what a step holds',
+  'MentoraText — owns the words of a step',
+  'The Revealing Layout — which alone reveals one thing among several',
+  'The Layout Assembly — which alone places it, once per screen',
+];
+const List<String> wizardLayoutDocForbidden = [
+  'Stepper, Step, StepState, PageView, PageController, IndexedStack',
+  'Offstage, Visibility, Opacity, Stack, AnimatedSwitcher, Hero',
+  'Any progression, ratio, percentage, total, remainder or rank',
+  'Form, TextFormField, any validation, any model, any source of data',
+  'Navigator, Route, MediaQuery, Theme.of, Padding, Expanded, dynamic',
+];
+const List<String> wizardLayoutDocTokens = [
+  'Layout: the room the layer adds around a revealed step — none',
+];
+const List<String> wizardLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> wizardLayoutDocScans = [
+  'No progression and no calculation of any kind',
+  'No framework step, no form, no validation',
+  'No way of hiding and no way through: what is absent is absent',
+  'No model, no network, no promise, no state of the work',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraWizardLayout, extending the revealing foundation',
+  'No shape that reveals owns how it is revealed',
+  'The five parts of a page are declared in exactly one place',
+];
 const String feedLayoutGalleryTitle = 'Layouts — Feed';
 const String feedLayoutDocHeading = 'MentoraFeedLayout — official contract';
 const String feedHeaderLabel = 'Ce que vous allez parcourir';

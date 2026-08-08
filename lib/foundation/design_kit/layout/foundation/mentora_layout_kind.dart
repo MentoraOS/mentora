@@ -54,4 +54,8 @@ enum MentoraLayoutKind {
   /// A person going through a succession of elements: a page built
   /// around the flow itself.
   feed,
+
+  /// A work cut into steps, of which exactly one is revealed — the one
+  /// the application announced.
+  wizard,
 }
