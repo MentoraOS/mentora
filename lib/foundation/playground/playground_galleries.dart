@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design_kit/navigation/mentora_navigation_announcement.dart';
 
 import '../design_kit/components/button/mentora_button.dart';
 import '../design_kit/components/button/mentora_button_style.dart';
@@ -1045,9 +1046,7 @@ final class _BottomSheetGalleryState extends State<BottomSheetGallery> {
     if (mounted) setState(() {});
   }
 
-  static MentoraBottomSheetRequest demandOf(
-    MentoraBottomSheetVariant variant,
-  ) {
+  static MentoraBottomSheetRequest demandOf(MentoraBottomSheetVariant variant) {
     return MentoraBottomSheetRequest(
       variant: variant,
       title: variant.name,
@@ -1284,9 +1283,8 @@ final class _SnackbarGalleryState extends State<SnackbarGallery> {
           MentoraButton(
             key: const Key('snackbar-say'),
             label: 'say',
-            onPressed: () => widget.service.queue(
-              demandOf(MentoraSnackbarVariant.success),
-            ),
+            onPressed: () =>
+                widget.service.queue(demandOf(MentoraSnackbarVariant.success)),
           ),
           MentoraButton(
             key: const Key('snackbar-replace'),
@@ -1795,10 +1793,7 @@ final class ListTileGallery extends StatelessWidget {
               density: density,
             ),
           for (final chrome in MentoraListTileChrome.values)
-            entity(
-              key: Key('list-tile-chrome-${chrome.name}'),
-              chrome: chrome,
-            ),
+            entity(key: Key('list-tile-chrome-${chrome.name}'), chrome: chrome),
           // The announced states of the entity.
           for (final status in MentoraListTileStatus.values)
             entity(
@@ -2332,11 +2327,17 @@ final class _TabsGalleryState extends State<TabsGallery> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final emphasis in MentoraTabsEmphasis.values)
-            tabs(key: Key('tabs-emphasis-${emphasis.name}'), emphasis: emphasis),
+            tabs(
+              key: Key('tabs-emphasis-${emphasis.name}'),
+              emphasis: emphasis,
+            ),
           for (final shape in MentoraTabsShape.values)
             tabs(key: Key('tabs-shape-${shape.name}'), shape: shape),
           for (final overflow in MentoraTabsOverflow.values)
-            tabs(key: Key('tabs-overflow-${overflow.name}'), overflow: overflow),
+            tabs(
+              key: Key('tabs-overflow-${overflow.name}'),
+              overflow: overflow,
+            ),
           tabs(key: const Key('tabs-disabled'), enabled: false),
           // The live set: the application announces the facet it
           // revealed — the set only reported the intention.

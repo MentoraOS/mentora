@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_navigation_announcement.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
@@ -31,7 +32,6 @@ import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/structure/app_bar/mentora_app_bar.dart';
 import 'package:mentora/foundation/design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace.dart';
-import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace_style.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
 import 'package:mentora/foundation/design_kit/tokens/layout_tokens.dart';

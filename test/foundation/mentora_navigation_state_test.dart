@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' show TextDirection;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_navigation_announcement.dart';
 import 'package:mentora/foundation/design_kit/appearance/appearance_engine.dart';
 import 'package:mentora/foundation/design_kit/navigation/mentora_navigation_graph.dart';
 import 'package:mentora/foundation/design_kit/navigation/mentora_navigation_state.dart';
 import 'package:mentora/foundation/design_kit/navigation/mentora_route.dart';
-import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace_style.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
 
 MentoraRoute _place(
@@ -505,9 +505,12 @@ void main() {
         }
       }
       expect(announcements, hasLength(1));
+      // The echo is navigation vocabulary, and it lives with the
+      // navigation vocabulary — beside the truth it echoes, never
+      // inside the structure that consumes it.
       expect(
         announcements.single,
-        endsWith('structure/workspace/mentora_workspace_style.dart'),
+        endsWith('design_kit/navigation/mentora_navigation_announcement.dart'),
       );
     });
   });
