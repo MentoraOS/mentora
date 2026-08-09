@@ -44,7 +44,7 @@ final class MentoraWorkspace extends StatelessWidget {
   final MentoraWorkspaceConfiguration configuration;
 
   /// Where the person is, already resolved by the application.
-  final MentoraWorkspaceNavigationState navigation;
+  final MentoraNavigationAnnouncement navigation;
 
   /// The map of the space — the Drawer remains its owner, and the
   /// presentation it was given decides where it stands.

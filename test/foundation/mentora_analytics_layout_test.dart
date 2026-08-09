@@ -56,7 +56,7 @@ const List<String> _identities = ['revenu', 'activite', 'qualite'];
 
 const MentoraLayoutContext _frame = MentoraLayoutContext(
   semanticLabel: 'Contexte de travail',
-  navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+  navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
 );
 
 MentoraAnalyticsLayout _layout({
@@ -441,7 +441,7 @@ void main() {
         _layout(
           frame: const MentoraLayoutContext(
             semanticLabel: '',
-            navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+            navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
           ),
         ),
       );

@@ -46,7 +46,7 @@ const List<String> _identities = ['identite', 'coordonnees', 'confirmation'];
 
 const MentoraLayoutContext _frame = MentoraLayoutContext(
   semanticLabel: 'Contexte de travail',
-  navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+  navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
 );
 
 MentoraWizardLayout _layout({
@@ -479,7 +479,7 @@ void main() {
         _layout(
           frame: const MentoraLayoutContext(
             semanticLabel: '',
-            navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+            navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
           ),
         ),
       );

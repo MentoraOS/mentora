@@ -50,7 +50,7 @@ MentoraLayoutZone _zone(String id, {String? semanticLabel, Widget? content}) =>
 
 const MentoraLayoutContext _frame = MentoraLayoutContext(
   semanticLabel: 'Contexte de travail',
-  navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+  navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
 );
 
 /// A detail built the way a product builds one: every region is
@@ -295,7 +295,7 @@ void main() {
         _layout(
           frame: const MentoraLayoutContext(
             semanticLabel: '',
-            navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+            navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
           ),
         ),
       );

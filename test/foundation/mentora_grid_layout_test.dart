@@ -49,7 +49,7 @@ MentoraGridCell _cell(String id, {double extent = _extent, Widget? content}) =>
 
 const MentoraLayoutContext _frame = MentoraLayoutContext(
   semanticLabel: 'Contexte de travail',
-  navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+  navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
 );
 
 MentoraGridDisposition _disposition({List<MentoraGridRow>? rows}) =>
@@ -508,7 +508,7 @@ void main() {
         _layout(
           frame: const MentoraLayoutContext(
             semanticLabel: '',
-            navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+            navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
           ),
         ),
       );

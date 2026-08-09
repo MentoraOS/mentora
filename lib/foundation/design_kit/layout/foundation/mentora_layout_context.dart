@@ -21,7 +21,7 @@ final class MentoraLayoutContext {
   final String semanticLabel;
 
   /// Where the person is, already resolved by the application.
-  final MentoraWorkspaceNavigationState navigation;
+  final MentoraNavigationAnnouncement navigation;
 
   /// The disposition, already decided by the application.
   final MentoraWorkspaceConfiguration configuration;

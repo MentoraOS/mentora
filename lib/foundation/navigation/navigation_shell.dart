@@ -99,7 +99,7 @@ final class _NavigationShellState extends State<NavigationShell> {
       configuration: const MentoraWorkspaceConfiguration(
         navigation: MentoraWorkspaceNavigationChannel.base,
       ),
-      navigation: MentoraWorkspaceNavigationState(destinationId: _selectedId),
+      navigation: MentoraNavigationAnnouncement(destinationId: _selectedId),
       base: MentoraBottomNavigation(
         semanticLabel: strings.rootNavigation,
         destinations: destinations,

@@ -53,7 +53,7 @@ MentoraSection _section(
 
 const MentoraLayoutContext _frame = MentoraLayoutContext(
   semanticLabel: 'Contexte de travail',
-  navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+  navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
 );
 
 MentoraSectionLayout _layout({
@@ -352,7 +352,7 @@ void main() {
         _layout(
           frame: const MentoraLayoutContext(
             semanticLabel: '',
-            navigation: MentoraWorkspaceNavigationState(destinationId: 'home'),
+            navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
           ),
         ),
       );

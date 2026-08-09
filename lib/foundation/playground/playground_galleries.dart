@@ -5106,8 +5106,8 @@ final class _ContentLayoutDocumentation extends StatelessWidget {
 final class _LayoutScene {
   const _LayoutScene();
 
-  static const MentoraWorkspaceNavigationState where =
-      MentoraWorkspaceNavigationState(destinationId: 'home');
+  static const MentoraNavigationAnnouncement where =
+      MentoraNavigationAnnouncement(destinationId: 'home');
 
   static MentoraLayoutContext frame({bool withNavigation = false}) {
     return MentoraLayoutContext(
@@ -5485,7 +5485,7 @@ final class _WorkspaceGalleryState extends State<WorkspaceGallery> {
       key: key,
       semanticLabel: workspaceLabel,
       configuration: MentoraWorkspaceConfiguration(navigation: channel),
-      navigation: const MentoraWorkspaceNavigationState(destinationId: homeId),
+      navigation: const MentoraNavigationAnnouncement(destinationId: homeId),
       base: channel == MentoraWorkspaceNavigationChannel.base ? base : null,
       rail: channel == MentoraWorkspaceNavigationChannel.rail ? rail : null,
       orientation: channel == MentoraWorkspaceNavigationChannel.orientation

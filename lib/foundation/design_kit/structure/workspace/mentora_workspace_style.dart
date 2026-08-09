@@ -35,15 +35,18 @@ final class MentoraWorkspaceConfiguration {
   });
 }
 
-/// Where the person is in the product, already resolved.
+/// What the application ANNOUNCES to a working context: the place the
+/// person is in, already resolved.
 ///
 /// It is an IDENTITY — never a position, never an address, never a
-/// route. The application resolves it; the workspace holds every
-/// navigation channel to it.
-final class MentoraWorkspaceNavigationState {
+/// route. It is not the truth of navigation and never claims to be:
+/// the truth lives with the official navigation state, and a context
+/// is handed an echo of it — this announcement — so that a structure
+/// can mark the place without ever knowing the topology.
+final class MentoraNavigationAnnouncement {
   final String destinationId;
 
-  const MentoraWorkspaceNavigationState({required this.destinationId});
+  const MentoraNavigationAnnouncement({required this.destinationId});
 }
 
 /// The surface being worked in.

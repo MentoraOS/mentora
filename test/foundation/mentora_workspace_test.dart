@@ -141,7 +141,7 @@ MentoraWorkspace _workspace({
   return MentoraWorkspace(
     semanticLabel: semanticLabel,
     configuration: MentoraWorkspaceConfiguration(navigation: channel),
-    navigation: MentoraWorkspaceNavigationState(destinationId: destinationId),
+    navigation: MentoraNavigationAnnouncement(destinationId: destinationId),
     orientation: orientation,
     rail: rail,
     base: base,

@@ -105,7 +105,7 @@ MentoraLayoutContext _frame({
 }) {
   return MentoraLayoutContext(
     semanticLabel: semanticLabel,
-    navigation: const MentoraWorkspaceNavigationState(destinationId: _home),
+    navigation: const MentoraNavigationAnnouncement(destinationId: _home),
     configuration: MentoraWorkspaceConfiguration(
       navigation: withNavigation
           ? MentoraWorkspaceNavigationChannel.base
