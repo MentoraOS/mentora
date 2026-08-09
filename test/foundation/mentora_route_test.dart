@@ -430,6 +430,27 @@ void main() {
             'lib/foundation/design_kit/navigation/mentora_destination.dart',
       ]);
 
+      // The destination is the ONE deliberately presentational file of
+      // the layer: it carries the signs a person recognises, so it may
+      // import exactly the icon primitive and the official badge — and
+      // nothing else, which is why no value equality lives on it: a
+      // badge is a component, not a value.
+      final destinationImports = RegExp(r'^import (.*);', multiLine: true)
+          .allMatches(
+            codeOf(
+              File(
+                'lib/foundation/design_kit/navigation/'
+                'mentora_destination.dart',
+              ),
+            ),
+          )
+          .map((match) => match.group(1))
+          .toList();
+      expect(destinationImports, [
+        "'package:flutter/widgets.dart' show IconData",
+        "'../components/badge/mentora_badge.dart'",
+      ]);
+
       // The three structures that present ways to places all consume
       // the one type: the concept has one owner and three users.
       final consumers = <String>[];

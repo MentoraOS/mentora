@@ -171,6 +171,28 @@ void main() {
       expect(dialogue.state.activeRouteId, 'accueil');
     });
 
+    test('the echo is a whole value of its own: two announcements of '
+        'the same identity ARE the same announcement', () {
+      const first = MentoraNavigationAnnouncement(destinationId: 'accueil');
+      const second = MentoraNavigationAnnouncement(destinationId: 'accueil');
+
+      expect(first, second);
+      expect(first.hashCode, second.hashCode);
+      // A runtime copy is NOT the same object — and a set still keeps
+      // one of them: the equality is the value's, not the identity's.
+      final runtimeCopy = MentoraNavigationAnnouncement(
+        destinationId: 'accueil',
+      );
+      expect(identical(first, runtimeCopy), isFalse);
+      expect({first, runtimeCopy}, hasLength(1));
+      expect(identical(first, second), isTrue);
+      expect(
+        first,
+        isNot(const MentoraNavigationAnnouncement(destinationId: 'entree')),
+      );
+      expect(first, isNot(equals('accueil')));
+    });
+
     test('two dialogues with the same words ARE the same dialogue', () {
       final graph = _graph();
 

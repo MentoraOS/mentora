@@ -718,6 +718,21 @@ void main() {
           reason: '$name: a truth of navigation needs no framework',
         );
       }
+      // And the two pure FACTS import nothing at all: a place and an
+      // echo need nothing to be true.
+      for (final name in const [
+        'mentora_route.dart',
+        'mentora_navigation_announcement.dart',
+      ]) {
+        final source = codeOf(
+          File('lib/foundation/design_kit/navigation/$name'),
+        );
+        expect(
+          RegExp(r'^import ', multiLine: true).hasMatch(source),
+          isFalse,
+          reason: '$name: a fact needs nothing to be true',
+        );
+      }
     });
   });
 }

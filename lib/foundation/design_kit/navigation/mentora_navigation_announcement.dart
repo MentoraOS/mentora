@@ -15,4 +15,13 @@ final class MentoraNavigationAnnouncement {
   final String destinationId;
 
   const MentoraNavigationAnnouncement({required this.destinationId});
+
+  @override
+  bool operator ==(Object other) {
+    return other is MentoraNavigationAnnouncement &&
+        other.destinationId == destinationId;
+  }
+
+  @override
+  int get hashCode => destinationId.hashCode;
 }

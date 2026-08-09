@@ -106,10 +106,9 @@ final class MentoraNavigationCoordinator {
         other.state == state &&
         other.request == request &&
         other.resolution == resolution &&
-        other.announcement.destinationId == announcement.destinationId;
+        other.announcement == announcement;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(state, request, resolution, announcement.destinationId);
+  int get hashCode => Object.hash(state, request, resolution, announcement);
 }
