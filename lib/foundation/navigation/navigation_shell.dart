@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../design_kit/appearance/appearance_engine.dart';
 import '../design_kit/components/text/mentora_text.dart';
+import '../design_kit/navigation/mentora_destination.dart';
 import '../design_kit/components/text/mentora_text_role.dart';
 import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
-import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
@@ -58,32 +58,32 @@ final class _NavigationShellState extends State<NavigationShell> {
   @override
   Widget build(BuildContext context) {
     final strings = MentoraStrings.of(context);
-    final destinations = <MentoraBottomNavigationDestination>[
-      MentoraBottomNavigationDestination(
+    final destinations = <MentoraDestination>[
+      MentoraDestination(
         id: _home,
         label: strings.tabHome,
         icon: Icons.home_outlined,
         selectedIcon: Icons.home,
       ),
-      MentoraBottomNavigationDestination(
+      MentoraDestination(
         id: _consultation,
         label: strings.tabConsultation,
         icon: Icons.event_note_outlined,
         selectedIcon: Icons.event_note,
       ),
-      MentoraBottomNavigationDestination(
+      MentoraDestination(
         id: _business,
         label: strings.tabBusiness,
         icon: Icons.insights_outlined,
         selectedIcon: Icons.insights,
       ),
-      MentoraBottomNavigationDestination(
+      MentoraDestination(
         id: _notifications,
         label: strings.tabNotifications,
         icon: Icons.notifications_outlined,
         selectedIcon: Icons.notifications,
       ),
-      MentoraBottomNavigationDestination(
+      MentoraDestination(
         id: _account,
         label: strings.tabAccount,
         icon: Icons.person_outline,

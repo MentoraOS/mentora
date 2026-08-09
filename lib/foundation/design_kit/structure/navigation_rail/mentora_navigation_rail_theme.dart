@@ -95,8 +95,7 @@ final class MentoraNavigationRailTheme {
 
   Curve get curve => _motion.curveFor(MotionIntention.accompagner);
 
-  double widthOf(MentoraNavigationRailDisplay display) =>
-      specOf(display).width;
+  double widthOf(MentoraNavigationRailDisplay display) => specOf(display).width;
 
   /// A destination is a target: it honors the opposable minimum,
   /// whatever the Token proposes.
@@ -153,17 +152,17 @@ final class MentoraNavigationRailTheme {
         );
       case MentoraNavigationRailState.focused:
         return MentoraNavigationRailDestinationVisuals(
-          indicator: _role(ColorRole.focus).withValues(
-            alpha: navigationRailIndicatorOpacity,
-          ),
+          indicator: _role(
+            ColorRole.focus,
+          ).withValues(alpha: navigationRailIndicatorOpacity),
           mark: _role(ColorRole.focus),
           wordsRole: ColorRole.focus,
         );
       case MentoraNavigationRailState.hovered:
         return MentoraNavigationRailDestinationVisuals(
-          indicator: _role(ColorRole.highlight).withValues(
-            alpha: navigationRailIndicatorOpacity,
-          ),
+          indicator: _role(
+            ColorRole.highlight,
+          ).withValues(alpha: navigationRailIndicatorOpacity),
           mark: _role(ColorRole.supporting),
           wordsRole: ColorRole.supporting,
         );

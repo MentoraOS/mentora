@@ -3,6 +3,7 @@ import 'dart:ui' show Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_destination.dart';
 import 'package:mentora/foundation/app/mentora_foundation_app.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
@@ -17,7 +18,6 @@ import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
 import 'package:mentora/foundation/design_kit/registry/semantic_roles.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
-import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import 'package:mentora/foundation/design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import 'package:mentora/foundation/design_kit/structure/workspace/mentora_workspace.dart';
 import 'package:mentora/foundation/design_kit/theme/theme_engine.dart';
@@ -33,27 +33,27 @@ const MentoraBadge _badge = MentoraBadge(
   semanticLabel: '3 notifications non lues',
 );
 
-const List<MentoraBottomNavigationDestination> _places = [
-  MentoraBottomNavigationDestination(
+const List<MentoraDestination> _places = [
+  MentoraDestination(
     id: 'home',
     label: 'Accueil',
     icon: Icons.home_outlined,
     selectedIcon: Icons.home,
   ),
-  MentoraBottomNavigationDestination(
+  MentoraDestination(
     id: 'consultation',
     label: 'Consultation',
     icon: Icons.event_note_outlined,
     selectedIcon: Icons.event_note,
   ),
-  MentoraBottomNavigationDestination(
+  MentoraDestination(
     id: 'notifications',
     label: 'Notifications',
     icon: Icons.notifications_outlined,
     selectedIcon: Icons.notifications,
     badge: _badge,
   ),
-  MentoraBottomNavigationDestination(
+  MentoraDestination(
     id: 'archive',
     label: 'Archives',
     icon: Icons.inventory_2_outlined,
@@ -69,7 +69,7 @@ Future<FoundationServices> _services() async {
 }
 
 MentoraBottomNavigation _navigation({
-  List<MentoraBottomNavigationDestination> destinations = _places,
+  List<MentoraDestination> destinations = _places,
   String? selectedDestinationId = 'home',
   ValueChanged<String>? onDestinationRequested,
 }) {
@@ -280,7 +280,7 @@ void main() {
     testWidgets('a structure without a contract refuses to build — fail '
         'closed', (tester) async {
       Future<void> refuses(
-        List<MentoraBottomNavigationDestination> destinations, {
+        List<MentoraDestination> destinations, {
         String? selectedDestinationId = 'home',
       }) async {
         await _pump(
@@ -298,13 +298,13 @@ void main() {
       // Beyond the maximum it is no longer a level, it is a menu.
       await refuses([
         ..._places,
-        const MentoraBottomNavigationDestination(
+        const MentoraDestination(
           id: 'a',
           label: 'A',
           icon: Icons.circle_outlined,
           selectedIcon: Icons.circle,
         ),
-        const MentoraBottomNavigationDestination(
+        const MentoraDestination(
           id: 'b',
           label: 'B',
           icon: Icons.circle_outlined,
@@ -316,7 +316,7 @@ void main() {
       // A place without an identity, or without a name, is not a place.
       await refuses([
         _places.first,
-        const MentoraBottomNavigationDestination(
+        const MentoraDestination(
           id: '',
           label: 'Consultation',
           icon: Icons.circle_outlined,
@@ -325,7 +325,7 @@ void main() {
       ]);
       await refuses([
         _places.first,
-        const MentoraBottomNavigationDestination(
+        const MentoraDestination(
           id: 'consultation',
           label: '',
           icon: Icons.circle_outlined,

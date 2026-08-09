@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart' show IconData;
 
-import '../../components/badge/mentora_badge.dart';
 import '../../tokens/navigation_rail_tokens.dart';
 
 /// How much of itself the structure shows.
@@ -25,39 +23,6 @@ enum MentoraNavigationRailState {
   disabled,
   collapsed,
   expanded,
-}
-
-/// A destination is an IDENTITY.
-///
-/// It is not an icon, not a position, and not an address: it is a
-/// place of the product that keeps the same identity for as long as
-/// the product exists. The structure knows destinations and nothing
-/// else — where they lead is the application's business.
-final class MentoraNavigationRailDestination {
-  /// What this place IS — stable forever, never a position.
-  final String id;
-
-  /// What it is called. The application owns every string
-  /// (Localization Engine); the Kit composes none.
-  final String label;
-
-  final IconData icon;
-  final IconData selectedIcon;
-
-  /// What is happening there — the Badge remains its owner.
-  final MentoraBadge? badge;
-
-  /// Whether the place can be reached right now.
-  final bool enabled;
-
-  const MentoraNavigationRailDestination({
-    required this.id,
-    required this.label,
-    required this.icon,
-    required this.selectedIcon,
-    this.badge,
-    this.enabled = true,
-  });
 }
 
 /// The act that changes how much the structure shows. A control

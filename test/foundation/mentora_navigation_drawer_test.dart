@@ -3,6 +3,7 @@ import 'dart:ui' show Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_destination.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
@@ -30,13 +31,13 @@ void _noop() {}
 const List<MentoraDrawerSection> _sections = [
   MentoraDrawerSection(
     destinations: [
-      MentoraDrawerDestination(
+      MentoraDestination(
         id: 'home',
         label: 'Accueil',
         icon: Icons.home_outlined,
         selectedIcon: Icons.home,
       ),
-      MentoraDrawerDestination(
+      MentoraDestination(
         id: 'consultation',
         label: 'Consultations',
         icon: Icons.event_note_outlined,
@@ -52,7 +53,7 @@ const List<MentoraDrawerSection> _sections = [
   MentoraDrawerSection(
     title: 'Espace professionnel',
     destinations: [
-      MentoraDrawerDestination(
+      MentoraDestination(
         id: 'archive',
         label: 'Archives',
         icon: Icons.inventory_2_outlined,

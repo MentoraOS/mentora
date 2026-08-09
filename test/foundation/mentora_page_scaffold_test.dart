@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_destination.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
@@ -36,14 +37,14 @@ import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.da
 
 void _noop() {}
 
-const List<MentoraNavigationRailDestination> _places = [
-  MentoraNavigationRailDestination(
+const List<MentoraDestination> _places = [
+  MentoraDestination(
     id: 'home',
     label: 'Accueil',
     icon: Icons.home_outlined,
     selectedIcon: Icons.home,
   ),
-  MentoraNavigationRailDestination(
+  MentoraDestination(
     id: 'consultation',
     label: 'Consultation',
     icon: Icons.event_note_outlined,
@@ -54,7 +55,7 @@ const List<MentoraNavigationRailDestination> _places = [
 const List<MentoraDrawerSection> _sections = [
   MentoraDrawerSection(
     destinations: [
-      MentoraDrawerDestination(
+      MentoraDestination(
         id: 'home',
         label: 'Accueil',
         icon: Icons.home_outlined,

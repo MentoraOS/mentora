@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../navigation/mentora_destination.dart';
 
 import '../../components/avatar/mentora_avatar.dart';
 import '../../components/button/mentora_button.dart';
@@ -29,7 +30,7 @@ import 'mentora_navigation_rail_theme.dart';
 final class MentoraNavigationRail extends StatefulWidget {
   /// The places of the product — identities, in the order the product
   /// presents them.
-  final List<MentoraNavigationRailDestination> destinations;
+  final List<MentoraDestination> destinations;
 
   /// What the person meant. The structure reports; it never decides.
   final ValueChanged<String> onDestinationSelected;
@@ -136,9 +137,7 @@ final class _MentoraNavigationRailState extends State<MentoraNavigationRail> {
 
   /// Exactly one effective state for one destination: availability,
   /// then where the person is, then the focus, then the pointer.
-  MentoraNavigationRailState _stateOf(
-    MentoraNavigationRailDestination place,
-  ) {
+  MentoraNavigationRailState _stateOf(MentoraDestination place) {
     if (!_live || !place.enabled) {
       return MentoraNavigationRailState.disabled;
     }
@@ -251,12 +250,11 @@ final class _MentoraNavigationRailState extends State<MentoraNavigationRail> {
 
   Widget _destination(
     MentoraNavigationRailTheme theme,
-    MentoraNavigationRailDestination place,
+    MentoraDestination place,
   ) {
     final state = _stateOf(place);
     final visuals = theme.destinationVisualsOf(state);
-    final reachable =
-        _live && place.enabled && place.id != _selectedId;
+    final reachable = _live && place.enabled && place.id != _selectedId;
     final showsWords = specOf(widget.display).showsWords;
 
     return Semantics(
@@ -269,9 +267,7 @@ final class _MentoraNavigationRailState extends State<MentoraNavigationRail> {
           type: MaterialType.transparency,
           child: InkWell(
             key: Key('rail-destination-${place.id}'),
-            borderRadius: BorderRadius.circular(
-              navigationRailIndicatorRadius,
-            ),
+            borderRadius: BorderRadius.circular(navigationRailIndicatorRadius),
             canRequestFocus: _live && place.enabled,
             // The structure reports the intention; it never decides.
             onTap: reachable
@@ -286,9 +282,7 @@ final class _MentoraNavigationRailState extends State<MentoraNavigationRail> {
             child: AnimatedContainer(
               duration: theme.transitionDuration,
               curve: theme.curve,
-              constraints: BoxConstraints(
-                minHeight: theme.destinationExtent,
-              ),
+              constraints: BoxConstraints(minHeight: theme.destinationExtent),
               decoration: BoxDecoration(
                 color: visuals.indicator,
                 borderRadius: BorderRadius.circular(

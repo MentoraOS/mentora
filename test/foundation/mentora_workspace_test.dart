@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_destination.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
@@ -19,7 +20,6 @@ import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
 import 'package:mentora/foundation/design_kit/registry/semantic_roles.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
-import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import 'package:mentora/foundation/design_kit/structure/master_detail/mentora_master_detail.dart';
 import 'package:mentora/foundation/design_kit/structure/master_detail/mentora_master_detail_style.dart';
 import 'package:mentora/foundation/design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
@@ -51,14 +51,14 @@ MentoraPageScaffold get _page => const MentoraPageScaffold(
   content: _content,
 );
 
-const List<MentoraBottomNavigationDestination> _destinations = [
-  MentoraBottomNavigationDestination(
+const List<MentoraDestination> _destinations = [
+  MentoraDestination(
     id: _home,
     label: 'Accueil',
     icon: Icons.home_outlined,
     selectedIcon: Icons.home,
   ),
-  MentoraBottomNavigationDestination(
+  MentoraDestination(
     id: 'elsewhere',
     label: 'Ailleurs',
     icon: Icons.explore_outlined,
@@ -66,8 +66,8 @@ const List<MentoraBottomNavigationDestination> _destinations = [
   ),
 ];
 
-const List<MentoraNavigationRailDestination> _places = [
-  MentoraNavigationRailDestination(
+const List<MentoraDestination> _places = [
+  MentoraDestination(
     id: _home,
     label: 'Accueil',
     icon: Icons.home_outlined,
@@ -78,7 +78,7 @@ const List<MentoraNavigationRailDestination> _places = [
 const List<MentoraDrawerSection> _sections = [
   MentoraDrawerSection(
     destinations: [
-      MentoraDrawerDestination(
+      MentoraDestination(
         id: _home,
         label: 'Accueil',
         icon: Icons.home_outlined,

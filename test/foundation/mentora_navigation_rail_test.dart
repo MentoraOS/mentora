@@ -4,6 +4,7 @@ import 'dart:ui' show Tristate;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_destination.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
@@ -25,14 +26,14 @@ import 'package:mentora/foundation/design_kit/theme/theme_variant.dart';
 import 'package:mentora/foundation/design_kit/tokens/navigation_rail_tokens.dart';
 import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.dart';
 
-const List<MentoraNavigationRailDestination> _places = [
-  MentoraNavigationRailDestination(
+const List<MentoraDestination> _places = [
+  MentoraDestination(
     id: 'home',
     label: 'Accueil',
     icon: Icons.home_outlined,
     selectedIcon: Icons.home,
   ),
-  MentoraNavigationRailDestination(
+  MentoraDestination(
     id: 'consultation',
     label: 'Consultation',
     icon: Icons.event_note_outlined,
@@ -43,7 +44,7 @@ const List<MentoraNavigationRailDestination> _places = [
       semanticLabel: 'Nouvelles consultations',
     ),
   ),
-  MentoraNavigationRailDestination(
+  MentoraDestination(
     id: 'archive',
     label: 'Archives',
     icon: Icons.inventory_2_outlined,
@@ -101,7 +102,7 @@ MentoraNavigationRail _rail({
   MentoraNavigationRailDisplay display = MentoraNavigationRailDisplay.compact,
   MentoraNavigationRailChrome chrome = MentoraNavigationRailChrome.surface,
   MentoraNavigationRailController? controller,
-  List<MentoraNavigationRailDestination> destinations = _places,
+  List<MentoraDestination> destinations = _places,
   ValueChanged<String>? onDestinationSelected,
   MentoraNavigationRailToggle? displayToggle,
   bool composed = false,
@@ -186,13 +187,13 @@ void main() {
         tester,
         _rail(
           destinations: const [
-            MentoraNavigationRailDestination(
+            MentoraDestination(
               id: 'home',
               label: 'Accueil',
               icon: Icons.home_outlined,
               selectedIcon: Icons.home,
             ),
-            MentoraNavigationRailDestination(
+            MentoraDestination(
               id: 'home',
               label: 'Encore',
               icon: Icons.home_outlined,
@@ -207,7 +208,7 @@ void main() {
         tester,
         _rail(
           destinations: const [
-            MentoraNavigationRailDestination(
+            MentoraDestination(
               id: 'home',
               label: '',
               icon: Icons.home_outlined,
@@ -309,10 +310,7 @@ void main() {
       );
       expect(find.byKey(const Key('rail-divider')), findsOneWidget);
 
-      await _pump(
-        tester,
-        _rail(chrome: MentoraNavigationRailChrome.floating),
-      );
+      await _pump(tester, _rail(chrome: MentoraNavigationRailChrome.floating));
       expect(
         (_decorationOf(tester).border! as Border).top.color,
         colors.colorOf(ColorRole.outline, ThemeVariantId.light),
@@ -332,10 +330,7 @@ void main() {
         'of them', (tester) async {
       await _pump(
         tester,
-        _rail(
-          display: MentoraNavigationRailDisplay.expanded,
-          composed: true,
-        ),
+        _rail(display: MentoraNavigationRailDisplay.expanded, composed: true),
       );
 
       expect(find.byType(MentoraAvatar), findsOneWidget);
@@ -385,9 +380,10 @@ void main() {
       );
       expect(
         closed.color,
-        services
-            .get<ColorTokenEngine>()
-            .colorOf(ColorRole.unavailable, ThemeVariantId.light),
+        services.get<ColorTokenEngine>().colorOf(
+          ColorRole.unavailable,
+          ThemeVariantId.light,
+        ),
       );
 
       await tester.tap(
@@ -407,15 +403,10 @@ void main() {
 
       await _pump(
         tester,
-        _rail(
-          controller: controller,
-          onDestinationSelected: (_) => reported++,
-        ),
+        _rail(controller: controller, onDestinationSelected: (_) => reported++),
       );
       expect(
-        tester
-            .widget<Opacity>(find.byKey(const Key('rail-presence')))
-            .opacity,
+        tester.widget<Opacity>(find.byKey(const Key('rail-presence'))).opacity,
         navigationRailDisabledVeilOpacity,
       );
 
@@ -437,20 +428,21 @@ void main() {
       await tester.pumpAndSettle();
 
       // Whatever the focus landed on, the focus role expresses it.
-      final focused = tester.widgetList<Icon>(find.byType(Icon)).where(
-        (icon) =>
-            icon.color ==
-            services
-                .get<ColorTokenEngine>()
-                .colorOf(ColorRole.focus, ThemeVariantId.light),
-      );
+      final focused = tester
+          .widgetList<Icon>(find.byType(Icon))
+          .where(
+            (icon) =>
+                icon.color ==
+                services.get<ColorTokenEngine>().colorOf(
+                  ColorRole.focus,
+                  ThemeVariantId.light,
+                ),
+          );
       expect(focused, isNotEmpty);
     });
 
     testWidgets('the four theme variants, both directions and every '
-        'reading comfort are served without special handling', (
-      tester,
-    ) async {
+        'reading comfort are served without special handling', (tester) async {
       for (final variant in ThemeVariantId.values) {
         final services = await _pump(tester, _rail(), variant: variant);
         expect(
@@ -488,9 +480,10 @@ void main() {
       final services = await _pump(tester, _rail());
       expect(
         _surfaceOf(tester).duration,
-        services
-            .get<MotionEngine>()
-            .durationFor(MotionIntention.accompagner, appearance),
+        services.get<MotionEngine>().durationFor(
+          MotionIntention.accompagner,
+          appearance,
+        ),
       );
 
       await _pump(

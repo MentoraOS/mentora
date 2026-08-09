@@ -239,9 +239,7 @@ void main() {
     late ThemeEngine engine;
 
     setUpAll(() async {
-      final services = await AppBootstrap(
-        logger: _MemoryLogger(),
-      ).initialize();
+      final services = await AppBootstrap(logger: _MemoryLogger()).initialize();
       engine = services.get<ThemeEngine>();
     });
 
@@ -370,7 +368,10 @@ void main() {
         engine.resolve(systemLocale: const Locale('pt', 'BR')),
         const Locale('pt'),
       );
-      expect(engine.resolve(systemLocale: const Locale('ja')), const Locale('en'));
+      expect(
+        engine.resolve(systemLocale: const Locale('ja')),
+        const Locale('en'),
+      );
       expect(engine.resolve(), const Locale('en'));
     });
 
@@ -517,12 +518,7 @@ void main() {
       final source = File(
         'lib/foundation/navigation/navigation_shell.dart',
       ).readAsStringSync();
-      expect(
-        RegExp(
-          r'MentoraBottomNavigationDestination\(',
-        ).allMatches(source).length,
-        5,
-      );
+      expect(RegExp(r'MentoraDestination\(').allMatches(source).length, 5);
       // Five identities, never five positions.
       expect(RegExp(r'id: _\w+,').allMatches(source).length, 5);
     });

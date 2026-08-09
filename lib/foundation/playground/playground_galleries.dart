@@ -17,6 +17,7 @@ import '../design_kit/layout/catalog_layout/mentora_catalog_layout.dart';
 import '../design_kit/layout/content_layout/mentora_content_layout.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
+import '../design_kit/navigation/mentora_destination.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
 import '../design_kit/layout/detail_layout/mentora_detail_layout.dart';
@@ -32,7 +33,6 @@ import '../design_kit/layout/settings_layout/mentora_settings_layout.dart';
 import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import '../design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import '../design_kit/tokens/split_view_tokens.dart';
-import '../design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import '../design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer.dart';
 import '../design_kit/structure/navigation_drawer/mentora_navigation_drawer_style.dart';
@@ -2086,14 +2086,14 @@ final class _NavigationRailGalleryState extends State<NavigationRailGallery> {
     super.dispose();
   }
 
-  static const List<MentoraNavigationRailDestination> places = [
-    MentoraNavigationRailDestination(
+  static const List<MentoraDestination> places = [
+    MentoraDestination(
       id: 'home',
       label: 'Accueil',
       icon: Icons.home_outlined,
       selectedIcon: Icons.home,
     ),
-    MentoraNavigationRailDestination(
+    MentoraDestination(
       id: 'consultation',
       label: 'Consultation',
       icon: Icons.event_note_outlined,
@@ -2104,13 +2104,13 @@ final class _NavigationRailGalleryState extends State<NavigationRailGallery> {
         semanticLabel: 'Nouvelles consultations',
       ),
     ),
-    MentoraNavigationRailDestination(
+    MentoraDestination(
       id: 'business',
       label: 'Activité',
       icon: Icons.insights_outlined,
       selectedIcon: Icons.insights,
     ),
-    MentoraNavigationRailDestination(
+    MentoraDestination(
       id: 'archive',
       label: 'Archives',
       icon: Icons.inventory_2_outlined,
@@ -2633,13 +2633,13 @@ final class _NavigationDrawerGalleryState
   static const List<MentoraDrawerSection> sections = [
     MentoraDrawerSection(
       destinations: [
-        MentoraDrawerDestination(
+        MentoraDestination(
           id: 'home',
           label: 'Accueil',
           icon: Icons.home_outlined,
           selectedIcon: Icons.home,
         ),
-        MentoraDrawerDestination(
+        MentoraDestination(
           id: 'consultation',
           label: 'Consultations',
           icon: Icons.event_note_outlined,
@@ -2655,13 +2655,13 @@ final class _NavigationDrawerGalleryState
     MentoraDrawerSection(
       title: 'Espace professionnel',
       destinations: [
-        MentoraDrawerDestination(
+        MentoraDestination(
           id: 'business',
           label: 'Activité',
           icon: Icons.insights_outlined,
           selectedIcon: Icons.insights,
         ),
-        MentoraDrawerDestination(
+        MentoraDestination(
           id: 'archive',
           label: 'Archives',
           icon: Icons.inventory_2_outlined,
@@ -3121,14 +3121,14 @@ final class _BottomNavigationGalleryState
     ),
   ];
 
-  static List<MentoraBottomNavigationDestination> places(
+  static List<MentoraDestination> places(
     int count, {
     bool badges = false,
     Set<String> unavailable = const {},
   }) {
     return [
       for (final place in catalogue.take(count))
-        MentoraBottomNavigationDestination(
+        MentoraDestination(
           id: place.id,
           label: place.label,
           icon: place.icon,
@@ -3157,7 +3157,7 @@ final class _BottomNavigationGalleryState
 
     Widget scene(
       String name,
-      List<MentoraBottomNavigationDestination> destinations, {
+      List<MentoraDestination> destinations, {
       String? selectedId = 'home',
     }) {
       return MentoraBottomNavigation(

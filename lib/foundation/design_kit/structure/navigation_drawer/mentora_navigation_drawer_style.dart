@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart' show IconData;
+import '../../navigation/mentora_destination.dart';
 
-import '../../components/badge/mentora_badge.dart';
 import '../../tokens/drawer_tokens.dart';
 
 /// How the orientation map is presented.
@@ -18,44 +17,12 @@ enum MentoraDrawerVisibility { opened, closed }
 /// The states of one destination of the map.
 enum MentoraDrawerState { idle, selected, hovered, focused, disabled }
 
-/// A destination is an IDENTITY.
-///
-/// It is not a position and not an address: it is a place of the
-/// person's space, and it keeps the same identity for as long as the
-/// product exists.
-final class MentoraDrawerDestination {
-  /// What this place IS — stable forever, never a position.
-  final String id;
-
-  /// What it is called. The application owns every string
-  /// (Localization Engine); the Kit composes none.
-  final String label;
-
-  final IconData icon;
-  final IconData selectedIcon;
-
-  /// What is happening there — the Badge remains its owner.
-  final MentoraBadge? badge;
-
-  /// Whether the place can be reached right now.
-  final bool enabled;
-
-  const MentoraDrawerDestination({
-    required this.id,
-    required this.label,
-    required this.icon,
-    required this.selectedIcon,
-    this.badge,
-    this.enabled = true,
-  });
-}
-
 /// A named group of places. A map without sections is a map with one.
 final class MentoraDrawerSection {
   /// What this group of places is called, when it deserves a name.
   final String? title;
 
-  final List<MentoraDrawerDestination> destinations;
+  final List<MentoraDestination> destinations;
 
   const MentoraDrawerSection({required this.destinations, this.title});
 }

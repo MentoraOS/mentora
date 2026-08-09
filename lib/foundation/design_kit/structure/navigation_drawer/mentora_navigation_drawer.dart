@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../navigation/mentora_destination.dart';
 
 import '../../components/button/mentora_button.dart';
 import '../../components/design_kit_scope.dart';
@@ -165,7 +166,7 @@ final class _MentoraNavigationDrawerState
     }
   }
 
-  MentoraDrawerState _stateOf(MentoraDrawerDestination place) {
+  MentoraDrawerState _stateOf(MentoraDestination place) {
     if (!place.enabled) return MentoraDrawerState.disabled;
     if (place.id == widget.controller.selectedId) {
       return MentoraDrawerState.selected;
@@ -346,7 +347,7 @@ final class _MentoraNavigationDrawerState
 
   Widget _destination(
     MentoraNavigationDrawerTheme theme,
-    MentoraDrawerDestination place,
+    MentoraDestination place,
   ) {
     final state = _stateOf(place);
     final visuals = theme.destinationVisualsOf(state);

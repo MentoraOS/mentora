@@ -223,9 +223,7 @@ void main() {
 
       await _pump(
         tester,
-        _context(
-          scrollBehaviour: MentoraAppBarScrollBehaviour.stretchable,
-        ),
+        _context(scrollBehaviour: MentoraAppBarScrollBehaviour.stretchable),
       );
       expect(tester.takeException(), isStateError);
     });
@@ -362,9 +360,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester.widget<Divider>(find.byKey(const Key('app-bar-divider'))).color,
-        services
-            .get<ColorTokenEngine>()
-            .colorOf(ColorRole.divider, ThemeVariantId.light),
+        services.get<ColorTokenEngine>().colorOf(
+          ColorRole.divider,
+          ThemeVariantId.light,
+        ),
       );
       expect(_decorationOf(tester).boxShadow, isNull);
     });
@@ -397,10 +396,7 @@ void main() {
         );
       }
 
-      await _pump(
-        tester,
-        _context(variant: MentoraAppBarVariant.transparent),
-      );
+      await _pump(tester, _context(variant: MentoraAppBarVariant.transparent));
       expect(_decorationOf(tester).color, isNull);
     });
 
@@ -435,7 +431,8 @@ void main() {
       await _pump(
         tester,
         const MentoraAppBar(
-          title: 'Consultations de suivi avec les experts partenaires du '
+          title:
+              'Consultations de suivi avec les experts partenaires du '
               'réseau international',
           variant: MentoraAppBarVariant.compact,
         ),
@@ -449,9 +446,10 @@ void main() {
       final services = await _pump(tester, _context());
       expect(
         _surfaceOf(tester).duration,
-        services
-            .get<MotionEngine>()
-            .durationFor(MotionIntention.montrerLaContinuite, appearance),
+        services.get<MotionEngine>().durationFor(
+          MotionIntention.montrerLaContinuite,
+          appearance,
+        ),
       );
 
       await _pump(
@@ -523,6 +521,10 @@ void main() {
         // orientation map presents the person's space with the very
         // component that presents an entity.
         'composition',
+        // A structure that presents ways to places consumes the ONE
+        // navigation vocabulary — a destination is declared once for
+        // the whole Kit, never once per structure.
+        'navigation',
         'tokens',
         'registry',
         'theme',

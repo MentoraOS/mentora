@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mentora/foundation/design_kit/navigation/mentora_destination.dart';
 import 'package:mentora/foundation/bootstrap/design_kit_bootstrap.dart';
 import 'package:mentora/foundation/core/di/foundation_services.dart';
 import 'package:mentora/foundation/design_kit/accessibility/accessibility_engine.dart';
@@ -44,7 +45,6 @@ import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/structure/app_bar/mentora_app_bar.dart';
 import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation.dart';
-import 'package:mentora/foundation/design_kit/structure/bottom_navigation/mentora_bottom_navigation_style.dart';
 import 'package:mentora/foundation/design_kit/structure/master_detail/mentora_master_detail.dart';
 import 'package:mentora/foundation/design_kit/structure/master_detail/mentora_master_detail_style.dart';
 import 'package:mentora/foundation/design_kit/structure/page_scaffold/mentora_page_scaffold.dart';
@@ -68,14 +68,14 @@ const Widget _content = MentoraText(
   role: MentoraTextRole.body,
 );
 
-const List<MentoraBottomNavigationDestination> _destinations = [
-  MentoraBottomNavigationDestination(
+const List<MentoraDestination> _destinations = [
+  MentoraDestination(
     id: _home,
     label: 'Accueil',
     icon: Icons.home_outlined,
     selectedIcon: Icons.home,
   ),
-  MentoraBottomNavigationDestination(
+  MentoraDestination(
     id: 'elsewhere',
     label: 'Ailleurs',
     icon: Icons.explore_outlined,

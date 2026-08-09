@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../navigation/mentora_destination.dart';
 
 import '../../components/design_kit_scope.dart';
 import '../../components/text/mentora_text.dart';
@@ -28,7 +29,7 @@ import 'mentora_bottom_navigation_theme.dart';
 final class MentoraBottomNavigation extends StatefulWidget {
   /// The principal places of the product — identities, in the order
   /// the product presents them.
-  final List<MentoraBottomNavigationDestination> destinations;
+  final List<MentoraDestination> destinations;
 
   /// Where the person is. The application announces it; the structure
   /// never guesses it and never decides it.
@@ -98,9 +99,7 @@ final class _MentoraBottomNavigationState
 
   /// Exactly one effective state for one destination: availability,
   /// then where the person is, then the focus, then the pointer.
-  MentoraBottomNavigationState _stateOf(
-    MentoraBottomNavigationDestination place,
-  ) {
+  MentoraBottomNavigationState _stateOf(MentoraDestination place) {
     if (!place.enabled) return MentoraBottomNavigationState.disabled;
     if (place.id == widget.selectedDestinationId) {
       return MentoraBottomNavigationState.selected;
@@ -170,7 +169,7 @@ final class _MentoraBottomNavigationState
 
   Widget _destination(
     MentoraBottomNavigationTheme theme,
-    MentoraBottomNavigationDestination place,
+    MentoraDestination place,
   ) {
     final state = _stateOf(place);
     final visuals = theme.destinationVisualsOf(state);
@@ -237,7 +236,7 @@ final class _MentoraBottomNavigationState
   /// stands at the corner the reading direction puts it in.
   Widget _mark(
     MentoraBottomNavigationTheme theme,
-    MentoraBottomNavigationDestination place,
+    MentoraDestination place,
     MentoraBottomNavigationDestinationVisuals visuals,
   ) {
     final capsule = AnimatedContainer(
