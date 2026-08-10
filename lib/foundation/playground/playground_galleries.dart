@@ -14,6 +14,7 @@ import '../design_kit/structure/split_view/mentora_split_view_style.dart';
 import '../design_kit/structure/workspace/mentora_workspace.dart';
 import '../design_kit/structure/workspace/mentora_workspace_style.dart';
 import '../design_kit/layout/analytics_layout/mentora_analytics_layout.dart';
+import '../design_kit/layout/authentication_layout/mentora_authentication_layout.dart';
 import '../design_kit/layout/catalog_layout/mentora_catalog_layout.dart';
 import '../design_kit/layout/content_layout/mentora_content_layout.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
@@ -3422,6 +3423,172 @@ final class _CatalogLayoutDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: catalogLayoutDocScans,
             keyPrefix: 'catalog-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Authentication Layout catalogue - the page where a
+/// person proves who they are. The layout expresses; the product
+/// authenticates.
+final class AuthenticationLayoutGallery extends StatelessWidget {
+  const AuthenticationLayoutGallery({super.key});
+
+  // Six regions and their cards: the frame is sized by what it shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  static MentoraLayoutZone zone(String label, Widget content) =>
+      MentoraLayoutZone(semanticLabel: label, content: content);
+
+  static Widget words(String body) =>
+      MentoraText(body, role: MentoraTextRole.body);
+
+  static MentoraAuthenticationLayout shape({Key? key, bool complete = true}) {
+    return MentoraAuthenticationLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      header: complete
+          ? zone(authenticationHeaderLabel, words(layoutContentBody))
+          : null,
+      introduction: complete
+          ? zone(authenticationIntroductionLabel, words(layoutContentBody))
+          : null,
+      // The matter itself: the only region the page cannot do without
+      // - what is presented belongs to the application, and the layout
+      // hands it on unread.
+      credentials: zone(
+        authenticationCredentialsLabel,
+        const MentoraCard(
+          variant: MentoraCardVariant.surface,
+          child: MentoraText(
+            authenticationCredentialsWords,
+            role: MentoraTextRole.body,
+          ),
+        ),
+      ),
+      supportingContent: complete
+          ? zone(authenticationSupportingLabel, words(layoutContentBody))
+          : null,
+      actions: complete
+          ? zone(
+              authenticationActionsLabel,
+              MentoraButton(
+                label: authenticationActLabel,
+                onPressed: () {},
+                size: MentoraButtonSize.small,
+              ),
+            )
+          : null,
+      footer: complete
+          ? zone(authenticationFooterLabel, words(layoutContentBody))
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: authenticationLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-authentication'))),
+          // The proof alone: a page built around one matter stands
+          // from the matter on.
+          _scene(
+            shape(
+              key: const Key('layout-authentication-bare'),
+              complete: false,
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(
+                shape(key: Key('layout-authentication-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(
+                shape(key: Key('layout-authentication-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(key: Key('layout-authentication-${direction.name}')),
+              ),
+            ),
+          const _AuthenticationLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Authentication Layout's living documentation - built only with
+/// Mentora components.
+final class _AuthenticationLayoutDocumentation extends StatelessWidget {
+  const _AuthenticationLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('authentication-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(
+            authenticationLayoutDocHeading,
+            role: MentoraTextRole.subtitle,
+          ),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: authenticationLayoutDocArchitecture,
+            keyPrefix: 'authentication-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: authenticationLayoutDocResponsibilities,
+            keyPrefix: 'authentication-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: authenticationLayoutDocComponents,
+            keyPrefix: 'authentication-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: authenticationLayoutDocTokens,
+            keyPrefix: 'authentication-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: authenticationLayoutDocEngines,
+            keyPrefix: 'authentication-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: authenticationLayoutDocForbidden,
+            keyPrefix: 'authentication-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: authenticationLayoutDocScans,
+            keyPrefix: 'authentication-layout-doc-scan',
           ),
         ],
       ),

@@ -78,4 +78,8 @@ enum MentoraLayoutKind {
   /// A conversation space: the official regions of a dialogue the
   /// product holds, in the official order.
   messaging,
+
+  /// A page built around one matter: the proof of identity a person
+  /// presents to be recognised.
+  authentication,
 }

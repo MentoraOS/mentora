@@ -244,6 +244,61 @@ const List<String> catalogLayoutDocScans = [
   'No shape that presents a collection owns how it is presented',
   'One identified content across the layer: no entry twin was opened',
 ];
+const String authenticationLayoutGalleryTitle = 'Layouts — Authentication';
+const String authenticationLayoutDocHeading =
+    'MentoraAuthenticationLayout — official contract';
+const String authenticationHeaderLabel = 'Ce que vous allez faire';
+const String authenticationIntroductionLabel = 'Ce qu’il faut savoir d’abord';
+const String authenticationCredentialsLabel = 'La preuve d’identité';
+const String authenticationSupportingLabel = 'Ce qui aide à côté';
+const String authenticationActionsLabel = 'Ce qui conclut';
+const String authenticationFooterLabel = 'Ce qui est dit dessous';
+const String authenticationCredentialsWords =
+    'Ce que vous présentez pour être reconnu — jamais lu par la forme.';
+const String authenticationActLabel = 'Continuer';
+const List<String> authenticationLayoutDocArchitecture = [
+  'A specialization of the PRINCIPAL foundation, like Form and Feed',
+  'One matter — the proof of identity — required by the COMPILER',
+  'credentials is an alias over the one holder: never a second field',
+  'The six official words of a principal page, in the official order',
+  'It declares its kind and its alias — the foundation owns the rest',
+];
+const List<String> authenticationLayoutDocResponsibilities = [
+  'It authenticates no one: it organises the page where a person proves',
+  'It knows no one who signs in, nothing typed, no secret, no code',
+  'It examines nothing, accepts nothing, refuses nothing of the proof',
+  'A region is handed, never interpreted — the components own it',
+  'The layout expresses; the product authenticates',
+];
+const List<String> authenticationLayoutDocComponents = [
+  'MentoraInput — owns an entry given to it; MentoraText — owns the words',
+  'MentoraCard — owns the container of what a region shows',
+  'MentoraButton — owns the acts that conclude',
+  'The Principal Layout — which alone holds the matter and the words',
+  'The Layout Assembly — which alone places them, once per screen',
+];
+const List<String> authenticationLayoutDocForbidden = [
+  'Anyone who signs in, any secret, any code, any token, any session',
+  'Any provider, any protocol, any security or identity API',
+  'Any network, promise, stream or engine of any kind',
+  'Any model, state of the proof, or memory of its own',
+  'Navigator, MediaQuery, Theme.of, Padding, Expanded, dynamic, Object?',
+];
+const List<String> authenticationLayoutDocTokens = [
+  'Layout: the room the layer adds between the regions — none',
+];
+const List<String> authenticationLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> authenticationLayoutDocScans = [
+  'No identity machinery: no secret, no code, no token, no session',
+  'No security API, no protocol, no network, no promise',
+  'No selection, no order of its own, no arithmetic, no memory',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraAuthenticationLayout, extending the principal foundation',
+  'Exactly three consumers of the principal foundation — all pure',
+  'One alias over the one matter — form, feed and credentials each theirs',
+];
 const String messagingLayoutGalleryTitle = 'Layouts — Messaging';
 const String messagingLayoutDocHeading =
     'MentoraMessagingLayout — official contract';

@@ -21,6 +21,7 @@ import 'package:mentora/foundation/design_kit/components/snackbar/mentora_snackb
 import 'package:mentora/foundation/design_kit/components/text/mentora_text.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.dart';
 import 'package:mentora/foundation/design_kit/layout/analytics_layout/mentora_analytics_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/authentication_layout/mentora_authentication_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/content_layout/mentora_content_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/catalog_layout/mentora_catalog_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
@@ -286,6 +287,14 @@ Map<MentoraLayoutKind, Widget> _layouts({
         MentoraIdentifiedContent(id: 'premier', content: _content),
         MentoraIdentifiedContent(id: 'second', content: SizedBox.shrink()),
       ],
+    ),
+    MentoraLayoutKind.authentication: MentoraAuthenticationLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      credentials: const MentoraLayoutZone(
+        semanticLabel: 'La preuve d’identité',
+        content: _content,
+      ),
     ),
     MentoraLayoutKind.messaging: MentoraMessagingLayout(
       frame: plain,
@@ -1092,6 +1101,7 @@ void main() {
         'MentoraCatalogLayout',
         'MentoraTimelineLayout',
         'MentoraMessagingLayout',
+        'MentoraAuthenticationLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];
