@@ -39,6 +39,7 @@ import 'package:mentora/foundation/design_kit/layout/grid_layout/mentora_grid_la
 import 'package:mentora/foundation/design_kit/layout/list_layout/mentora_list_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/settings_layout/mentora_settings_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/search_results_layout/mentora_search_results_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
@@ -284,6 +285,16 @@ Map<MentoraLayoutKind, Widget> _layouts({
       catalogId: 'offre',
       catalogSemanticLabel: 'L offre',
       entries: const [
+        MentoraIdentifiedContent(id: 'premier', content: _content),
+        MentoraIdentifiedContent(id: 'second', content: SizedBox.shrink()),
+      ],
+    ),
+    MentoraLayoutKind.searchResults: MentoraSearchResultsLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      searchResultsId: 'trouvailles',
+      searchResultsSemanticLabel: 'Ce qui a été trouvé',
+      results: const [
         MentoraIdentifiedContent(id: 'premier', content: _content),
         MentoraIdentifiedContent(id: 'second', content: SizedBox.shrink()),
       ],
@@ -1102,6 +1113,7 @@ void main() {
         'MentoraTimelineLayout',
         'MentoraMessagingLayout',
         'MentoraAuthenticationLayout',
+        'MentoraSearchResultsLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

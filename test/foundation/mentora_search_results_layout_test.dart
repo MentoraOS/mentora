@@ -19,15 +19,13 @@ import 'package:mentora/foundation/design_kit/components/design_kit_scope.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text.dart';
 import 'package:mentora/foundation/design_kit/components/text/mentora_text_role.dart';
 import 'package:mentora/foundation/design_kit/composition/list_tile/mentora_list_tile.dart';
-import 'package:mentora/foundation/design_kit/layout/catalog_layout/mentora_catalog_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_collected_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_context.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_kind.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_style.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_page_like_layout.dart';
-import 'package:mentora/foundation/design_kit/layout/list_layout/mentora_list_layout.dart';
-import 'package:mentora/foundation/design_kit/layout/timeline_layout/mentora_timeline_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/search_results_layout/mentora_search_results_layout.dart';
 import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
 import 'package:mentora/foundation/design_kit/registry/token_engines.dart';
 import 'package:mentora/foundation/design_kit/structure/app_bar/mentora_app_bar.dart';
@@ -39,43 +37,47 @@ import 'package:mentora/foundation/design_kit/tokens/layout_tokens.dart';
 import 'package:mentora/foundation/design_kit/tokens/surface_elevation_tokens.dart';
 
 /// What the application owns — recognisable, already built, and never
-/// touched by the layout that presents it. The words carry a date and
-/// an hour on purpose: the layout must hand them on without
-/// understanding them.
+/// touched by the layout that presents it. The words carry the marks
+/// of a seeking on purpose — a relevance, a rank among the others —
+/// so the layout must hand them on without understanding any of them.
 Widget _words(String id) => MentoraText(
-  'Moment $id — 12 mars 2026, 14 h 05',
-  key: Key('moment-$id'),
+  'Résultat $id — 97 % pertinent, 1er sur 3',
+  key: Key('result-$id'),
   role: MentoraTextRole.body,
 );
 
-MentoraIdentifiedContent _moment(String id, {Widget? content}) =>
+MentoraIdentifiedContent _result(String id, {Widget? content}) =>
     MentoraIdentifiedContent(id: id, content: content ?? _words(id));
 
 /// The identities are words of the product, never ranks and never
-/// instants: what they suggest chronologically is deliberately NOT the
+/// measures: what they suggest as an order is deliberately NOT the
 /// order they are announced in.
-const List<String> _identities = ['paiement', 'inscription', 'premier-appel'];
+const List<String> _identities = [
+  'troisieme-trouvaille',
+  'premiere-trouvaille',
+  'deuxieme-trouvaille',
+];
 
 const MentoraLayoutContext _frame = MentoraLayoutContext(
   semanticLabel: 'Contexte de travail',
   navigation: MentoraNavigationAnnouncement(destinationId: 'home'),
 );
 
-MentoraTimelineLayout _layout({
+MentoraSearchResultsLayout _layout({
   MentoraLayoutContext frame = _frame,
   String pageSemanticLabel = 'Page courante',
-  String timelineId = 'parcours',
-  String timelineSemanticLabel = 'Le parcours',
-  List<MentoraIdentifiedContent>? moments,
+  String searchResultsId = 'trouvailles',
+  String searchResultsSemanticLabel = 'Ce qui a été trouvé',
+  List<MentoraIdentifiedContent>? results,
   MentoraAppBar? place,
   List<MentoraButton> acts = const [],
 }) {
-  return MentoraTimelineLayout(
+  return MentoraSearchResultsLayout(
     frame: frame,
     pageSemanticLabel: pageSemanticLabel,
-    timelineId: timelineId,
-    timelineSemanticLabel: timelineSemanticLabel,
-    moments: moments ?? [for (final id in _identities) _moment(id)],
+    searchResultsId: searchResultsId,
+    searchResultsSemanticLabel: searchResultsSemanticLabel,
+    results: results ?? [for (final id in _identities) _result(id)],
     place: place,
     acts: acts,
   );
@@ -116,13 +118,13 @@ Future<FoundationServices> _pump(
   return services;
 }
 
-Finder _timeline() => find.byKey(const Key('list-parcours'));
+Finder _collection() => find.byKey(const Key('list-trouvailles'));
 
-Finder _momentOf(String id) => find.byKey(Key('list-item-$id'));
+Finder _resultOf(String id) => find.byKey(Key('list-item-$id'));
 
 void main() {
-  group('MentoraTimelineLayout — a succession of moments, already '
-      'ordered', () {
+  group('MentoraSearchResultsLayout — a collection of results already '
+      'found', () {
     testWidgets('it is a specialization of the one foundation, through '
         'the collected foundation, and the registry knows its shape', (
       tester,
@@ -130,98 +132,73 @@ void main() {
       expect(_layout(), isA<MentoraLayout>());
       expect(_layout(), isA<MentoraPageLikeLayout>());
       expect(_layout(), isA<MentoraCollectedLayout>());
-      expect(_layout().kind, MentoraLayoutKind.timeline);
+      expect(_layout().kind, MentoraLayoutKind.searchResults);
 
       await _pump(tester, _layout());
-      expect(find.byKey(const Key('layout-timeline')), findsOneWidget);
+      expect(find.byKey(const Key('layout-searchResults')), findsOneWidget);
       expect(find.byType(MentoraWorkspace), findsOneWidget);
       expect(find.byType(MentoraPageScaffold), findsOneWidget);
     });
 
-    test('the words of a succession of moments are aliases over the one '
-        'holder: there is no second field anywhere', () {
-      final moments = [for (final id in _identities) _moment(id)];
-      final layout = _layout(moments: moments);
+    test('the words of a collection of results are aliases over the '
+        'one holder: there is no second field anywhere', () {
+      final results = [for (final id in _identities) _result(id)];
+      final layout = _layout(results: results);
 
-      expect(layout.timelineId, 'parcours');
-      expect(layout.timelineId, layout.collectionId);
-      expect(layout.timelineSemanticLabel, layout.collectionSemanticLabel);
-      expect(layout.moments, same(moments));
-      expect(layout.moments, same(layout.contents));
+      expect(layout.searchResultsId, 'trouvailles');
+      expect(layout.searchResultsId, layout.collectionId);
+      expect(layout.searchResultsSemanticLabel, layout.collectionSemanticLabel);
+      expect(layout.results, same(results));
+      expect(layout.results, same(layout.contents));
     });
 
-    test('the collection is never transformed: what was announced is '
-        'the very object held, and the very object served', () {
-      final moments = [for (final id in _identities) _moment(id)];
-      final layout = _layout(moments: moments);
+    test('the collection is never transformed: the results announced '
+        'are exactly the results held, and exactly the results served', () {
+      final results = [for (final id in _identities) _result(id)];
+      final layout = _layout(results: results);
 
       // The SAME list instance, end to end: not a copy, not a view,
       // not a rearrangement — the layout never even touched it.
-      expect(layout.contents, same(moments));
-      expect(layout.moments, same(moments));
-      for (var rank = 0; rank < moments.length; rank += 1) {
-        expect(identical(layout.moments[rank], moments[rank]), isTrue);
+      expect(identical(layout.results, results), isTrue);
+      expect(identical(layout.contents, results), isTrue);
+      for (var rank = 0; rank < results.length; rank += 1) {
+        expect(identical(layout.results[rank], results[rank]), isTrue);
       }
-    });
-
-    test('it is the third pure consumer of the collected foundation: '
-        'list, catalog and timeline speak the very same machinery', () {
-      final units = [for (final id in _identities) _moment(id)];
-      final list = MentoraListLayout(
-        frame: _frame,
-        pageSemanticLabel: 'Page courante',
-        listId: 'transactions',
-        listSemanticLabel: 'Les transactions',
-        items: units,
-      );
-      final catalog = MentoraCatalogLayout(
-        frame: _frame,
-        pageSemanticLabel: 'Page courante',
-        catalogId: 'offre',
-        catalogSemanticLabel: 'L’offre',
-        entries: units,
-      );
-      final timeline = _layout(moments: units);
-
-      for (final shape in [list, catalog, timeline]) {
-        expect(shape, isA<MentoraCollectedLayout>());
-      }
-      expect(list.items, same(list.contents));
-      expect(catalog.entries, same(catalog.contents));
-      expect(timeline.moments, same(timeline.contents));
     });
 
     testWidgets('it asks the assembly for the single disposition: it '
         'arranges nothing itself', (tester) async {
       await _pump(tester, _layout());
 
-      expect(_timeline(), findsOneWidget);
+      expect(_collection(), findsOneWidget);
       for (final id in _identities) {
-        expect(_momentOf(id), findsOneWidget, reason: id);
+        expect(_resultOf(id), findsOneWidget, reason: id);
       }
     });
 
-    testWidgets('a moment is an IDENTITY: the product refers to it by '
-        'what it is, never by where it stands and never by an instant', (
+    testWidgets('a result is an IDENTITY: the product refers to it by '
+        'what it is, never by where it stands and never by a rank', (
       tester,
     ) async {
       await _pump(tester, _layout());
 
-      expect(_momentOf('inscription'), findsOneWidget);
+      expect(_resultOf('premiere-trouvaille'), findsOneWidget);
       expect(find.byKey(const Key('list-item-0')), findsNothing);
       expect(find.byKey(const Key('list-item-ailleurs')), findsNothing);
     });
 
-    testWidgets('the order announced is the order read: no chronology '
-        'is computed, and nothing is rearranged', (tester) async {
-      // The words of every moment carry the SAME date and hour: any
-      // shape that computed a chronology would have nothing to order
-      // by — the announcement is the only order there is.
+    testWidgets('the order announced is the order read: nothing is '
+        'ranked here, and nothing is rearranged', (tester) async {
+      // The words of every result claim the SAME relevance and the
+      // SAME rank, and the identities contradict the announced order
+      // on purpose: any shape that ordered by relevance, by rank or by
+      // words would betray itself — the announcement is the only order
+      // there is.
       await _pump(tester, _layout());
 
-      var previous = tester.getRect(_momentOf(_identities.first)).top;
+      var previous = tester.getRect(_resultOf(_identities.first)).top;
       for (final id in _identities.skip(1)) {
-        final top = tester.getRect(_momentOf(id)).top;
+        final top = tester.getRect(_resultOf(id)).top;
         expect(top, greaterThan(previous), reason: id);
         previous = top;
       }
@@ -231,51 +208,58 @@ void main() {
         'way: the product owns the order, wherever it points', (tester) async {
       await _pump(
         tester,
-        _layout(moments: [for (final id in _identities.reversed) _moment(id)]),
+        _layout(results: [for (final id in _identities.reversed) _result(id)]),
       );
 
-      var previous = tester.getRect(_momentOf(_identities.last)).top;
+      var previous = tester.getRect(_resultOf(_identities.last)).top;
       for (final id in _identities.reversed.skip(1)) {
-        final top = tester.getRect(_momentOf(id)).top;
+        final top = tester.getRect(_resultOf(id)).top;
         expect(top, greaterThan(previous), reason: id);
         previous = top;
       }
     });
 
-    testWidgets('every moment announced is expressed: nothing is '
-        'grouped, nothing is paged, nothing is held back', (tester) async {
+    testWidgets('every result announced is expressed: nothing is '
+        'filtered away, nothing is paged, nothing is held back', (
+      tester,
+    ) async {
       await _pump(tester, _layout());
 
       for (final id in _identities) {
-        expect(_momentOf(id), findsOneWidget, reason: id);
-        expect(find.byKey(Key('moment-$id')), findsOneWidget, reason: id);
+        expect(_resultOf(id), findsOneWidget, reason: id);
+        expect(find.byKey(Key('result-$id')), findsOneWidget, reason: id);
       }
       expect(find.byType(RefreshIndicator), findsNothing);
       expect(find.byType(PageView), findsNothing);
     });
 
-    testWidgets('a moment is handed on strictly intact: the words carry '
-        'a date and an hour, and the layout never reads them', (tester) async {
+    testWidgets('a result is handed on strictly intact: the words '
+        'carry a relevance and a rank, and the layout never reads '
+        'them', (tester) async {
       await _pump(tester, _layout());
 
-      // What was written is exactly what stands — no instant
-      // understood, no zone applied, no interpretation of any kind.
+      // What was written is exactly what stands — no relevance
+      // understood, no rank obeyed, no interpretation of any kind.
       for (final id in _identities) {
-        expect(find.text('Moment $id — 12 mars 2026, 14 h 05'), findsOneWidget);
         expect(
-          tester.getTopLeft(find.byKey(Key('moment-$id'))),
-          tester.getTopLeft(_momentOf(id)),
+          find.text('Résultat $id — 97 % pertinent, 1er sur 3'),
+          findsOneWidget,
+          reason: id,
+        );
+        expect(
+          tester.getTopLeft(find.byKey(Key('result-$id'))),
+          tester.getTopLeft(_resultOf(id)),
           reason: id,
         );
       }
     });
 
-    testWidgets('it adds no room between the moments', (tester) async {
+    testWidgets('it adds no room between the results', (tester) async {
       await _pump(tester, _layout());
 
-      var previous = tester.getRect(_momentOf(_identities.first));
+      var previous = tester.getRect(_resultOf(_identities.first));
       for (final id in _identities.skip(1)) {
-        final rect = tester.getRect(_momentOf(id));
+        final rect = tester.getRect(_resultOf(id));
         expect(rect.top, previous.bottom, reason: id);
         previous = rect;
       }
@@ -285,7 +269,7 @@ void main() {
     testWidgets('it creates no scroll view and no padding of its own', (
       tester,
     ) async {
-      await _pump(tester, _layout(moments: [_moment('inscription')]));
+      await _pump(tester, _layout(results: [_result('premiere-trouvaille')]));
 
       expect(find.byType(Scrollable), findsNothing);
       expect(find.byType(SingleChildScrollView), findsNothing);
@@ -293,22 +277,22 @@ void main() {
       expect(find.byType(GridView), findsNothing);
 
       final page = tester.getRect(find.byType(MentoraPageScaffold));
-      final timeline = tester.getRect(_timeline());
-      expect(timeline.left, page.left);
-      expect(timeline.width, page.width);
-      expect(timeline.top, page.top);
+      final collection = tester.getRect(_collection());
+      expect(collection.left, page.left);
+      expect(collection.width, page.width);
+      expect(collection.top, page.top);
     });
 
-    testWidgets('the components stay the owners of what a moment is '
+    testWidgets('the components stay the owners of what a result is '
         'made of', (tester) async {
       await _pump(
         tester,
         _layout(
-          moments: [
-            _moment(
-              'inscription',
+          results: [
+            _result(
+              'premiere-trouvaille',
               content: const MentoraCard(
-                key: Key('moment-inscription'),
+                key: Key('result-premiere-trouvaille'),
                 variant: MentoraCardVariant.surface,
                 child: MentoraListTile(
                   headline: 'Awa Diallo',
@@ -339,16 +323,19 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the same shape carries any succession: it represents '
-        'no domain of the company', (tester) async {
-      for (final subject in const ['premier parcours', 'second parcours']) {
+    testWidgets('the same shape carries any results: it represents no '
+        'domain of the company', (tester) async {
+      for (final subject in const [
+        'premières trouvailles',
+        'secondes trouvailles',
+      ]) {
         await _pump(
           tester,
           _layout(
-            timelineSemanticLabel: subject,
-            moments: [
-              _moment(
-                'inscription',
+            searchResultsSemanticLabel: subject,
+            results: [
+              _result(
+                'premiere-trouvaille',
                 content: MentoraText(subject, role: MentoraTextRole.body),
               ),
             ],
@@ -360,17 +347,17 @@ void main() {
       }
     });
 
-    testWidgets('only the timeline is announced: every moment keeps its '
-        'own voice', (tester) async {
+    testWidgets('only the collection is announced: every result keeps '
+        'its own voice', (tester) async {
       final handle = tester.ensureSemantics();
       await _pump(
         tester,
         _layout(
-          moments: [
-            _moment(
-              'inscription',
+          results: [
+            _result(
+              'premiere-trouvaille',
               content: const MentoraListTile(
-                key: Key('moment-inscription'),
+                key: Key('result-premiere-trouvaille'),
                 headline: 'Awa Diallo',
                 semanticLabel: 'Awa Diallo',
               ),
@@ -379,58 +366,32 @@ void main() {
         ),
       );
 
-      expect(tester.getSemantics(_timeline()).label, 'Le parcours');
-      expect(find.bySemanticsLabel('Le parcours'), findsOneWidget);
+      expect(tester.getSemantics(_collection()).label, 'Ce qui a été trouvé');
+      expect(find.bySemanticsLabel('Ce qui a été trouvé'), findsOneWidget);
       expect(find.bySemanticsLabel(RegExp('Awa Diallo')), findsWidgets);
       handle.dispose();
     });
 
-    testWidgets('a moment keeps its own rect: the key holder adds no '
+    testWidgets('a result keeps its own rect: the key holder adds no '
         'geometry of its own', (tester) async {
-      await _pump(tester, _layout(moments: [_moment('inscription')]));
+      await _pump(tester, _layout(results: [_result('premiere-trouvaille')]));
 
       expect(
-        tester.getRect(find.byKey(const Key('moment-inscription'))),
-        tester.getRect(_momentOf('inscription')),
+        tester.getRect(find.byKey(const Key('result-premiere-trouvaille'))),
+        tester.getRect(_resultOf('premiere-trouvaille')),
       );
     });
 
-    testWidgets('the timeline travels as one focus group', (tester) async {
+    testWidgets('the collection travels as one focus group', (tester) async {
       await _pump(tester, _layout());
 
       expect(
         find.descendant(
-          of: _timeline(),
+          of: _collection(),
           matching: find.byType(FocusTraversalGroup),
         ),
         findsOneWidget,
       );
-    });
-
-    testWidgets('the layout never takes the focus, and never gives it '
-        'back to itself', (tester) async {
-      final inside = FocusNode(debugLabel: 'inside');
-      addTearDown(inside.dispose);
-
-      await _pump(
-        tester,
-        _layout(
-          moments: [
-            _moment(
-              'inscription',
-              content: Focus(focusNode: inside, child: _words('inscription')),
-            ),
-          ],
-        ),
-      );
-
-      expect(inside.hasPrimaryFocus, isFalse);
-      inside.requestFocus();
-      await tester.pumpAndSettle();
-      expect(inside.hasPrimaryFocus, isTrue);
-
-      await tester.pumpAndSettle();
-      expect(inside.hasPrimaryFocus, isTrue);
     });
 
     testWidgets('the zones of the page it asks for stay the zones of '
@@ -438,7 +399,7 @@ void main() {
       await _pump(
         tester,
         _layout(
-          moments: [_moment('inscription')],
+          results: [_result('premiere-trouvaille')],
           place: const MentoraAppBar(title: 'Page courante'),
           acts: [
             MentoraButton(
@@ -455,35 +416,42 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('a timeline layout without a contract refuses to build — '
-        'fail closed, ten times over', (tester) async {
+    testWidgets('a collection of results without a contract refuses to '
+        'build — fail closed, ten times over', (tester) async {
       Future<void> refuses(Widget layout) async {
         await _pump(tester, layout);
         expect(tester.takeException(), isStateError);
       }
 
-      // 1. A timeline without an identity is not one.
-      await refuses(_layout(timelineId: ''));
-      // 2. A timeline without a name is not a landmark.
-      await refuses(_layout(timelineSemanticLabel: ''));
-      // 3. A timeline with no moment presents nothing.
-      await refuses(_layout(moments: const []));
-      // 4. A moment without an identity is not a moment.
-      await refuses(_layout(moments: [_moment('')]));
+      // 1. A collection without an identity is not one.
+      await refuses(_layout(searchResultsId: ''));
+      // 2. A collection without a name is not a landmark.
+      await refuses(_layout(searchResultsSemanticLabel: ''));
+      // 3. A collection with no result presents nothing.
+      await refuses(_layout(results: const []));
+      // 4. A result without an identity is not a result.
+      await refuses(_layout(results: [_result('')]));
       // 5. And it is refused wherever it stands: the whole collection
       //    is walked, never its head alone.
-      await refuses(_layout(moments: [_moment('inscription'), _moment('')]));
-      // 6. Two moments never share one identity.
       await refuses(
-        _layout(moments: [_moment('inscription'), _moment('inscription')]),
+        _layout(results: [_result('premiere-trouvaille'), _result('')]),
+      );
+      // 6. Two results never share one identity.
+      await refuses(
+        _layout(
+          results: [
+            _result('premiere-trouvaille'),
+            _result('premiere-trouvaille'),
+          ],
+        ),
       );
       // 7. And identity is a set, not a comparison with the neighbour.
       await refuses(
         _layout(
-          moments: [
-            _moment('inscription'),
-            _moment('paiement'),
-            _moment('inscription'),
+          results: [
+            _result('premiere-trouvaille'),
+            _result('deuxieme-trouvaille'),
+            _result('premiere-trouvaille'),
           ],
         ),
       );
@@ -503,14 +471,14 @@ void main() {
       expect(tester.takeException(), isStateError);
     });
 
-    testWidgets('a timeline layout is a whole screen: it never carries '
-        'a second one — fail closed', (tester) async {
+    testWidgets('a search results layout is a whole screen: it never '
+        'carries a second one — fail closed', (tester) async {
       final refusals = <Object>[];
       final reporter = FlutterError.onError;
       FlutterError.onError = (details) => refusals.add(details.exception);
       await _pump(
         tester,
-        _layout(moments: [_moment('inscription', content: _layout())]),
+        _layout(results: [_result('premiere-trouvaille', content: _layout())]),
       );
       FlutterError.onError = reporter;
 
@@ -525,7 +493,7 @@ void main() {
       for (final variant in ThemeVariantId.values) {
         await _pump(tester, _layout(), variant: variant);
         expect(tester.takeException(), isNull, reason: variant.name);
-        expect(_timeline(), findsOneWidget);
+        expect(_collection(), findsOneWidget);
       }
     });
 
@@ -533,11 +501,11 @@ void main() {
       for (final scale in FontScalePreference.values) {
         await _pump(
           tester,
-          _layout(moments: [_moment('inscription')]),
+          _layout(results: [_result('premiere-trouvaille')]),
           appearance: AppearanceState(fontScale: scale),
         );
         expect(tester.takeException(), isNull, reason: scale.name);
-        expect(_timeline(), findsOneWidget);
+        expect(_collection(), findsOneWidget);
       }
     });
 
@@ -552,13 +520,13 @@ void main() {
       }
     });
 
-    testWidgets('it holds in both reading directions, and the timeline '
-        'still takes the whole width', (tester) async {
+    testWidgets('it holds in both reading directions, and the '
+        'collection still takes the whole width', (tester) async {
       for (final direction in TextDirection.values) {
         await _pump(tester, _layout(), direction: direction);
         expect(tester.takeException(), isNull, reason: direction.name);
         expect(
-          tester.getRect(_timeline()).width,
+          tester.getRect(_collection()).width,
           tester.getRect(find.byType(MentoraPageScaffold)).width,
           reason: direction.name,
         );
@@ -604,8 +572,8 @@ void main() {
 
     /// The shape AND the foundation it is built on: the machinery
     /// lives there, so the scans follow it.
-    Iterable<File> timelineFiles() => [
-      ...dartFilesOf('lib/foundation/design_kit/layout/timeline_layout'),
+    Iterable<File> searchResultsFiles() => [
+      ...dartFilesOf('lib/foundation/design_kit/layout/search_results_layout'),
       File(
         'lib/foundation/design_kit/layout/foundation/'
         'mentora_collected_layout.dart',
@@ -613,7 +581,7 @@ void main() {
     ];
 
     void refuse(Map<String, RegExp> forbidden, String because) {
-      final files = timelineFiles().toList();
+      final files = searchResultsFiles().toList();
       expect(files, isNotEmpty);
       for (final file in files) {
         final source = codeOf(file);
@@ -627,41 +595,42 @@ void main() {
       }
     }
 
-    test('a timeline layout knows nothing of time', () {
+    test('the seeking belongs to the product: no engine, no question '
+        'and no way of looking anywhere near this shape', () {
       // Structural, never lexical: a concept USED carries a
       // constructor, a member or a named argument behind it — the
       // prose may name what the code may not carry.
       refuse({
-        'a temporal type': RegExp(
-          r'(?<![A-Za-z])(DateTime|TimeOfDay|TimeZone|Locale|Calendar|'
-          r'Duration|Clock|Stopwatch|Timer|History)(?![A-Za-z])',
+        'an engine or a question': RegExp(
+          r'(?<![A-Za-z])(SearchQuery|SearchEngine|SearchProvider|'
+          r'SearchService|SearchRepository|Index|Elastic\w*|Meilisearch|'
+          r'Algolia|Lucene|Sql|GraphQL)(?![a-z])',
         ),
-        'a temporal member': RegExp(
-          r'(?<![A-Za-z])(date|time|hour|minute|second|month|year|week|'
-          r'day|timestamp|epoch|instant|elapsed)\s*[:.(=]',
+        'a way of matching words': RegExp(
+          r'\.(contains|startsWith|endsWith|indexOf|matchAsPrefix|'
+          r'allMatches|toLowerCase|toUpperCase)\(',
         ),
-        'a chronology of its own': RegExp(
-          r'\.(isBefore|isAfter|difference|toUtc|toLocal|'
-          r'millisecondsSinceEpoch|compareTo)\b',
+        'a machinery of seeking': RegExp(
+          r'(?<![A-Za-z])(match\w*|fuzzy|stemming|synonym\w*|'
+          r'highlight\w*|autocomplete|suggestion\w*|spellcheck|'
+          r'query|token\w*)\s*[:.(=<]',
         ),
-        'a comparison machinery': RegExp(
-          r'(?<![A-Za-z])(Comparable|Comparator)(?![A-Za-z])',
+        'a measure of answering': RegExp(
+          r'(?<![A-Za-z])(rank\w*|score|scoring|relevance|weight|'
+          r'boost)\s*[:.(=]',
         ),
       }, 'it never carries');
     });
 
-    test('a timeline layout selects nothing, rearranges nothing, groups '
-        'nothing and pages nothing', () {
+    test('a search results layout selects nothing, orders nothing and '
+        'pages nothing', () {
       refuse({
         'a selection or an order of its own': RegExp(
           r'\.(where|firstWhere|lastWhere|singleWhere|sort|sorted|reversed|'
           r'reduce|fold|skip|take|expand|removeWhere|retainWhere)\s*[(.]',
         ),
-        'a grouping': RegExp(
-          r'(?<![A-Za-z])(groupBy|grouped|Group\w*)\s*[:.(=<]',
-        ),
         'a filter or a search': RegExp(
-          r'(?<![A-Za-z])(filter\w*|Filter|search|query)\s*[:.(=<]',
+          r'(?<![A-Za-z])(filter\w*|Filter|search)\s*[:.(=<]',
         ),
         'a paging': RegExp(
           r'(?<![A-Za-z])(pageSize|pageToken|offset|cursor|limit|hasMore|'
@@ -673,23 +642,27 @@ void main() {
       }, 'it never carries');
     });
 
-    test('a timeline layout knows no data, no network and no state', () {
+    test('a search results layout knows no data, no network, no clock '
+        'and no state', () {
       refuse({
         'a model': RegExp(
           r'(?<![A-Za-z])(User|Wallet|Expert|Consultation|Invoice|Business|'
-          r'Account|Profile|Entity|Model|Repository|Event)(?![a-z])',
+          r'Account|Profile|Entity|Model|Repository)(?![a-z])',
         ),
         'a source of data': RegExp(
           r'(?<![A-Za-z])(Provider|Bloc|Cubit|Riverpod|ChangeNotifier|'
           r'StreamBuilder|FutureBuilder)(?![A-Za-z])',
         ),
         'a network or a promise': RegExp(
-          r'(?<![A-Za-z])(http|HttpClient|Firestore|WebSocket|Future|Stream|'
-          r'async|await)(?![A-Za-z])',
+          r'(?<![A-Za-z])(http|HttpClient|Rest\w*|Firestore|Firebase|'
+          r'Socket|WebSocket|Grpc|Future|Stream|async|await)(?![A-Za-z])',
         ),
-        'a state of the succession': RegExp(
+        'a clock of its own': RegExp(
+          r'(?<![A-Za-z])(DateTime|Timer|Stopwatch|Duration)(?![A-Za-z])',
+        ),
+        'a state of the results': RegExp(
           r'(?<![A-Za-z])(loading|refreshing|error|success|offline|'
-          r'processing|waiting)(?![A-Za-z])',
+          r'processing|waiting|empty\w+)(?![A-Za-z])',
         ),
         'a memory of its own': RegExp(
           r'(?<![A-Za-z])(StatefulWidget|setState|initState|ValueNotifier)'
@@ -698,12 +671,13 @@ void main() {
         'an untyped value': RegExp(
           r'(?<![A-Za-z])(dynamic|Object\?)(?![A-Za-z])',
         ),
-        'an untyped moment': RegExp(r'final\s+Widget\?\s'),
+        'an untyped result': RegExp(r'final\s+Widget\?\s'),
+        'a serialization': RegExp(r'(?<![A-Za-z])(fromJson|toJson)\s*[(<]'),
       }, 'it never carries');
     });
 
-    test('a timeline layout builds no framework widget, runs no engine, '
-        'measures nothing and navigates nowhere', () {
+    test('a search results layout builds no framework widget, runs no '
+        'machinery, measures nothing and navigates nowhere', () {
       refuse({
         'a room of its own': RegExp(
           r'(?<![A-Za-z])(Padding|SafeArea|Expanded|Flexible|Spacer|Wrap|'
@@ -715,8 +689,8 @@ void main() {
           r'PageView)\s*[(.<]',
         ),
         'a machinery of motion or of scroll': RegExp(
-          r'(?<![A-Za-z])(ScrollController|AnimationController|Ticker|'
-          r'TimelineEngine)(?![A-Za-z])',
+          r'(?<![A-Za-z])(ScrollController|AnimationController|Ticker)'
+          r'(?![A-Za-z])',
         ),
         'its own words': RegExp(r'(?<![A-Za-z])Text\('),
         'its own style': RegExp(r'(?<![A-Za-z])TextStyle\('),
@@ -740,18 +714,19 @@ void main() {
       }, 'it never carries');
     });
 
-    test('one timeline layout exists in the whole product, it extends '
-        'the collected foundation, and it declares nothing else', () {
+    test('one search results layout exists in the whole product, it '
+        'extends the collected foundation, and it declares nothing '
+        'else', () {
       final declarations = <String>[];
       for (final file in dartFilesOf('lib')) {
         if (RegExp(
-          r'class\s+MentoraTimelineLayout(?![A-Za-z])',
+          r'class\s+MentoraSearchResultsLayout(?![A-Za-z])',
         ).hasMatch(file.readAsStringSync())) {
           declarations.add(file.path.replaceAll(r'\', '/'));
         }
       }
       expect(declarations, hasLength(1));
-      expect(declarations.single, contains('layout/timeline_layout/'));
+      expect(declarations.single, contains('layout/search_results_layout/'));
 
       final source = codeOf(File(declarations.single));
       expect(
@@ -760,32 +735,36 @@ void main() {
         ).hasMatch(source),
         isTrue,
       );
+      // The shape declares no machinery of its own — and it cannot
+      // even name the loom the foundation is woven on.
+      expect(source.contains('BuildContext'), isFalse);
       for (final owned in const [
         r'Widget\s+build\(',
         r'surfaceOf\(',
-        r'void\s+verify\(',
+        r'void\s+verify\w*\(',
+        r'throw\s',
         r'final\s+[\w<>?, ]+\s+\w+\s*;',
         r'enum\s+\w+',
       ]) {
         expect(RegExp(owned).hasMatch(source), isFalse, reason: owned);
       }
-      // The words of the succession are aliases over the one holder.
+      // The words of the results are aliases over the one holder.
       expect(
         RegExp(
-          r'String\s+get\s+timelineId\s*=>\s*collectionId;',
+          r'String\s+get\s+searchResultsId\s*=>\s*collectionId;',
         ).hasMatch(source),
         isTrue,
       );
       expect(
         RegExp(
-          r'String\s+get\s+timelineSemanticLabel\s*=>\s*'
+          r'String\s+get\s+searchResultsSemanticLabel\s*=>\s*'
           r'collectionSemanticLabel;',
         ).hasMatch(source),
         isTrue,
       );
       expect(
         RegExp(
-          r'List<MentoraIdentifiedContent>\s+get\s+moments\s*=>\s*contents;',
+          r'List<MentoraIdentifiedContent>\s+get\s+results\s*=>\s*contents;',
         ).hasMatch(source),
         isTrue,
       );
@@ -817,8 +796,8 @@ void main() {
     });
 
     test('the collected foundation has exactly four consumers — list, '
-        'catalog, timeline and search results — and every one of them '
-        'is pure', () {
+        'catalog, timeline and search results — and no pair of them '
+        'duplicates anything', () {
       final shapes = <String>[];
       for (final file in dartFilesOf('lib')) {
         final source = codeOf(file);
@@ -866,6 +845,19 @@ void main() {
         RegExp(r'MentoraLayoutSurface\.collection\(').hasMatch(foundation),
         isTrue,
       );
+    });
+
+    test('the living catalogue presents the search results layout', () {
+      final gallery = File(
+        'lib/foundation/playground/playground_galleries.dart',
+      ).readAsStringSync();
+      final mounted = File(
+        'lib/foundation/playground/playground_app.dart',
+      ).readAsStringSync();
+
+      expect(gallery.contains('layout/search_results_layout/'), isTrue);
+      expect(gallery.contains('class SearchResultsLayoutGallery'), isTrue);
+      expect(mounted.contains('SearchResultsLayoutGallery('), isTrue);
     });
   });
 }

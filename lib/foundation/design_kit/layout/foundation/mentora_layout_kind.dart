@@ -82,4 +82,8 @@ enum MentoraLayoutKind {
   /// A page built around one matter: the proof of identity a person
   /// presents to be recognised.
   authentication,
+
+  /// A collection of results already found: elements the application
+  /// announces, each keeping its own voice.
+  searchResults,
 }

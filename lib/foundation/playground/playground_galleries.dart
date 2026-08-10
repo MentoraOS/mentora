@@ -32,6 +32,7 @@ import '../design_kit/layout/timeline_layout/mentora_timeline_layout.dart';
 import '../design_kit/layout/wizard_layout/mentora_wizard_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
+import '../design_kit/layout/search_results_layout/mentora_search_results_layout.dart';
 import '../design_kit/layout/section_layout/mentora_section_layout.dart';
 import '../design_kit/layout/settings_layout/mentora_settings_layout.dart';
 import '../design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
@@ -3423,6 +3424,172 @@ final class _CatalogLayoutDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: catalogLayoutDocScans,
             keyPrefix: 'catalog-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Search Results Layout catalogue - a collection of
+/// results already found. The layout expresses; the product seeks.
+final class SearchResultsLayoutGallery extends StatelessWidget {
+  const SearchResultsLayoutGallery({super.key});
+
+  /// Deliberately NOT what their words suggest as an order: the
+  /// announcement is the only order there is - nothing is ranked here.
+  static const List<String> _results = [
+    searchResultsFirstId,
+    searchResultsSecondId,
+    searchResultsThirdId,
+  ];
+
+  // Three results and their cards: the frame is sized by what it
+  // shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  /// What a result is - built by components, never by the layout, and
+  /// never understood by it.
+  static MentoraIdentifiedContent result(String id) => MentoraIdentifiedContent(
+    id: id,
+    content: MentoraCard(
+      key: Key('search-result-$id'),
+      variant: MentoraCardVariant.surface,
+      child: const MentoraListTile(
+        headline: searchResultsEntryName,
+        supporting: searchResultsEntrySupporting,
+        semanticLabel: searchResultsEntryName,
+        leading: MentoraAvatar(
+          identity: MentoraAvatarIdentity.initials,
+          name: searchResultsEntryName,
+          initials: searchResultsEntryInitials,
+        ),
+        badges: [
+          MentoraBadge(
+            variant: MentoraBadgeVariant.verified,
+            label: searchResultsMentionLabel,
+            semanticLabel: searchResultsMentionLabel,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  static MentoraSearchResultsLayout shape({Key? key, bool complete = true}) {
+    return MentoraSearchResultsLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      searchResultsId: searchResultsGalleryId,
+      searchResultsSemanticLabel: searchResultsGalleryLabel,
+      results: [
+        for (final id in _results)
+          if (complete || id == searchResultsFirstId) result(id),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: searchResultsLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-search-results'))),
+          // One result alone: a collection of results stands from the
+          // first one on.
+          _scene(
+            shape(
+              key: const Key('layout-search-results-bare'),
+              complete: false,
+            ),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(
+                shape(key: Key('layout-search-results-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(
+                shape(key: Key('layout-search-results-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(key: Key('layout-search-results-${direction.name}')),
+              ),
+            ),
+          const _SearchResultsLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Search Results Layout's living documentation - built only with
+/// Mentora components.
+final class _SearchResultsLayoutDocumentation extends StatelessWidget {
+  const _SearchResultsLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('search-results-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(
+            searchResultsLayoutDocHeading,
+            role: MentoraTextRole.subtitle,
+          ),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: searchResultsLayoutDocArchitecture,
+            keyPrefix: 'search-results-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: searchResultsLayoutDocResponsibilities,
+            keyPrefix: 'search-results-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: searchResultsLayoutDocComponents,
+            keyPrefix: 'search-results-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: searchResultsLayoutDocTokens,
+            keyPrefix: 'search-results-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: searchResultsLayoutDocEngines,
+            keyPrefix: 'search-results-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: searchResultsLayoutDocForbidden,
+            keyPrefix: 'search-results-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: searchResultsLayoutDocScans,
+            keyPrefix: 'search-results-layout-doc-scan',
           ),
         ],
       ),

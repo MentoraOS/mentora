@@ -244,6 +244,62 @@ const List<String> catalogLayoutDocScans = [
   'No shape that presents a collection owns how it is presented',
   'One identified content across the layer: no entry twin was opened',
 ];
+const String searchResultsLayoutGalleryTitle = 'Layouts — Search Results';
+const String searchResultsLayoutDocHeading =
+    'MentoraSearchResultsLayout — official contract';
+const String searchResultsGalleryId = 'trouvailles';
+const String searchResultsGalleryLabel = 'Ce qui a été trouvé';
+const String searchResultsFirstId = 'troisieme-trouvaille';
+const String searchResultsSecondId = 'premiere-trouvaille';
+const String searchResultsThirdId = 'deuxieme-trouvaille';
+const String searchResultsEntryName = 'Awa Diallo';
+const String searchResultsEntryInitials = 'AD';
+const String searchResultsEntrySupporting =
+    'Ce que le produit a trouvé — déjà décidé, jamais relu.';
+const String searchResultsMentionLabel = 'Vérifié';
+const List<String> searchResultsLayoutDocArchitecture = [
+  'A specialization of the COLLECTED foundation — its fourth consumer',
+  'A result is an IDENTITY: never a rank, never a measure',
+  'The results are read in the announced order — all of them, every time',
+  'It declares two things: its official kind, and the words of results',
+  'searchResultsId and results are aliases over the one holder',
+];
+const List<String> searchResultsLayoutDocResponsibilities = [
+  'It is not a search: it presents results already found',
+  'It knows no question, no way of seeking, no measure of answering',
+  'It filters nothing, orders nothing, pages nothing, holds nothing back',
+  'A result is handed, never interpreted — the components own it',
+  'Only the collection is announced: every result keeps its own voice',
+];
+const List<String> searchResultsLayoutDocComponents = [
+  'MentoraCard — owns the container of a result',
+  'MentoraListTile — owns what a result says of itself',
+  'MentoraAvatar — owns the face; MentoraBadge — owns the mention',
+  'The Collected Layout — which alone holds the collection',
+  'The Layout Assembly — which alone places it, once per screen',
+];
+const List<String> searchResultsLayoutDocForbidden = [
+  'Any question, any way of seeking, any engine, any provider, any index',
+  'Any ranking, any measure, any order of its own, any filter',
+  'Any paging, any cursor, any more-to-load, any count',
+  'Any network, promise, clock or memory of its own',
+  'Navigator, MediaQuery, Theme.of, Padding, Expanded, dynamic, Object?',
+];
+const List<String> searchResultsLayoutDocTokens = [
+  'Layout: the room the layer adds between the results — none',
+];
+const List<String> searchResultsLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> searchResultsLayoutDocScans = [
+  'The seeking belongs to the product: no engine, no question, no measure',
+  'No selection, no order of its own, no paging, no arithmetic',
+  'No data, no network, no promise, no memory of its own',
+  'No framework widget, no measure of the screen, no address, no coded value',
+  'One MentoraSearchResultsLayout, extending the collected foundation',
+  'Exactly four consumers of the collected foundation — all of them pure',
+  'One identified content across the layer: no result twin was opened',
+];
 const String authenticationLayoutGalleryTitle = 'Layouts — Authentication';
 const String authenticationLayoutDocHeading =
     'MentoraAuthenticationLayout — official contract';
