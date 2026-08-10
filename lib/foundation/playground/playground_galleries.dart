@@ -26,6 +26,7 @@ import '../design_kit/layout/feed_layout/mentora_feed_layout.dart';
 import '../design_kit/layout/form_layout/mentora_form_layout.dart';
 import '../design_kit/layout/grid_layout/mentora_grid_layout.dart';
 import '../design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
+import '../design_kit/layout/timeline_layout/mentora_timeline_layout.dart';
 import '../design_kit/layout/wizard_layout/mentora_wizard_layout.dart';
 import '../design_kit/layout/list_layout/mentora_list_layout.dart';
 import '../design_kit/layout/navigation_layout/mentora_navigation_layout.dart';
@@ -3420,6 +3421,163 @@ final class _CatalogLayoutDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: catalogLayoutDocScans,
             keyPrefix: 'catalog-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Timeline Layout catalogue - a succession of moments,
+/// already ordered by the product. The layout respects the announced
+/// order and computes no chronology of any kind.
+final class TimelineLayoutGallery extends StatelessWidget {
+  const TimelineLayoutGallery({super.key});
+
+  /// Deliberately NOT what their words suggest chronologically: the
+  /// announcement is the only order there is.
+  static const List<String> _moments = [
+    timelinePaymentId,
+    timelineEnrollmentId,
+    timelineFirstCallId,
+  ];
+
+  // Three moments and their cards: the frame is sized by what it
+  // shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  /// What a moment is - built by components, never by the layout, and
+  /// never understood by it. The words carry a date on purpose.
+  static MentoraIdentifiedContent moment(String id) => MentoraIdentifiedContent(
+    id: id,
+    content: MentoraCard(
+      key: Key('timeline-moment-$id'),
+      variant: MentoraCardVariant.surface,
+      child: const MentoraListTile(
+        headline: timelineMomentName,
+        supporting: timelineMomentSupporting,
+        semanticLabel: timelineMomentName,
+        leading: MentoraAvatar(
+          identity: MentoraAvatarIdentity.initials,
+          name: timelineMomentName,
+          initials: timelineMomentInitials,
+        ),
+        badges: [
+          MentoraBadge(
+            variant: MentoraBadgeVariant.verified,
+            label: timelineMentionLabel,
+            semanticLabel: timelineMentionLabel,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  static MentoraTimelineLayout shape({Key? key, bool complete = true}) {
+    return MentoraTimelineLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      timelineId: timelineGalleryId,
+      timelineSemanticLabel: timelineGalleryLabel,
+      moments: [
+        for (final id in _moments)
+          if (complete || id == timelinePaymentId) moment(id),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: timelineLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-timeline'))),
+          // One moment alone: a succession stands from the first
+          // moment on.
+          _scene(
+            shape(key: const Key('layout-timeline-bare'), complete: false),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(shape(key: Key('layout-timeline-${variant.name}'))),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(shape(key: Key('layout-timeline-${comfort.name}'))),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(key: Key('layout-timeline-${direction.name}')),
+              ),
+            ),
+          const _TimelineLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Timeline Layout's living documentation - built only with
+/// Mentora components.
+final class _TimelineLayoutDocumentation extends StatelessWidget {
+  const _TimelineLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('timeline-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(timelineLayoutDocHeading, role: MentoraTextRole.subtitle),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: timelineLayoutDocArchitecture,
+            keyPrefix: 'timeline-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: timelineLayoutDocResponsibilities,
+            keyPrefix: 'timeline-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: timelineLayoutDocComponents,
+            keyPrefix: 'timeline-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: timelineLayoutDocTokens,
+            keyPrefix: 'timeline-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: timelineLayoutDocEngines,
+            keyPrefix: 'timeline-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: timelineLayoutDocForbidden,
+            keyPrefix: 'timeline-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: timelineLayoutDocScans,
+            keyPrefix: 'timeline-layout-doc-scan',
           ),
         ],
       ),

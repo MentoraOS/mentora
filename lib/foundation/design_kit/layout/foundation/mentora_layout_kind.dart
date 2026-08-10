@@ -70,4 +70,8 @@ enum MentoraLayoutKind {
   /// A space where a person goes through an offer: a collection of
   /// entries announced by the application, each keeping its own voice.
   catalog,
+
+  /// A succession of moments, already ordered: a collection the
+  /// application announces, each moment keeping its own voice.
+  timeline,
 }

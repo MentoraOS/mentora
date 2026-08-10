@@ -244,6 +244,61 @@ const List<String> catalogLayoutDocScans = [
   'No shape that presents a collection owns how it is presented',
   'One identified content across the layer: no entry twin was opened',
 ];
+const String timelineLayoutGalleryTitle = 'Layouts — Timeline';
+const String timelineLayoutDocHeading =
+    'MentoraTimelineLayout — official contract';
+const String timelineGalleryId = 'parcours';
+const String timelineGalleryLabel = 'Le parcours';
+const String timelinePaymentId = 'paiement';
+const String timelineEnrollmentId = 'inscription';
+const String timelineFirstCallId = 'premier-appel';
+const String timelineMomentName = 'Awa Diallo';
+const String timelineMomentInitials = 'AD';
+const String timelineMomentSupporting = 'Le 12 mars 2026, à 14 h 05';
+const String timelineMentionLabel = 'Vérifié';
+const List<String> timelineLayoutDocArchitecture = [
+  'A specialization of the COLLECTED foundation, like List and Catalog',
+  'A moment is an IDENTITY: never an index, never an instant',
+  'The moments are read in the announced order — all of them, every time',
+  'It declares two things: its official kind, and the words of a succession',
+  'timelineId and moments are aliases over the one holder — no second field',
+];
+const List<String> timelineLayoutDocResponsibilities = [
+  'It shows no date: it shows a succession the product already ordered',
+  'It computes no chronology, groups nothing, compares no instants',
+  'It selects nothing, rearranges nothing, pages nothing',
+  'A moment is handed, never interpreted — the components own it',
+  'Only the timeline is announced: every moment keeps its own voice',
+];
+const List<String> timelineLayoutDocComponents = [
+  'MentoraCard — owns the container of a moment',
+  'MentoraListTile — owns what a moment says of itself',
+  'MentoraAvatar — owns the face; MentoraBadge — owns the mention',
+  'The Collected Layout — which alone holds the collection',
+  'The Layout Assembly — which alone places it, once per screen',
+];
+const List<String> timelineLayoutDocForbidden = [
+  'DateTime, TimeZone, Calendar, Duration, Clock — no temporal API at all',
+  'Any sort, grouping, comparison, filter, paging or count',
+  'ListView, any scroll view, any refresh, any lazy loading',
+  'Any model, network, promise or state of the succession',
+  'Navigator, MediaQuery, Theme.of, Padding, Expanded, dynamic, Object?',
+];
+const List<String> timelineLayoutDocTokens = [
+  'Layout: the room the layer adds between the moments — none',
+];
+const List<String> timelineLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> timelineLayoutDocScans = [
+  'No temporal type, no temporal member, no chronology of its own',
+  'No selection, no grouping, no paging, no arithmetic',
+  'No data, no network, no promise, no memory of its own',
+  'No framework widget, no engine, no measure, no address, no coded value',
+  'One MentoraTimelineLayout, extending the collected foundation',
+  'Exactly three consumers of the collected foundation — all of them pure',
+  'One identified content across the layer: no moment twin was opened',
+];
 const String analyticsLayoutGalleryTitle = 'Layouts — Analytics';
 const String analyticsLayoutDocHeading =
     'MentoraAnalyticsLayout — official contract';

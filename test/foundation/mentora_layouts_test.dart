@@ -40,6 +40,7 @@ import 'package:mentora/foundation/design_kit/layout/settings_layout/mentora_set
 import 'package:mentora/foundation/design_kit/layout/section_layout/mentora_section_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/split_workspace_layout/mentora_split_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/tabbed_content_layout/mentora_tabbed_content_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/timeline_layout/mentora_timeline_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/wizard_layout/mentora_wizard_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/workspace_layout/mentora_workspace_layout.dart';
 import 'package:mentora/foundation/design_kit/motion/motion_engine.dart';
@@ -281,6 +282,16 @@ Map<MentoraLayoutKind, Widget> _layouts({
       catalogId: 'offre',
       catalogSemanticLabel: 'L offre',
       entries: const [
+        MentoraIdentifiedContent(id: 'premier', content: _content),
+        MentoraIdentifiedContent(id: 'second', content: SizedBox.shrink()),
+      ],
+    ),
+    MentoraLayoutKind.timeline: MentoraTimelineLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      timelineId: 'parcours',
+      timelineSemanticLabel: 'Le parcours',
+      moments: const [
         MentoraIdentifiedContent(id: 'premier', content: _content),
         MentoraIdentifiedContent(id: 'second', content: SizedBox.shrink()),
       ],
@@ -1066,6 +1077,7 @@ void main() {
         'MentoraSettingsLayout',
         'MentoraAnalyticsLayout',
         'MentoraCatalogLayout',
+        'MentoraTimelineLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];
