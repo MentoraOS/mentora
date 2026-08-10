@@ -9,10 +9,14 @@ import 'mentora_contract_request.dart';
 /// concerns this contract" — and a fact, once stated, never moves
 /// again.
 ///
-/// It answers THE demand it was given: resolving a different contract
-/// than the one asked about is not answering, it is substituting —
-/// and no rule of the foundation allows a demand to be answered with
-/// another contract.
+/// The demand speaks always before the resolution — with the
+/// contract's voice through it. Then the resolution verifies what it
+/// owns, and it owns two things here: that the contract resolved IS
+/// the contract asked about, word for word — a substitution is
+/// refused, no rule of the foundation allows one — and that the
+/// contract is one the product DECLARED. The demand is a pure carrier
+/// and holds no gathering; the resolution is the first voice that
+/// does, so the declaration is answered here, once.
 final class MentoraContractResolution {
   /// The demand this resolution answers.
   final MentoraContractRequest request;
@@ -26,13 +30,8 @@ final class MentoraContractResolution {
   });
 
   /// What the resolution refuses — fail closed.
-  ///
-  /// The demand speaks first with its own voice — and through it, the
-  /// contract and the gathering with theirs. Then the resolution
-  /// verifies the only thing it owns: that the contract resolved IS
-  /// the contract asked about, word for word.
   void verify(MentoraContractRegistry registry) {
-    request.verify(registry);
+    request.verify();
 
     if (resolvedContract != request.contract) {
       throw StateError(
@@ -40,6 +39,13 @@ final class MentoraContractResolution {
         '"${resolvedContract.id}" for a demand that asked about '
         '"${request.contract.id}" is a substitution, and no rule of '
         'the foundation allows one.',
+      );
+    }
+    if (!registry.contracts.contains(resolvedContract)) {
+      throw StateError(
+        'A demand can only be resolved to a contract the product '
+        'declared: "${resolvedContract.id}" as resolved is not one of '
+        'them.',
       );
     }
   }

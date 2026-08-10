@@ -40,8 +40,9 @@ final class MentoraContractCoordinator {
     // voices.
     registry.verify();
 
-    // 2 — what is asked about it.
-    request.verify(registry);
+    // 2 — what is asked about it: the carrier, with the contract's
+    // voice through it.
+    request.verify();
 
     // 3 — what was answered, and the agreement: the answer of this
     // dialogue answers THIS dialogue's demand.

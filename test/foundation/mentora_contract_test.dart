@@ -224,15 +224,12 @@ void main() {
 
   group('MentoraContractRequest — the demand concerning a contract', () {
     test('a request carries the contract whole and strictly intact — '
-        'and a whole demand passes whole, wherever it stands', () {
+        'and a whole demand passes whole', () {
       final contract = _contract();
       final request = MentoraContractRequest(contract: contract);
 
       expect(identical(request.contract, contract), isTrue);
-      final registry = _registry();
-      for (final declared in registry.contracts) {
-        MentoraContractRequest(contract: declared).verify(registry);
-      }
+      request.verify();
     });
 
     test('two demands about the same contract ARE the same demand', () {
@@ -255,36 +252,11 @@ void main() {
       expect(identical(first, second), isTrue);
     });
 
-    test('a contract the product never declared is refused — and a '
-        'forgery too: the same identity with other words', () {
+    test('the carrier invents no refusal: a malformed contract fails '
+        'with the CONTRACT’s voice, unrewritten — and verifying moves '
+        'nothing', () {
       expect(
-        () => _ask(contract: _contract(id: 'ailleurs')).verify(_registry()),
-        throwsA(
-          isA<StateError>().having(
-            (error) => error.message,
-            'message',
-            contains('only ask about a contract the product declared'),
-          ),
-        ),
-      );
-      expect(
-        () =>
-            _ask(contract: _contract(name: 'Un autre nom')).verify(_registry()),
-        throwsStateError,
-      );
-      expect(
-        () => _ask(
-          contract: _contract(description: 'Ce qui complète'),
-        ).verify(_registry()),
-        throwsStateError,
-      );
-    });
-
-    test('an invalid contract is refused with the CONTRACT’s own '
-        'voice, and verifying moves nothing', () {
-      final registry = _registry();
-      expect(
-        () => _ask(contract: _contract(id: '')).verify(registry),
+        () => _ask(contract: _contract(id: '')).verify(),
         throwsA(
           isA<StateError>().having(
             (error) => error.message,
@@ -294,8 +266,8 @@ void main() {
         ),
       );
       final request = _ask();
-      request.verify(registry);
-      request.verify(registry);
+      request.verify();
+      request.verify();
       expect(request, _ask());
     });
   });
@@ -354,18 +326,47 @@ void main() {
       );
     });
 
-    test('an invalid demand is refused through the DEMAND’s own voice, '
-        'and stating the fact twice changes nothing', () {
+    test('the demand speaks always before the resolution: a malformed '
+        'contract is refused through the demand, unrewritten', () {
+      expect(
+        () => _answer(asked: _contract(id: '')).verify(_registry()),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            contains('without an identity is not a contract'),
+          ),
+        ),
+      );
+    });
+
+    test('a contract the product never declared is refused — the '
+        'resolution is the first voice that holds the gathering — and '
+        'a forgery falls the same way', () {
       expect(
         () => _answer(asked: _contract(id: 'ailleurs')).verify(_registry()),
         throwsA(
           isA<StateError>().having(
             (error) => error.message,
             'message',
-            contains('only ask about a contract the product declared'),
+            contains('only be resolved to a contract the product declared'),
           ),
         ),
       );
+      expect(
+        () =>
+            _answer(asked: _contract(name: 'Un autre nom')).verify(_registry()),
+        throwsStateError,
+      );
+      expect(
+        () => _answer(
+          asked: _contract(description: 'Ce qui complète'),
+        ).verify(_registry()),
+        throwsStateError,
+      );
+    });
+
+    test('stating the fact twice changes nothing anywhere', () {
       final registry = _registry();
       final answer = _answer();
       answer.verify(registry);
@@ -456,14 +457,24 @@ void main() {
       );
       expect(
         () => _dialogue(
-          asked: _contract(id: 'ailleurs'),
+          asked: _contract(id: ''),
           resolved: _contract(id: 'motion'),
         ).verify(),
         throwsA(
           isA<StateError>().having(
             (error) => error.message,
             'message',
-            contains('only ask about a contract the product declared'),
+            contains('without an identity is not a contract'),
+          ),
+        ),
+      );
+      expect(
+        () => _dialogue(asked: _contract(id: 'ailleurs')).verify(),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            contains('only be resolved to a contract the product declared'),
           ),
         ),
       );
@@ -573,7 +584,6 @@ void main() {
       ]);
       expect(importsOf('mentora_contract_request.dart'), [
         "'mentora_contract.dart'",
-        "'mentora_contract_registry.dart'",
       ]);
       expect(importsOf('mentora_contract_resolution.dart'), [
         "'mentora_contract.dart'",
@@ -587,39 +597,32 @@ void main() {
       ]);
     });
 
-    test('the chain of voices is required: the demand verifies the '
-        'contract, the answer verifies the demand, the dialogue lets '
-        'each speak in the official order — and none reaches around', () {
-      expect(
-        RegExp(
-          r'contract\.verify\(\)',
-        ).hasMatch(codeOf(contractFileOf('mentora_contract_request.dart'))),
-        isTrue,
-      );
+    test('the request is a pure carrier: no throw in its source, no '
+        'gathering in its reach — and the chain of voices holds in '
+        'the official order', () {
+      final request = codeOf(contractFileOf('mentora_contract_request.dart'));
+      expect(RegExp(r'throw\s').hasMatch(request), isFalse);
+      expect(request.contains('MentoraContractRegistry'), isFalse);
+      expect(RegExp(r'contract\.verify\(\)').hasMatch(request), isTrue);
+
       final resolution = codeOf(
         contractFileOf('mentora_contract_resolution.dart'),
       );
-      expect(
-        RegExp(r'request\.verify\(registry\)').hasMatch(resolution),
-        isTrue,
-      );
-      expect(
-        RegExp(r'registry\.contracts').hasMatch(resolution),
-        isFalse,
-        reason: 'the answer never walks the gathering itself',
-      );
+      expect(RegExp(r'request\.verify\(\)').hasMatch(resolution), isTrue);
+
       final coordinator = codeOf(
         contractFileOf('mentora_contract_coordinator.dart'),
       );
       final order = [
         coordinator.indexOf('registry.verify()'),
-        coordinator.indexOf('request.verify(registry)'),
+        coordinator.indexOf('request.verify()'),
         coordinator.indexOf('resolution.verify(registry)'),
       ];
       expect(order.every((position) => position >= 0), isTrue);
       for (int voice = 1; voice < order.length; voice += 1) {
         expect(order[voice], greaterThan(order[voice - 1]));
       }
+      expect(RegExp(r'registry\.contracts').hasMatch(coordinator), isFalse);
     });
 
     test('no voice can even name a voice that is not its own', () {
