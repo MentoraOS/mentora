@@ -18,6 +18,7 @@ import '../design_kit/layout/catalog_layout/mentora_catalog_layout.dart';
 import '../design_kit/layout/content_layout/mentora_content_layout.dart';
 import '../design_kit/layout/dashboard_layout/mentora_dashboard_layout.dart';
 import '../design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
+import '../design_kit/layout/messaging_layout/mentora_messaging_layout.dart';
 import '../design_kit/navigation/mentora_destination.dart';
 import '../design_kit/layout/foundation/mentora_layout_context.dart';
 import '../design_kit/layout/foundation/mentora_layout_style.dart';
@@ -3421,6 +3422,157 @@ final class _CatalogLayoutDocumentation extends StatelessWidget {
             title: inputDocScansTitle,
             lines: catalogLayoutDocScans,
             keyPrefix: 'catalog-layout-doc-scan',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The official Messaging Layout catalogue - a conversation space, its
+/// regions a closed vocabulary. The layout expresses; the product
+/// dialogues.
+final class MessagingLayoutGallery extends StatelessWidget {
+  const MessagingLayoutGallery({super.key});
+
+  // Five regions and their cards: the frame is sized by what it
+  // shows.
+  static Widget _scene(Widget layout) => _LayoutScene.framed(layout, bands: 12);
+
+  static MentoraLayoutZone zone(String label, Widget content) =>
+      MentoraLayoutZone(semanticLabel: label, content: content);
+
+  static Widget words(String body) =>
+      MentoraText(body, role: MentoraTextRole.body);
+
+  static MentoraMessagingLayout shape({Key? key, bool complete = true}) {
+    return MentoraMessagingLayout(
+      key: key,
+      frame: _LayoutScene.frame(),
+      pageSemanticLabel: layoutPageLabel,
+      place: const MentoraAppBar(title: layoutPageLabel),
+      header: complete
+          ? zone(messagingHeaderLabel, words(layoutContentBody))
+          : null,
+      // The dialogue itself: the only region the space cannot do
+      // without - the words belong to the application, spoken marks
+      // included, and the layout hands them on unread.
+      conversation: zone(
+        messagingConversationLabel,
+        const MentoraCard(
+          variant: MentoraCardVariant.surface,
+          child: MentoraText(messagingSpokenWords, role: MentoraTextRole.body),
+        ),
+      ),
+      composition: complete
+          ? zone(messagingCompositionLabel, words(messagingComposedWords))
+          : null,
+      supportingContent: complete
+          ? zone(messagingSupportingLabel, words(layoutContentBody))
+          : null,
+      footer: complete
+          ? zone(messagingFooterLabel, words(layoutContentBody))
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DesignKitScope.of(context);
+
+    return GallerySection(
+      title: messagingLayoutGalleryTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _scene(shape(key: const Key('layout-shape-messaging'))),
+          // The dialogue alone: a space that is only read is a
+          // conversation space still.
+          _scene(
+            shape(key: const Key('layout-messaging-bare'), complete: false),
+          ),
+          // The four theme variants, high contrasts included.
+          for (final variant in ThemeVariantId.values)
+            DesignKitScope.deriving(
+              scope,
+              variant: variant,
+              child: _scene(
+                shape(key: Key('layout-messaging-${variant.name}')),
+              ),
+            ),
+          for (final comfort in ReadingComfortPreference.values)
+            DesignKitScope.deriving(
+              scope,
+              appearance: scope.appearance.copyWith(readingComfort: comfort),
+              child: _scene(
+                shape(key: Key('layout-messaging-${comfort.name}')),
+              ),
+            ),
+          for (final direction in TextDirection.values)
+            Directionality(
+              textDirection: direction,
+              child: _scene(
+                shape(key: Key('layout-messaging-${direction.name}')),
+              ),
+            ),
+          const _MessagingLayoutDocumentation(),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Messaging Layout's living documentation - built only with
+/// Mentora components.
+final class _MessagingLayoutDocumentation extends StatelessWidget {
+  const _MessagingLayoutDocumentation();
+
+  @override
+  Widget build(BuildContext context) {
+    return MentoraCard(
+      key: const Key('messaging-layout-doc'),
+      variant: MentoraCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MentoraText(
+            messagingLayoutDocHeading,
+            role: MentoraTextRole.subtitle,
+          ),
+          const _DocumentationSection(
+            title: inputDocArchitectureTitle,
+            lines: messagingLayoutDocArchitecture,
+            keyPrefix: 'messaging-layout-doc-architecture',
+          ),
+          const _DocumentationSection(
+            title: inputDocResponsibilitiesTitle,
+            lines: messagingLayoutDocResponsibilities,
+            keyPrefix: 'messaging-layout-doc-responsibility',
+          ),
+          const _DocumentationSection(
+            title: listTileDocComponentsTitle,
+            lines: messagingLayoutDocComponents,
+            keyPrefix: 'messaging-layout-doc-component',
+          ),
+          const _DocumentationSection(
+            title: textDocTokensTitle,
+            lines: messagingLayoutDocTokens,
+            keyPrefix: 'messaging-layout-doc-token',
+          ),
+          const _DocumentationSection(
+            title: textDocEnginesTitle,
+            lines: messagingLayoutDocEngines,
+            keyPrefix: 'messaging-layout-doc-engine',
+          ),
+          const _DocumentationSection(
+            title: textDocForbiddenTitle,
+            lines: messagingLayoutDocForbidden,
+            keyPrefix: 'messaging-layout-doc-forbidden',
+          ),
+          const _DocumentationSection(
+            title: inputDocScansTitle,
+            lines: messagingLayoutDocScans,
+            keyPrefix: 'messaging-layout-doc-scan',
           ),
         ],
       ),

@@ -283,6 +283,36 @@ enum MentoraDetailRegion {
   const MentoraDetailRegion({required this.carriesInformation});
 }
 
+/// The official regions of a conversation space, in the official
+/// order.
+///
+/// A conversation space is where a person takes part in a dialogue the
+/// product already holds. The vocabulary is CLOSED: a product never
+/// invents a region of such a space, and the order below IS the order
+/// they are read in — it is the declaration itself, so it cannot
+/// drift.
+///
+/// One region is the reason the space exists — the dialogue itself —
+/// and the shape's constructor says so: it is the only region that is
+/// not optional there. The place where a person composes is not it:
+/// a space may only be read, and it is a conversation space still.
+enum MentoraMessagingRegion {
+  /// What stands above the dialogue, and frames it.
+  header,
+
+  /// The dialogue itself: the reason the space exists.
+  conversation,
+
+  /// Where the person composes what they will say next.
+  composition,
+
+  /// What helps beside the dialogue, without being it.
+  supportingContent,
+
+  /// What is said under everything: the conditions, the recourse.
+  footer,
+}
+
 /// One category of a configuration space.
 ///
 /// A category is an IDENTITY, a name, what is always there of it, and

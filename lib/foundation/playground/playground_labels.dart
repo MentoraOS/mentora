@@ -244,6 +244,59 @@ const List<String> catalogLayoutDocScans = [
   'No shape that presents a collection owns how it is presented',
   'One identified content across the layer: no entry twin was opened',
 ];
+const String messagingLayoutGalleryTitle = 'Layouts — Messaging';
+const String messagingLayoutDocHeading =
+    'MentoraMessagingLayout — official contract';
+const String messagingHeaderLabel = 'Au-dessus du dialogue';
+const String messagingConversationLabel = 'Le dialogue';
+const String messagingCompositionLabel = 'Ce que vous allez dire';
+const String messagingSupportingLabel = 'Ce qui aide à côté';
+const String messagingFooterLabel = 'Ce qui est dit dessous';
+const String messagingSpokenWords = 'Bonjour — vu à 14 h 05, en ligne.';
+const String messagingComposedWords = 'Votre réponse, déjà composée.';
+const List<String> messagingLayoutDocArchitecture = [
+  'A specialization of the ZONED foundation, like Detail and Principal',
+  'A closed vocabulary of five regions — the order IS the declaration',
+  'The dialogue is required by the COMPILER: no run-time check needed',
+  'The place where a person composes is optional: a space may only be read',
+  'It declares its kind and its regions — the zoned foundation owns the rest',
+];
+const List<String> messagingLayoutDocResponsibilities = [
+  'It shows no words of the dialogue: it shows a person in a dialogue',
+  'It knows no one who speaks, no moment spoken, no way anything travels',
+  'It sends nothing, receives nothing, syncs nothing, notifies nothing',
+  'A region is handed, never interpreted — the components own it',
+  'Each region is announced exactly once and is its own focus group',
+];
+const List<String> messagingLayoutDocComponents = [
+  'MentoraCard — owns the container of what a region shows',
+  'MentoraText — owns the words; MentoraInput — owns an entry given to it',
+  'MentoraButton — owns the acts kept at hand',
+  'The Zoned Layout — which alone holds the regions and the refusals',
+  'The Layout Assembly — which alone places them, once per screen',
+];
+const List<String> messagingLayoutDocForbidden = [
+  'Any message, sender, receiver, presence, typing or read receipt',
+  'Any delivery, thread, channel, socket, push or protocol',
+  'Any network, promise, stream, timer or conversation engine',
+  'Any model, state of the dialogue, or memory of its own',
+  'Navigator, MediaQuery, Theme.of, Padding, Expanded, dynamic, Object?',
+];
+const List<String> messagingLayoutDocTokens = [
+  'Layout: the room the layer adds between the regions — none',
+];
+const List<String> messagingLayoutDocEngines = [
+  'The components consume their own engines; the layout consumes none',
+];
+const List<String> messagingLayoutDocScans = [
+  'No dialogue machinery: no one who speaks, nothing that travels',
+  'No network, no realtime, no promise, no timer, no engine',
+  'No selection, no order of its own, no arithmetic, no memory',
+  'No framework widget, no measure, no address, no coded value',
+  'One MentoraMessagingLayout, extending the zoned foundation',
+  'Exactly three direct consumers of the zoned foundation — all pure',
+  'One closed vocabulary of five regions, declared once, in order',
+];
 const String timelineLayoutGalleryTitle = 'Layouts — Timeline';
 const String timelineLayoutDocHeading =
     'MentoraTimelineLayout — official contract';

@@ -27,6 +27,7 @@ import 'package:mentora/foundation/design_kit/layout/dashboard_layout/mentora_da
 import 'package:mentora/foundation/design_kit/layout/detail_layout/mentora_detail_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/feed_layout/mentora_feed_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/master_detail_layout/mentora_master_detail_layout.dart';
+import 'package:mentora/foundation/design_kit/layout/messaging_layout/mentora_messaging_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_assembly.dart';
 import 'package:mentora/foundation/design_kit/layout/foundation/mentora_layout_context.dart';
@@ -285,6 +286,18 @@ Map<MentoraLayoutKind, Widget> _layouts({
         MentoraIdentifiedContent(id: 'premier', content: _content),
         MentoraIdentifiedContent(id: 'second', content: SizedBox.shrink()),
       ],
+    ),
+    MentoraLayoutKind.messaging: MentoraMessagingLayout(
+      frame: plain,
+      pageSemanticLabel: 'Page courante',
+      conversation: const MentoraLayoutZone(
+        semanticLabel: 'Le dialogue',
+        content: _content,
+      ),
+      composition: const MentoraLayoutZone(
+        semanticLabel: 'Ce que vous allez dire',
+        content: SizedBox.shrink(),
+      ),
     ),
     MentoraLayoutKind.timeline: MentoraTimelineLayout(
       frame: plain,
@@ -1078,6 +1091,7 @@ void main() {
         'MentoraAnalyticsLayout',
         'MentoraCatalogLayout',
         'MentoraTimelineLayout',
+        'MentoraMessagingLayout',
       ];
       for (final shape in shapes) {
         final declarations = <String>[];

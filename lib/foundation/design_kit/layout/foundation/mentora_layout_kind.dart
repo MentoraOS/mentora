@@ -74,4 +74,8 @@ enum MentoraLayoutKind {
   /// A succession of moments, already ordered: a collection the
   /// application announces, each moment keeping its own voice.
   timeline,
+
+  /// A conversation space: the official regions of a dialogue the
+  /// product holds, in the official order.
+  messaging,
 }
