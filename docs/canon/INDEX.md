@@ -3,7 +3,7 @@ doc: canon-index
 title: Index canonique
 type: apparatus
 titre: canon
-statut: "R2-Corpus Lot 3a — F1 fait ; F2 en cours (F2.1 fait) ; F3→F5 en attente"
+statut: "R2-Corpus Lot 3b — F1 fait ; F2 en cours (F2.1, F2.2 faits) ; F3→F5 en attente"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -32,7 +32,7 @@ aucun contenu**. Il prépare l'arrivée des documents.
 | Titre | Emplacement | Statut Lot 1 |
 |-------|-------------|--------------|
 | **F1 — Foundation** | [`source/foundation/`](source/foundation/) → [01-foundation-constitution.md](source/foundation/01-foundation-constitution.md) | **matérialisé** (Lot 2, verbatim) |
-| **F2 — Constitution** | [`source/constitution/`](source/constitution/) → [01-domain-landscape.md](source/constitution/01-domain-landscape.md) | **en cours** (Lot 3a : F2.1 fait) |
+| **F2 — Constitution** | [`source/constitution/`](source/constitution/) → [01](source/constitution/01-domain-landscape.md) · [02](source/constitution/02-context-map.md) | **en cours** (Lot 3b : F2.1, F2.2 faits) |
 | **F3 — Domaine** | [`source/domain/`](source/domain/) | contenant vide |
 | **F4 — Exécution** | [`source/application/`](source/application/) | contenant vide |
 | **F5 — Production** | [`source/production/`](source/production/) | contenant vide |
