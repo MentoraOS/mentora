@@ -1,3 +1,19 @@
+---
+doc: f1-foundation-constitution
+title: F1 — Foundation Constitution v1.0.0
+type: source
+titre: foundation
+statut: "Ratifié et GELÉ — foundation-v1.0.0"
+corpus_ref: "foundation-v1.0.0 (8d095ee)"
+proprietaire: Conseil Constitutionnel de Mentora
+materialise_par: "R2-Corpus Lot 2"
+note: >-
+  Transcription canonique verbatim. Le corps ci-dessous est identique au texte
+  gelé, relocalisé depuis docs/architecture/ vers son foyer canonique
+  (docs/canon/source/foundation/). Aucune modification du texte constitutionnel,
+  aucune duplication : un seul exemplaire, un seul propriétaire.
+---
+
 # Foundation Constitution v1.0.0
 
 > Ce document énonce les règles permanentes de la Foundation de Mentora.

@@ -3,7 +3,7 @@ doc: canon-index
 title: Index canonique
 type: apparatus
 titre: canon
-statut: "R2-Corpus Lot 1 — infrastructure (index de structure, sans contenu)"
+statut: "R2-Corpus Lot 2 — F1 matérialisé ; F2→F5 encore en attente"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -31,7 +31,7 @@ aucun contenu**. Il prépare l'arrivée des documents.
 
 | Titre | Emplacement | Statut Lot 1 |
 |-------|-------------|--------------|
-| **F1 — Foundation** | [`source/foundation/`](source/foundation/) | contenant vide |
+| **F1 — Foundation** | [`source/foundation/`](source/foundation/) → [01-foundation-constitution.md](source/foundation/01-foundation-constitution.md) | **matérialisé** (Lot 2, verbatim) |
 | **F2 — Constitution** | [`source/constitution/`](source/constitution/) | contenant vide |
 | **F3 — Domaine** | [`source/domain/`](source/domain/) | contenant vide |
 | **F4 — Exécution** | [`source/application/`](source/application/) | contenant vide |

@@ -15,18 +15,17 @@ cree_par: "R2-Corpus Lot 1"
 gelés. Tout le reste du corpus (vérification, projection, publication) en
 dérive et ne peut jamais la contredire.
 
-> Au Lot 1, ce dossier est un **contenant vide**. Aucun contenu de Source
-> n'est encore matérialisé (interdiction du Lot 1). Les documents F1→F5
-> arriveront aux lots suivants.
+> Matérialisation en cours (R2-Corpus). **F1 est matérialisé** (Lot 2) ;
+> **F2 → F5** demeurent des contenants en attente de leurs lots respectifs.
 
 ## Titres
 
-| Titre | Dossier |
-|-------|---------|
-| F1 — Foundation | [`foundation/`](foundation/) |
-| F2 — Constitution | [`constitution/`](constitution/) |
-| F3 — Domaine | [`domain/`](domain/) |
-| F4 — Exécution | [`application/`](application/) |
-| F5 — Production | [`production/`](production/) |
+| Titre | Dossier | Statut |
+|-------|---------|--------|
+| F1 — Foundation | [`foundation/`](foundation/) | **matérialisé** (Lot 2, verbatim) |
+| F2 — Constitution | [`constitution/`](constitution/) | en attente (lot dédié) |
+| F3 — Domaine | [`domain/`](domain/) | en attente |
+| F4 — Exécution | [`application/`](application/) | en attente |
+| F5 — Production | [`production/`](production/) | en attente |
 
 Évolution : **Titre VII uniquement**.
