@@ -3,7 +3,7 @@ doc: canon-source-f2
 title: F2 — Constitution (Source)
 type: source
 titre: constitution
-statut: "R2-Corpus Lot 1 — contenant vide (aucun contenu constitutionnel)"
+statut: "R2-Corpus Lot 3 — reconstruction en cours (F2.1 fait ; F2.2→F2.9 en attente)"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -11,9 +11,23 @@ cree_par: "R2-Corpus Lot 1"
 
 # F2 — Constitution stratégique
 
-Contenant réservé à la Source du
-**Titre F2 — Constitution** (15 domaines, 18 lois, dictionnaire bilingue,
-context map).
+Source du **Titre F2 — Constitution** (15 domaines, 18 lois, dictionnaire
+bilingue, context map).
 
-> **Vide au Lot 1.** Le Glossaire (projection) ne commence pas ici et ne
-> commence pas à ce lot.
+## Documents (reconstruction fidèle — R2-Corpus Lot 3)
+
+> F2 n'a jamais eu de texte ratifié unique : son contenu était réparti dans les
+> rapports de session, amendé par audits. Chaque chapitre est **reconstruit
+> fidèlement** depuis ces sources (jamais depuis la mémoire), avec rapport de
+> conformité. Découpage en sous-lots par chapitre.
+
+| # | Document | Statut |
+|---|----------|--------|
+| 01 | [Domain Landscape Blueprint](01-domain-landscape.md) | **fait** (Lot 3a) — 15 domaines, état final |
+| 02 | Domain Context Map | en attente (Lot 3b) |
+| 03 | Ubiquitous Language • Responsibilities • Contracts | en attente (Lot 3c) |
+| 04 | Bilingual Dictionary | en attente (Lot 3d) |
+| 05 | Domain Rules • Invariants • Failure Modes | en attente (Lot 3e) |
+| 06 | Architecture Constitution (le gel) | en attente (Lot 3f) |
+
+Toute évolution passe par le **Titre VII**.

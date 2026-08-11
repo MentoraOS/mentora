@@ -23,7 +23,7 @@ dérive et ne peut jamais la contredire.
 | Titre | Dossier | Statut |
 |-------|---------|--------|
 | F1 — Foundation | [`foundation/`](foundation/) | **matérialisé** (Lot 2, verbatim) |
-| F2 — Constitution | [`constitution/`](constitution/) | en attente (lot dédié) |
+| F2 — Constitution | [`constitution/`](constitution/) | **en cours** (Lot 3, reconstruction ; F2.1 fait) |
 | F3 — Domaine | [`domain/`](domain/) | en attente |
 | F4 — Exécution | [`application/`](application/) | en attente |
 | F5 — Production | [`production/`](production/) | en attente |
