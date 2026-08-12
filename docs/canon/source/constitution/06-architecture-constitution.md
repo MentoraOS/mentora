@@ -14,9 +14,11 @@ note: >-
   n'est amendé par aucune source ultérieure (F2.5.1/F2.5.2 complètent la langue
   sans retoucher ses articles). Ce chapitre possède EXCLUSIVEMENT les articles
   constitutionnels P1-P18 et les neuf Titres. L'ordre des Titres est celui de la
-  source ratifiée (voir la note de provenance : il diffère de l'énumération d'un
-  brief ultérieur ; la fidélité au texte gelé prévaut ; seule une révision au
-  Titre VII pourrait le changer). Scaffolding de session exclu.
+  source ratifiée. Principe : la matérialisation du Corpus Canonique n'a aucun
+  pouvoir éditorial — elle reproduit exclusivement la dernière source ratifiée ;
+  aucun autre document (brief, résumé, note, mémoire, échange ultérieur) n'a
+  autorité sur le Corpus hors amendement ratifié au Titre VII. Scaffolding de
+  session exclu.
 ---
 
 # F2.9 — Architecture Constitution
@@ -141,6 +143,6 @@ Toute modification future est une révision constitutionnelle, soumise au Titre 
 
 Reconstruction fidèle de l'état final ratifié à partir de la source de session **F2.9 — Architecture Constitution & Final Blueprint Freeze** (Constitution v1.0.0). F2.9 est le texte de gel ; il n'est amendé par aucune source ultérieure (F2.5.1/F2.5.2 complètent la langue — Dictionary v1.1.0 — sans retoucher ses articles). Ce chapitre possède **exclusivement** les articles constitutionnels **P1-P18** et les neuf Titres ; les autres chapitres les référencent sans les dupliquer.
 
-**Ordre des Titres.** Les neuf Titres sont matérialisés dans l'ordre **de la source ratifiée** : I Principes fondateurs (P1-P18) · II Droits des domaines · III Droits des personnes · IV Lois de l'évolution · V Lois de la preuve (définitions) · VI Interdictions absolues · VII Gouvernance · VIII Audit final (feuille blanche) · IX Déclaration finale. **Divergence signalée** : le brief d'ouverture du sous-lot énumérait les Titres dans un ordre et sous des libellés différents (Interdictions=IV, Définitions=V, Lois d'évolution=VI, Ratification=VIII, Feuille blanche=IX). La fidélité au texte gelé prévaut sur toute paraphrase ultérieure ; seule une révision au **Titre VII** pourrait modifier cet ordre.
+**Ordre des Titres.** Les neuf Titres sont matérialisés dans l'ordre **de la source ratifiée** : I Principes fondateurs (P1-P18) · II Droits des domaines · III Droits des personnes · IV Lois de l'évolution · V Lois de la preuve (définitions) · VI Interdictions absolues · VII Gouvernance · VIII Audit final (feuille blanche) · IX Déclaration finale. **Différence de source documentaire signalée** (et non erreur de la Constitution) : une énumération ultérieure des Titres circulait dans un ordre et sous des libellés différents (Interdictions=IV, Définitions=V, Lois d'évolution=VI, Ratification=VIII, Feuille blanche=IX). Elle n'a aucune autorité sur le Corpus. **Principe** : *la matérialisation du Corpus Canonique ne possède aucun pouvoir éditorial ; elle reproduit exclusivement la dernière source ratifiée. Tout autre document — brief, résumé, note, mémoire ou échange ultérieur — n'a aucune autorité sur le Corpus tant qu'un amendement du Titre VII n'a pas été ratifié.* L'ordre ci-dessus est donc l'**ordre constitutionnel officiel**.
 
 Le scaffolding de session (Phase 0, « Le Conseil siège », État Git, STOP) n'est pas reproduit.

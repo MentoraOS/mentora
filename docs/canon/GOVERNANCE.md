@@ -48,6 +48,13 @@ aucune autorité nouvelle**.
    dans le contrôle de version et, pour les jalons, dans [`history/`](history/).
 5. **Séparation acte / rédaction** : le Conseil rédige et certifie ; seul le CTO
    signe. Aucun document ne peut se signer lui-même.
+6. **La matérialisation n'a aucun pouvoir éditorial.** La reconstruction ou la
+   transcription d'un chapitre de Source **reproduit exclusivement la dernière
+   source ratifiée**. Aucun autre document — brief, résumé, note, mémoire ou
+   échange ultérieur — n'a autorité sur le Corpus tant qu'un amendement du
+   **Titre VII** n'a pas été ratifié. Une différence entre la Source et une telle
+   paraphrase est une **différence de source documentaire**, jamais une erreur de
+   la Constitution : la Source prévaut, la différence est documentée.
 
 ## Cycle d'un document de publication
 
