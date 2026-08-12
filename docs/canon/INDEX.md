@@ -54,13 +54,15 @@ aucun contenu**. Il prépare l'arrivée des documents.
 | Catalogues (12) | [`projection/catalogs/`](projection/catalogs/) → [01](projection/catalogs/01-events-catalog.md) · [02](projection/catalogs/02-commands-catalog.md) · [03](projection/catalogs/03-queries-catalog.md) · [04](projection/catalogs/04-policies-catalog.md) · [05](projection/catalogs/05-aggregates-catalog.md) · [06](projection/catalogs/06-projections-catalog.md) · [07](projection/catalogs/07-identities-catalog.md) · [08](projection/catalogs/08-state-machines-catalog.md) · [09](projection/catalogs/09-laws-catalog.md) · [10](projection/catalogs/10-theorems-catalog.md) · [11](projection/catalogs/11-proof-chains-catalog.md) · [12](projection/catalogs/12-anti-patterns-catalog.md) | **projeté** (Lot 4) |
 | Index dérivés | [`projection/indexes/`](projection/indexes/) | à venir |
 
-## Publication
+## Publication (Publication Package — R2-Projections Lot 5)
 
-| Objet | Emplacement |
-|-------|-------------|
-| Rapports émis (**PCR-001**, …) | [`publication/reports/`](publication/reports/) |
-| Releases | [`publication/releases/`](publication/releases/) |
-| Packages (Production Closure Package, …) | [`publication/packages/`](publication/packages/) |
+| Objet | Emplacement | Statut |
+|-------|-------------|--------|
+| Rapports émis (**PCR-001**, …) | [`publication/reports/`](publication/reports/) | — |
+| Canon Release | [`publication/releases/`](publication/releases/) → [01](publication/releases/01-canon-release.md) | **projeté** (Lot 5A) |
+| Distribution Package (livres) | [`publication/packages/`](publication/packages/) | à venir (Lot 5B) |
+| Compliance Package | [`publication/reports/`](publication/reports/) | à venir (Lot 5C) |
+| Publication Freeze | [`publication/reports/`](publication/reports/) | à venir (Lot 5D) |
 
 ## Décisions
 
