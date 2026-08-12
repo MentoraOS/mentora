@@ -1,6 +1,15 @@
 # 04 — Roadmap, Risks & Future Improvements
 
-## 0. Done — Lot 0B (Engineering Kernel)
+## 0a. Done — Lot 0C (Testing Foundation)
+
+Shipped the seven-package test factory: `testing-config` (Vitest preset),
+`testing` (matchers/fixtures/random/golden), `testing-clock`, `testing-id`,
+`testing-performance`, `testing-contracts` (port contract suites),
+`testing-architecture` (the workspace tests its own dependency law). 40/40
+tasks green, zero warnings. The Domain Kernel was OFFICIALLY REMOVED from
+Phase 0 by CTO decision — no business concept before Phase 1.
+
+## 0b. Done — Lot 0B (Engineering Kernel)
 
 Shipped `@mentora/kernel` (Result/Option/Either, branded `Id`, `Clock`/`IdGenerator`
 ports, typed errors, guards, utility types), `@mentora/shared` (pure utilities +
@@ -8,47 +17,44 @@ ports, typed errors, guards, utility types), `@mentora/shared` (pure utilities +
 DTOs, transverse types), plus the two-config build layout and the boundary
 lint rules — all compiling, linting and testing green. No business logic.
 
-## 1. Lot 0C — Domain kernel & the first vertical slice
+## 1. Lot 0D — CI/CD & Delivery Foundation (proposed)
 
-Lot 0C begins turning the Foundation into code, **bottom-up and thin-first**:
+Phase 0 builds the factory; 0D gives it a conveyor belt:
 
-1. **`@mentora/domain-kernel`** — the F3.1 building-block **base contracts** built
-   on `@mentora/kernel` (still no domain instances): `AggregateRoot`,
-   `DomainEvent`, `Decision`/`Reason`, `Specification`, `Policy`, the
-   `Repository` port shape. Pure, framework-free (I-7).
-2. **`@mentora/eslint-plugin-mentora`** — the *domain* lint rules: forbidden
-   vocabulary (Vocabulary Diff §D/§E as lint errors), event naming
-   `<Truth><PastParticiple>`, command naming `<Verb><Truth>`, "no framework
-   import in domain". This makes the Glossary executable.
-3. **One vertical slice, end to end, for a single bounded context** — proposed:
-   **Engagement** (the `Agreement`), the richest state machine, exercising R-A,
-   R-B, and the Séquence: `contracts-engagement` → `domain-engagement` →
-   `application-engagement` → `infra-engagement-prisma` → `app-api` (one command
-   path only).
-4. **The Séquence de Commande (F4.1) as a reusable application harness** — the
-   ten steps encoded once so every use case is "boring by construction."
+1. **GitHub Actions pipeline** — setup (corepack + pnpm cache) → `pnpm install
+   --frozen-lockfile` → `pnpm verify` (+ `--coverage`); the architecture suite
+   runs as part of `test`, so the dependency law gates every PR.
+2. **Turborepo remote cache** for incremental CI.
+3. **`@mentora/eslint-plugin-mentora`** — the *domain* lint rules: forbidden
+   vocabulary (Vocabulary Diff §D/§E as lint errors), event/command naming.
+   Prepared here so Phase 1's first domain package is born governed.
+4. **`turbo gen` scaffolds** — "new library package" / "new testing consumer"
+   generators applying the two-tsconfig layout, preset wiring and README
+   skeleton automatically.
+5. **Docker build skeleton** for future apps (distroless Node base, pnpm deploy
+   --prod), prepared but unused until the first app exists.
 
-The goal of 0C is *one command flowing through all ten steps of the Séquence*,
-proving the architecture, before breadth.
+Phase 1 (separate order) then starts the domain work: contracts/domain/
+application packages per bounded context, the Séquence harness, the first
+vertical slice (Engagement) — none of it before the CTO opens Phase 1.
 
-## 2. Later lots (indicative)
+## 2. Later phases (indicative — Phase 1+, on CTO order)
 
-- **0C** — persistence: Prisma schema per Registry, the Fiche de Registre as an
+- **Persistence** — Prisma schema per Registry, the Fiche de Registre as an
   opposable artifact, Outbox/Inbox (M-4), migrations (expand-contract).
-- **0D** — circulation: RabbitMQ adapter behind the Bus port, Enveloppe vs fact
+- **Circulation** — RabbitMQ adapter behind the Bus port, Enveloppe vs fact
   separation (M-3), Quarantaine (M-8).
-- **0E** — observability: OpenTelemetry wiring, the Journal (probant) vs Log
+- **Observability** — OpenTelemetry wiring, the Journal (probant) vs Log
   (perdable) distinction (O-2), correlation.
-- **0F** — CI/CD, Changesets (if any package is published), Docker images,
-  Turborepo remote cache.
-- **1.x** — the remaining 14 bounded contexts, each as a
-  contracts/domain/application/infra quad.
+- **Bounded contexts** — the 15 contexts, each as a
+  contracts/domain/application/infra quad, starting with one vertical slice
+  (Engagement) through the Séquence de Commande.
 
 ## 3. Risks identified
 
 | # | Risk | Likelihood | Mitigation |
 |---|------|-----------|------------|
-| R1 | **Vocabulary drift** — code invents `Booking`/`Wallet` despite the Glossary | high without tooling | the domain ESLint plugin (0B) turns forbidden vocabulary into build errors |
+| R1 | **Vocabulary drift** — code invents `Booking`/`Wallet` despite the Glossary | high without tooling | the domain ESLint plugin (0D) turns forbidden vocabulary into build errors |
 | R2 | **Boundary erosion** — deep-into-src imports as teams grow | medium | `no-restricted-imports` + `no-cycle` are errors today; add `dependency-cruiser` graph checks in CI |
 | R3 | **Nested monorepo friction** — `platform/` inside a Flutter repo confuses tooling | low | fully self-contained; documented; hoistable to its own repo |
 | R4 | **Turborepo cache incorrectness** — stale build from wrong inputs | low | inputs/outputs declared per task; remote cache verified in CI |

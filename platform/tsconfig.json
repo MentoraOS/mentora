@@ -5,6 +5,13 @@
   "references": [
     { "path": "./packages/kernel/tsconfig.build.json" },
     { "path": "./packages/shared/tsconfig.build.json" },
-    { "path": "./packages/contracts/tsconfig.build.json" }
+    { "path": "./packages/contracts/tsconfig.build.json" },
+    { "path": "./packages/testing-config/tsconfig.build.json" },
+    { "path": "./packages/testing/tsconfig.build.json" },
+    { "path": "./packages/testing-clock/tsconfig.build.json" },
+    { "path": "./packages/testing-id/tsconfig.build.json" },
+    { "path": "./packages/testing-performance/tsconfig.build.json" },
+    { "path": "./packages/testing-contracts/tsconfig.build.json" },
+    { "path": "./packages/testing-architecture/tsconfig.build.json" }
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "//": "IDE / ESLint / typecheck config. Includes tests; emits nothing.",
+  "extends": "@mentora/tsconfig/library",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*"]
+}

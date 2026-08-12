@@ -17,6 +17,20 @@ an app.
 | [`shared/`](shared) — `@mentora/shared` | Shared | pure utilities (array/object/string/math/datetime/functional/validation/retry) + `Logger`/`Config` port contracts. Depends on kernel. |
 | [`contracts/`](contracts) — `@mentora/contracts` | Contracts (technical) | DI tokens, technical DTOs (`Page`, `Sort`), transverse types (`CorrelationId`). Depends on kernel + shared. |
 
+## Testing Foundation (Lot 0C — the test factory, no business logic)
+
+| Package | Provides |
+|---------|----------|
+| [`testing-config/`](testing-config) | the one-line Vitest preset (`nodeVitestPreset`) |
+| [`testing/`](testing) | matchers (Result/Option/Either), fixtures, seeded `RandomFactory`, golden files |
+| [`testing-clock/`](testing-clock) | `FakeClock` + `VirtualScheduler` (deterministic time) |
+| [`testing-id/`](testing-id) | sequential / seeded-UUID / constant `IdGenerator`s |
+| [`testing-performance/`](testing-performance) | `benchmark` (median/p95), `expectUnderMillis`, heap helpers |
+| [`testing-contracts/`](testing-contracts) | `describeContract` + the Clock/IdGenerator contract suites |
+| [`testing-architecture/`](testing-architecture) | the workspace graph rules (cycles, layering, naming) as tests |
+
+See [docs/engineering/05-testing-strategy.md](../docs/engineering/05-testing-strategy.md).
+
 ## The intended layering (materialized in Lot 0B+)
 
 Packages fall into concentric rings, and the dependency arrow always points

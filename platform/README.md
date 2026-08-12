@@ -7,10 +7,12 @@ line here may create, rename, or modify a law, a domain, an Aggregate, an Event,
 a Command, or a Policy — code only implements what the Foundation already
 ratified.
 
-> **Status — R3 Phase 0, Lot 0B (Engineering Kernel).** The workspace (0A) now
-> carries its first real packages — `@mentora/kernel`, `@mentora/shared`,
-> `@mentora/contracts` — the dependency-free technical core every future package
-> builds on. **There is still no business logic and no application — by design.**
+> **Status — R3 Phase 0, Lot 0C (Testing Foundation).** On top of the workspace
+> (0A) and the engineering kernel (0B), the platform now carries its **test
+> factory**: seven `testing-*` packages (preset, matchers/fixtures, fake clock,
+> deterministic ids, performance harness, contract suites, architecture tests).
+> **There is still no business logic and no application — by design** (the
+> Domain Kernel is officially deferred to Phase 1 by CTO decision).
 
 ## Stack
 
