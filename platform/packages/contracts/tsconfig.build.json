@@ -1,0 +1,15 @@
+{
+  "//": "Emit/build project (composite, reference target). Source only.",
+  "extends": "@mentora/tsconfig/library",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "references": [
+    { "path": "../kernel/tsconfig.build.json" },
+    { "path": "../shared/tsconfig.build.json" }
+  ],
+  "include": ["src/**/*"],
+  "exclude": ["**/*.spec.ts"]
+}

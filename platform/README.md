@@ -7,10 +7,10 @@ line here may create, rename, or modify a law, a domain, an Aggregate, an Event,
 a Command, or a Policy — code only implements what the Foundation already
 ratified.
 
-> **Status — R3 Phase 0, Lot 0A (Monorepo Foundation).** This lot ships the
-> engineering substrate only: workspace, conventions, boundaries, build system,
-> shared configuration, dev infrastructure. **There is no business logic and no
-> application yet — by design.**
+> **Status — R3 Phase 0, Lot 0B (Engineering Kernel).** The workspace (0A) now
+> carries its first real packages — `@mentora/kernel`, `@mentora/shared`,
+> `@mentora/contracts` — the dependency-free technical core every future package
+> builds on. **There is still no business logic and no application — by design.**
 
 ## Stack
 
@@ -21,8 +21,11 @@ RabbitMQ · OpenSearch · MinIO · OpenTelemetry · Docker · GitHub Actions.
 
 ```
 platform/
-├── apps/            deployable units (services, workers…) — empty until 0B
-├── packages/        shared libraries (kernel, domains…) — empty until 0B
+├── apps/            deployable units (services, workers…) — empty until later lots
+├── packages/        shared libraries
+│   ├── kernel/      @mentora/kernel   — dependency-free abstractions (0B)
+│   ├── shared/      @mentora/shared   — pure utilities + port contracts (0B)
+│   └── contracts/   @mentora/contracts — technical DI tokens, DTOs, types (0B)
 ├── tooling/         engineering config packages (tsconfig, eslint, prettier)
 ├── infra/           local dev infrastructure (docker compose)
 ├── docs/            engineering docs (architecture, conventions, ADRs)
@@ -63,8 +66,10 @@ pnpm verify                # typecheck + lint + test + build (all via Turborepo)
 - [Architecture & repository structure](docs/engineering/01-architecture.md)
 - [Conventions (naming, packages, apps, libraries, imports, TS aliases)](docs/engineering/02-conventions.md)
 - [Build, versioning & workspace policies](docs/engineering/03-build-versioning-policies.md)
-- [Roadmap — Lot 0B and beyond](docs/engineering/04-roadmap.md)
+- [Roadmap — Lot 0C and beyond](docs/engineering/04-roadmap.md)
 - [ADR 0001 — Monorepo foundation & tooling](docs/adr/0001-monorepo-foundation.md)
+- [ADR 0002 — Repository strategy](docs/adr/0002-repository-strategy.md)
+- [ADR 0003 — Package classification](docs/adr/0003-package-classification.md)
 
 ## The one rule that governs everything here
 

@@ -1,26 +1,34 @@
 # 04 — Roadmap, Risks & Future Improvements
 
-## 1. Lot 0B — Kernel & the first vertical slice
+## 0. Done — Lot 0B (Engineering Kernel)
 
-Lot 0A ships the substrate. Lot 0B begins turning the Foundation into code,
-**bottom-up and thin-first**:
+Shipped `@mentora/kernel` (Result/Option/Either, branded `Id`, `Clock`/`IdGenerator`
+ports, typed errors, guards, utility types), `@mentora/shared` (pure utilities +
+`Logger`/`Config` port contracts), `@mentora/contracts` (DI tokens, technical
+DTOs, transverse types), plus the two-config build layout and the boundary
+lint rules — all compiling, linting and testing green. No business logic.
 
-1. **`@mentora/kernel`** — the F3.1 building-block **base types** (no domain
-   instances): `DomainEvent`, `AggregateRoot` contract, `Decision`/`Reason`,
-   `Result`, opaque `Id<T>`, the `Clock` port. Pure, dependency-free, 100% typed.
+## 1. Lot 0C — Domain kernel & the first vertical slice
+
+Lot 0C begins turning the Foundation into code, **bottom-up and thin-first**:
+
+1. **`@mentora/domain-kernel`** — the F3.1 building-block **base contracts** built
+   on `@mentora/kernel` (still no domain instances): `AggregateRoot`,
+   `DomainEvent`, `Decision`/`Reason`, `Specification`, `Policy`, the
+   `Repository` port shape. Pure, framework-free (I-7).
 2. **`@mentora/eslint-plugin-mentora`** — the *domain* lint rules: forbidden
    vocabulary (Vocabulary Diff §D/§E as lint errors), event naming
    `<Truth><PastParticiple>`, command naming `<Verb><Truth>`, "no framework
-   import in domain" (I-7). This makes the Glossary executable.
+   import in domain". This makes the Glossary executable.
 3. **One vertical slice, end to end, for a single bounded context** — proposed:
-   **Engagement** (the `Agreement`), because it is the richest state machine and
-   exercises R-A (registry key), R-B (new unit after terminal), and the Séquence:
-   `contracts-engagement` → `domain-engagement` → `application-engagement` →
-   `infra-engagement-prisma` → `app-api` (one command path only).
+   **Engagement** (the `Agreement`), the richest state machine, exercising R-A,
+   R-B, and the Séquence: `contracts-engagement` → `domain-engagement` →
+   `application-engagement` → `infra-engagement-prisma` → `app-api` (one command
+   path only).
 4. **The Séquence de Commande (F4.1) as a reusable application harness** — the
    ten steps encoded once so every use case is "boring by construction."
 
-The goal of 0B is *one command flowing through all ten steps of the Séquence*,
+The goal of 0C is *one command flowing through all ten steps of the Séquence*,
 proving the architecture, before breadth.
 
 ## 2. Later lots (indicative)

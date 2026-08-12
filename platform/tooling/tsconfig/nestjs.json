@@ -1,11 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "@mentora/tsconfig/nestjs",
-  "//": "Preset for a NestJS application under apps/*. NestJS relies on reflection-based DI, so it requires experimentalDecorators + emitDecoratorMetadata and the pre-ES2022 class-field semantics (useDefineForClassFields: false). verbatimModuleSyntax is disabled here because Nest's DI reads runtime type metadata that the verbatim rule would strip.",
+  "//": "Preset for a NestJS application under apps/*. NestJS relies on reflection-based DI, so it requires experimentalDecorators + emitDecoratorMetadata and the pre-ES2022 class-field semantics (useDefineForClassFields: false). verbatimModuleSyntax is disabled because Nest's DI reads runtime type metadata the verbatim rule would strip. Path-bearing options (rootDir, outDir, tsBuildInfoFile) and file globs live in the consuming app's tsconfig — see the note in library.json.",
   "extends": "./base.json",
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "target": "ES2022",
     "lib": ["ES2022"],
     "experimentalDecorators": true,
@@ -13,11 +11,6 @@
     "useDefineForClassFields": false,
     "verbatimModuleSyntax": false,
     "composite": false,
-    "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo",
     "types": ["node"]
-  },
-  "include": ["src"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts", "**/*.spec.ts", "**/*.e2e-spec.ts"]
+  }
 }

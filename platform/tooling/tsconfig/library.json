@@ -1,14 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "@mentora/tsconfig/library",
-  "//": "Preset for a shared library package under packages/*. Pure ESM, emits declarations, composite for project-reference builds. No decorators (a library that needs decorators is really a framework-coupled app concern).",
+  "//": "Preset for a shared library package under packages/*. Pure ESM, emits declarations, composite so it can be a TypeScript project reference. It carries ONLY location-independent compilerOptions: path-bearing options (rootDir, outDir, tsBuildInfoFile) and file globs (include/exclude) must live in the CONSUMING package's tsconfig, because relative paths in an extended base resolve to the base's directory, not the consumer's.",
   "extends": "./base.json",
   "compilerOptions": {
     "composite": true,
-    "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
-  },
-  "include": ["src"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts", "**/*.spec.ts"]
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
 }

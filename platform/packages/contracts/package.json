@@ -1,0 +1,39 @@
+{
+  "name": "@mentora/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Technical cross-cutting contracts for the Mentora platform: DI tokens, technical DTOs, transverse types. Interfaces only, no implementation.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "dependencies": {
+    "@mentora/kernel": "workspace:*",
+    "@mentora/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

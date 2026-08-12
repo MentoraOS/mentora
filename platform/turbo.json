@@ -26,12 +26,12 @@
     "test": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "test/**", "vitest.config.*", "package.json"],
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "test:unit": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "test/**", "package.json"],
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "clean": {
       "cache": false

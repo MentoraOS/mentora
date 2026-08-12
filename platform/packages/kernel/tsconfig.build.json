@@ -1,0 +1,11 @@
+{
+  "//": "Emit/build project (composite, reference target). Source only — tests are excluded so dist ships no test code.",
+  "extends": "@mentora/tsconfig/library",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/*.spec.ts"]
+}

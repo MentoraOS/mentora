@@ -1,0 +1,38 @@
+{
+  "name": "@mentora/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure, reusable utilities and cross-cutting port contracts (Logger, Config) for the Mentora platform. Depends only on @mentora/kernel. No business logic, no I/O.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "dependencies": {
+    "@mentora/kernel": "workspace:*"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

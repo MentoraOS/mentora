@@ -1,0 +1,9 @@
+{
+  "//": "IDE / ESLint / typecheck config. Includes tests so the type-aware linter and `pnpm typecheck` cover them. Emits nothing; the emitting project is tsconfig.build.json.",
+  "extends": "@mentora/tsconfig/library",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true
+  },
+  "include": ["src/**/*"]
+}

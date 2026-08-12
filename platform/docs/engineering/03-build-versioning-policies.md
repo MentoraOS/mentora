@@ -35,6 +35,19 @@ than a proprietary graph. Revisit if generator ergonomics become a bottleneck.
 - **No bundler at the library layer.** Libraries ship `dist/` ESM + `.d.ts`;
   bundling is an *app* concern (an app may use its framework's builder). This
   keeps libraries debuggable and their public types authoritative.
+- **Two tsconfigs per package** — a deliberate, standard split:
+  - `tsconfig.json` — the IDE / ESLint / `typecheck` project. Includes `src/**`
+    **and tests**, so the type-aware linter and `pnpm typecheck` cover specs.
+    Emits nothing (`noEmit`).
+  - `tsconfig.build.json` — the emit project (`composite`, source only, tests
+    excluded). It is the TypeScript **project-reference** target and what
+    `pnpm build` runs (`tsc -b tsconfig.build.json`). Its `references` list the
+    build projects of its dependencies, so `tsc -b` compiles the graph in order.
+
+  Why split: path-bearing options and file globs cannot live in a shared base
+  (relative paths in an extended config resolve to the *base's* directory), and
+  the linter needs tests in a project while the shipped `dist/` must not contain
+  them. One config cannot satisfy both; two do, cleanly.
 
 ## 3. Versioning
 

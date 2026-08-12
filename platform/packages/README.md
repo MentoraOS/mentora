@@ -4,11 +4,18 @@
 here. Packages are the **interior** of the dependency graph; they never import
 an app.
 
-> **No business logic at Lot 0A — by design.** No Aggregate, Event, Command,
-> Policy, Repository, Process Manager, or Adapter exists yet. This lot ships
-> only the taxonomy and conventions into which Lot 0B will place them. Creating
-> them now would be creating law, which the Foundation forbids outside its own
-> ratified text.
+> **No business logic yet — by design.** Lot 0B added the three technical
+> foundation packages below. Still no Aggregate, Event, Command, Policy,
+> Repository, Process Manager, or Adapter — those are law, created only in the
+> Foundation's ratified text and *implemented* (not invented) in later lots.
+
+## Foundation packages (Lot 0B — technical, no business logic)
+
+| Package | Family (ADR 0003) | Holds |
+|---------|-------------------|-------|
+| [`kernel/`](kernel) — `@mentora/kernel` | Kernel | `Result`, `Option`, `Either`, branded `Id`, `Clock`/`IdGenerator` ports, typed errors, guards, utility types. Imports nothing. |
+| [`shared/`](shared) — `@mentora/shared` | Shared | pure utilities (array/object/string/math/datetime/functional/validation/retry) + `Logger`/`Config` port contracts. Depends on kernel. |
+| [`contracts/`](contracts) — `@mentora/contracts` | Contracts (technical) | DI tokens, technical DTOs (`Page`, `Sort`), transverse types (`CorrelationId`). Depends on kernel + shared. |
 
 ## The intended layering (materialized in Lot 0B+)
 

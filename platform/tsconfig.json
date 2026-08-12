@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "//": "Root solution file. It owns NO sources (files: []) — it exists so an editor opened at the workspace root resolves a valid config, and so `tsc -b` can be pointed at package references later. Each package carries its own tsconfig extending tsconfig.base.json (or a tooling/tsconfig preset).",
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "noEmit": true
-  },
+  "//": "Root TypeScript SOLUTION file. It owns no sources (files: []); it lists the workspace packages' BUILD projects as references so `tsc -b` builds the whole graph in dependency order. Each package also has a tsconfig.json (IDE/lint/typecheck, tests included) and a tsconfig.build.json (emit, source only).",
   "files": [],
-  "include": []
+  "references": [
+    { "path": "./packages/kernel/tsconfig.build.json" },
+    { "path": "./packages/shared/tsconfig.build.json" },
+    { "path": "./packages/contracts/tsconfig.build.json" }
+  ]
 }
