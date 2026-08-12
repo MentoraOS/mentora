@@ -3,7 +3,7 @@ doc: canon-source-f5
 title: F5 — Production (Source)
 type: source
 titre: production
-statut: "R2-Corpus Lot 6 — reconstruction en cours (F5.1→F5.8 faits ; F5.99 en attente)"
+statut: "R2-Corpus Lot 6E — reconstruction complète (F5.1→F5.99, 100 %)"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -21,6 +21,7 @@ R / S / O / T / RY / SC / OP / PG ; plus le Grand Audit F5.99 en douze Procès).
 > la mémoire), avec rapport de conformité. Découpage F5 en cinq lots : 6A
 > (Runtime + Persistence), 6B (Observability + Security), 6C (Reliability +
 > Scalability), 6D (Operations + Governance), 6E (Grand Audit F5.99 + clôture).
+> **F5 est matérialisé à 100 % (Lot 6E).**
 
 | # | Document | Statut |
 |---|----------|--------|
@@ -32,6 +33,6 @@ R / S / O / T / RY / SC / OP / PG ; plus le Grand Audit F5.99 en douze Procès).
 | 06 | [Scalability, Capacity & Multi-Tenant](06-scalability.md) | **fait** (Lot 6C) — lois SC-1→SC-10 |
 | 07 | [Incidents & Operations](07-operations.md) | **fait** (Lot 6D) — lois OP-1→OP-28 |
 | 08 | [Production Governance](08-governance.md) | **fait** (Lot 6D) — lois PG-1→PG-21, R2-Corpus |
-| 09 | Grand Audit F5.99 (12 Procès) & clôture | en attente (Lot 6E) |
+| 09 | [Grand Audit F5.99 (12 Procès) & clôture](09-grand-audit.md) | **fait** (Lot 6E) — 12 Procès TENUS, 5 propriétés émergentes, théorèmes ; aucune loi |
 
 Toute évolution passe par le **Titre VII**.
