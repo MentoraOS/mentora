@@ -1,0 +1,27 @@
+# pnpm workspace definition — Mentora engineering platform.
+#
+# The workspace is organized into four package families, each with a stable
+# top-level home. Globs are intentionally shallow (one level) so that the
+# dependency graph stays legible and package discovery is O(depth), not O(tree).
+#
+#   apps/*       deployable units (NestJS services, workers, schedulers…) — Lot 0B+
+#   packages/*   shared libraries consumed by apps and by each other
+#   tooling/*    engineering configuration packages (tsconfig, eslint, prettier)
+#
+# Business-domain packages (the 15 domains of the Foundation) will live under
+# packages/ in Lot 0B, one package per bounded context. No such package exists
+# at Lot 0A: this lot ships only the engineering substrate.
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
+
+# Catalog: a single source of truth for shared dependency versions across the
+# workspace (pnpm >= 9.5). Packages reference `catalog:` instead of pinning
+# versions locally, so an upgrade happens in exactly one place.
+catalog:
+  typescript: 5.6.3
+  "@types/node": 22.9.0
+  eslint: 9.15.0
+  prettier: 3.3.3
+  vitest: 2.1.5

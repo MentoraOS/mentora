@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@mentora/tsconfig/base",
+  "//": "Re-exports the workspace root tsconfig.base.json so packages can extend a stable package name ('@mentora/tsconfig/base') instead of a relative '../../tsconfig.base.json'. Relative paths break when a package moves; a package name does not.",
+  "extends": "../../tsconfig.base.json"
+}

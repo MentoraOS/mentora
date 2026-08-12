@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@mentora/tsconfig/library",
+  "//": "Preset for a shared library package under packages/*. Pure ESM, emits declarations, composite for project-reference builds. No decorators (a library that needs decorators is really a framework-coupled app concern).",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "**/*.test.ts", "**/*.spec.ts"]
+}

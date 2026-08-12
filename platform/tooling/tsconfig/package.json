@@ -1,0 +1,13 @@
+{
+  "name": "@mentora/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared TypeScript configuration presets for the Mentora platform. No runtime code.",
+  "license": "UNLICENSED",
+  "files": ["base.json", "library.json", "nestjs.json"],
+  "exports": {
+    "./base": "./base.json",
+    "./library": "./library.json",
+    "./nestjs": "./nestjs.json"
+  }
+}

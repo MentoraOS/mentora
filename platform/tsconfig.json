@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "//": "Root solution file. It owns NO sources (files: []) — it exists so an editor opened at the workspace root resolves a valid config, and so `tsc -b` can be pointed at package references later. Each package carries its own tsconfig extending tsconfig.base.json (or a tooling/tsconfig preset).",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": [],
+  "include": []
+}

@@ -1,0 +1,31 @@
+# Mentora platform (Node/TypeScript monorepo) — ignore rules.
+# Scoped to platform/; the repo root has its own .gitignore for the Flutter client.
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Turborepo
+.turbo/
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Environment (never commit secrets — F5.4 Secret Zero)
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Local infra volumes
+infra/.data/
