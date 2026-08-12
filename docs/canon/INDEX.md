@@ -51,7 +51,7 @@ aucun contenu**. Il prépare l'arrivée des documents.
 | Glossaire Officiel | [`projection/glossary/`](projection/glossary/) → [01](projection/glossary/01-official-glossary.md) | **projeté** (Lot 1) |
 | Vocabulary Diff | [`projection/glossary/`](projection/glossary/) → [02](projection/glossary/02-vocabulary-diff.md) | **projeté** (Lot 2) |
 | Handbook Officiel | [`projection/handbook/`](projection/handbook/) → [01](projection/handbook/01-official-handbook.md) | **projeté** (Lot 3) |
-| Catalogues | [`projection/catalogs/`](projection/catalogs/) | à venir (Lot 4) |
+| Catalogues (12) | [`projection/catalogs/`](projection/catalogs/) → [01](projection/catalogs/01-events-catalog.md) · [02](projection/catalogs/02-commands-catalog.md) · [03](projection/catalogs/03-queries-catalog.md) · [04](projection/catalogs/04-policies-catalog.md) · [05](projection/catalogs/05-aggregates-catalog.md) · [06](projection/catalogs/06-projections-catalog.md) · [07](projection/catalogs/07-identities-catalog.md) · [08](projection/catalogs/08-state-machines-catalog.md) · [09](projection/catalogs/09-laws-catalog.md) · [10](projection/catalogs/10-theorems-catalog.md) · [11](projection/catalogs/11-proof-chains-catalog.md) · [12](projection/catalogs/12-anti-patterns-catalog.md) | **projeté** (Lot 4) |
 | Index dérivés | [`projection/indexes/`](projection/indexes/) | à venir |
 
 ## Publication
