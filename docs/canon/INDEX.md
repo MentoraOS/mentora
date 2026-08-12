@@ -61,7 +61,7 @@ aucun contenu**. Il prépare l'arrivée des documents.
 | Rapports émis (**PCR-001**, …) | [`publication/reports/`](publication/reports/) | — |
 | Canon Release | [`publication/releases/`](publication/releases/) → [01](publication/releases/01-canon-release.md) | **projeté** (Lot 5A) |
 | Distribution Package (6 livres) | [`publication/packages/`](publication/packages/) → [01](publication/packages/01-foundation-book.md) · [02](publication/packages/02-constitution-book.md) · [03](publication/packages/03-domain-book.md) · [04](publication/packages/04-application-book.md) · [05](publication/packages/05-production-book.md) · [06](publication/packages/06-projection-book.md) | **projeté** (Lot 5B) |
-| Compliance Package | [`publication/reports/`](publication/reports/) | à venir (Lot 5C) |
+| Compliance Package (6 rapports) | [`publication/reports/`](publication/reports/) → [01](publication/reports/01-publication-validation-report.md) · [02](publication/reports/02-integrity-report.md) · [03](publication/reports/03-coverage-report.md) · [04](publication/reports/04-traceability-report.md) · [05](publication/reports/05-projection-consistency-report.md) · [06](publication/reports/06-source-consistency-report.md) | **projeté** (Lot 5C) |
 | Publication Freeze | [`publication/reports/`](publication/reports/) | à venir (Lot 5D) |
 
 ## Décisions
