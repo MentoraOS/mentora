@@ -1,0 +1,39 @@
+{
+  "name": "@mentora/eslint-plugin-mentora",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The official Mentora ESLint plugin: the Constitution's naming and boundary laws (R2) as executable lint rules. Architecture rules only — no business rules.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "docs"],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "docs:generate": "node scripts/generate-docs.mjs",
+    "clean": "rimraf dist .turbo"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.15.0"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

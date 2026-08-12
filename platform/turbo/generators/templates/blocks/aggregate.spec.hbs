@@ -1,0 +1,9 @@
+import { describe, expect, it } from 'vitest';
+
+import { {{ pascalCase name }} } from './{{ kebabCase name }}.js';
+
+describe('{{ pascalCase name }}', () => {
+  it('exists (Phase 1 will test the frozen invariants)', () => {
+    expect(new {{ pascalCase name }}()).toBeInstanceOf({{ pascalCase name }});
+  });
+});

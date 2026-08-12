@@ -1,0 +1,9 @@
+import { describe, expect, it } from 'vitest';
+
+import { {{ pascalCase name }}Projection } from './{{ kebabCase name }}.projection.js';
+
+describe('{{ pascalCase name }}Projection', () => {
+  it('exists (Phase 1 will test the derivation)', () => {
+    expect(new {{ pascalCase name }}Projection()).toBeInstanceOf({{ pascalCase name }}Projection);
+  });
+});

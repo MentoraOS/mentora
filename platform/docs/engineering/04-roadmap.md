@@ -1,5 +1,15 @@
 # 04 — Roadmap, Risks & Future Improvements
 
+## 0a-bis. Done — Lot 0D (Engineering Governance)
+
+Shipped `@mentora/eslint-plugin-mentora`: 16 catalog-driven rules with permanent
+diagnostic codes (MENTORA0001–0016), each citing its R2 source; four configs
+(recommended/strict/constitution/enterprise); generated per-rule docs kept in
+sync by tests; and the `turbo gen` scaffolds (package, aggregate, policy,
+projection, adapter, repository) whose templates are born governed (they compose
+the plugin's constitution config). Generated packages pass the full gate out of
+the box. Rule of the lot: **a rule without an R2 source does not exist.**
+
 ## 0a. Done — Lot 0C (Testing Foundation)
 
 Shipped the seven-package test factory: `testing-config` (Vitest preset),

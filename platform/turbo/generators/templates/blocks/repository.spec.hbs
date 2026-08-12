@@ -1,0 +1,10 @@
+import { describe, expect, it } from 'vitest';
+
+import type { {{ pascalCase name }}Repository } from './{{ kebabCase name }}.repository.js';
+
+describe('{{ pascalCase name }}Repository (port)', () => {
+  it('is declarable (Phase 1 ships its contract suite — testing-contracts)', () => {
+    const probe: {{ pascalCase name }}Repository = {};
+    expect(probe).toBeDefined();
+  });
+});

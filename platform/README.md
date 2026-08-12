@@ -7,12 +7,13 @@ line here may create, rename, or modify a law, a domain, an Aggregate, an Event,
 a Command, or a Policy — code only implements what the Foundation already
 ratified.
 
-> **Status — R3 Phase 0, Lot 0C (Testing Foundation).** On top of the workspace
-> (0A) and the engineering kernel (0B), the platform now carries its **test
-> factory**: seven `testing-*` packages (preset, matchers/fixtures, fake clock,
-> deterministic ids, performance harness, contract suites, architecture tests).
-> **There is still no business logic and no application — by design** (the
-> Domain Kernel is officially deferred to Phase 1 by CTO decision).
+> **Status — R3 Phase 0, Lot 0D (Engineering Governance).** On top of the
+> workspace (0A), the engineering kernel (0B) and the test factory (0C), the
+> platform now carries its **governance**: `@mentora/eslint-plugin-mentora`
+> (16 rules, permanent MENTORA-codes, every one citing its R2 source) and the
+> `turbo gen` scaffolds whose output is born governed. **There is still no
+> business logic and no application — by design** (domain work opens in Phase 1
+> on explicit CTO order).
 
 ## Stack
 

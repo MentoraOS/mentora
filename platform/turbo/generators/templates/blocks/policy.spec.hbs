@@ -1,0 +1,9 @@
+import { describe, expect, it } from 'vitest';
+
+import { {{ pascalCase name }}Policy } from './{{ kebabCase name }}.policy.js';
+
+describe('{{ pascalCase name }}Policy', () => {
+  it('exists (Phase 1 will test the published rule)', () => {
+    expect(new {{ pascalCase name }}Policy()).toBeInstanceOf({{ pascalCase name }}Policy);
+  });
+});
