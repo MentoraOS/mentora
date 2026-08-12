@@ -43,7 +43,7 @@ note: >-
 
 Le **Fait** (acte ou décision d'un propriétaire) ; la **Projection** (dérivation déterministe — se lit, ne se possède pas) ; le **Langage publié** ; le **Commanditaire** ; le **Détenteur du NON** ; le **Pont** (l'acte d'une personne au-dessus d'un mur) ; le **Mur** (Separate Ways) ; le **Gardien de registre** et sa **Police** ; la **Frontière de traduction** (ACL).
 
-*(Définitions constitutionnelles formelles de ces termes : voir F2.9 Titre V — chapitre `06-architecture-constitution.md`, matérialisé au sous-lot 3f.)*
+*(Définitions constitutionnelles formelles de ces termes : voir F2.9 Titre V — chapitre [06-architecture-constitution.md](06-architecture-constitution.md).)*
 
 ## A.3 Lexique officiel par domaine
 
@@ -144,4 +144,4 @@ Reconstruction fidèle de l'état final ratifié à partir des sources de sessio
 
 **Divergence résolue par propriété** : la source du chapitre combiné écrivait, dans la table des contrats (Réputation), le fait « VerditTranché ». Le nom d'événement appartient à **F2.2** (propriétaire des événements), qui l'a gelé sous la forme **`SignalementTranché`** (F2.2.99, police du registre de Réputation). Le nom a été réconcilié au propriétaire (`SignalementTranché`) ; la variante de la source est signalée ici, sans autre modification.
 
-Non dupliqués ici : les **définitions constitutionnelles formelles** des termes transversaux (F2.9 Titre V — chapitre `06-architecture-constitution.md`, sous-lot 3f) et la **correspondance bilingue FR↔EN** (Dictionnaire — chapitre [04-bilingual-dictionary.md](04-bilingual-dictionary.md)). Le scaffolding de session (Phase 0, audit-processus, risques, décision, État Git, STOP) n'est pas reproduit.
+Non dupliqués ici : les **définitions constitutionnelles formelles** des termes transversaux (F2.9 Titre V — chapitre [06-architecture-constitution.md](06-architecture-constitution.md)) et la **correspondance bilingue FR↔EN** (Dictionnaire — chapitre [04-bilingual-dictionary.md](04-bilingual-dictionary.md)). Le scaffolding de session (Phase 0, audit-processus, risques, décision, État Git, STOP) n'est pas reproduit.

@@ -25,7 +25,7 @@ note: >-
 
 > État **final ratifié**. Les lois nouvelles 14→18 nées ici complètent les
 > **18 lois permanentes**, consolidées en articles P1-P18 par F2.9 Titre I
-> (chapitre `06-architecture-constitution.md`, matérialisé au sous-lot 3f).
+> (chapitre [06-architecture-constitution.md](06-architecture-constitution.md)).
 
 ---
 
@@ -82,7 +82,7 @@ Classes : **[S]** structurelle · **[T]** temporelle · **[J]** juridique · **[
 | La connaissance descendante vit dans l'ACL | multi-PSP, multi-IdP — N dialectes, un langage | **Permanent** |
 | La validité se vérifie à la source | cache d'accords Consent « pour la latence » — une copie est une vue ; l'acte exige la source | **Permanent** (nouveau, № 15) |
 
-> Les énoncés constitutionnels formels de ces invariants sont les articles **P1-P18** de F2.9 Titre I (chapitre `06-architecture-constitution.md`, matérialisé au sous-lot 3f).
+> Les énoncés constitutionnels formels de ces invariants sont les articles **P1-P18** de F2.9 Titre I (chapitre [06-architecture-constitution.md](06-architecture-constitution.md)).
 
 ---
 
