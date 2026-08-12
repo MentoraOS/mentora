@@ -26,6 +26,6 @@ dérive et ne peut jamais la contredire.
 | F2 — Constitution | [`constitution/`](constitution/) | **matérialisé** (Lot 3, F2.1→F2.9, 100 %) |
 | F3 — Domaine | [`domain/`](domain/) | **matérialisé** (Lot 4, F3.1→F3.3, 100 %) |
 | F4 — Exécution | [`application/`](application/) | **matérialisé** (Lot 5, F4.1→F4.99, 100 %) |
-| F5 — Production | [`production/`](production/) | en attente |
+| F5 — Production | [`production/`](production/) | **en cours** (Lot 6, reconstruction ; F5.1, F5.2 faits) |
 
 Évolution : **Titre VII uniquement**.
