@@ -23,6 +23,7 @@ Package** — les six rapports (un rapport démontre, il ne décide jamais — N
 | 04 | [Traceability Report](04-traceability-report.md) | **CONFORME** (chaîne complète) |
 | 05 | [Projection Consistency Report](05-projection-consistency-report.md) | **CONFORME** (dettes gouvernées CMP-0001/0002) |
 | 06 | [Source Consistency Report](06-source-consistency-report.md) | **CONFORME** (cohérence F1→F5 acquise, F5.99) |
+| 07 | [Publication Closure Report](07-publication-closure-report.md) | **PUBLICATION CLOSE** (Lot 5D, irréversible) |
 
 > Réservé aussi au **Production Closure Report (PCR-001)**, `ÉMIS`, signé par le
 > CTO (acte accompli hors R2-Corpus). Les rapports **constatent**, ne corrigent
