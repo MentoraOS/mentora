@@ -25,10 +25,10 @@ const rules: Record<string, Rule.RuleModule> = {
   'event-naming': eventNaming,
   'command-naming': commandNaming,
   'query-naming': createSuffixRule(catalogByName('query-naming'), [
-    { suffix: 'Query', minWordsBefore: 2, stemShape: '<Truth><Aspect>' },
+    { suffix: 'Query', minWordsBefore: 1, stemShape: '<Truth><Aspect>' },
   ]),
   'policy-naming': createSuffixRule(catalogByName('policy-naming'), [
-    { suffix: 'Policy', minWordsBefore: 2, stemShape: '<Truth><Rule>' },
+    { suffix: 'Policy', minWordsBefore: 1, stemShape: '<Truth><Rule>' },
   ]),
   'specification-naming': createSuffixRule(catalogByName('specification-naming'), [
     { suffix: 'Specification', minWordsBefore: 1, stemShape: '<Question>' },

@@ -3,15 +3,38 @@
   "//": "Root TypeScript SOLUTION file. It owns no sources (files: []); it lists the workspace packages' BUILD projects as references so `tsc -b` builds the whole graph in dependency order. Each package also has a tsconfig.json (IDE/lint/typecheck, tests included) and a tsconfig.build.json (emit, source only).",
   "files": [],
   "references": [
-    { "path": "./packages/kernel/tsconfig.build.json" },
-    { "path": "./packages/shared/tsconfig.build.json" },
-    { "path": "./packages/contracts/tsconfig.build.json" },
-    { "path": "./packages/testing-config/tsconfig.build.json" },
-    { "path": "./packages/testing/tsconfig.build.json" },
-    { "path": "./packages/testing-clock/tsconfig.build.json" },
-    { "path": "./packages/testing-id/tsconfig.build.json" },
-    { "path": "./packages/testing-performance/tsconfig.build.json" },
-    { "path": "./packages/testing-contracts/tsconfig.build.json" },
-    { "path": "./packages/testing-architecture/tsconfig.build.json" }
+    {
+      "path": "./packages/kernel/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/shared/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/contracts/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing-config/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing-clock/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing-id/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing-performance/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing-contracts/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/testing-architecture/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/domain-agreement/tsconfig.build.json"
+    }
   ]
 }

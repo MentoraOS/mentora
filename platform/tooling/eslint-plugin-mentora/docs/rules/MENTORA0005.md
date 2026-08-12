@@ -1,6 +1,6 @@
 # MENTORA0005 — `mentora/query-naming`
 
-> Declarations ending in Query must be <Truth><Aspect>Query (≥ 2 words before the suffix).
+> Declarations ending in Query must carry a named truth/aspect (≥ 1 word before the suffix) — the ratified catalogue includes single-stem reads (MembershipQuery).
 
 ## Justification
 
@@ -15,12 +15,12 @@ R2 source/constitution/04-bilingual-dictionary.md §9 (Queries `<Truth><Aspect>Q
 ```ts
 ConsentValidityQuery
 AgreementStateQuery
+MembershipQuery
 ```
 
 ## Invalid
 
 ```ts
-DataQuery
 Query
 ```
 

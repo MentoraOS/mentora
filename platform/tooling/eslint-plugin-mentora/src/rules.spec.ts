@@ -125,11 +125,13 @@ tester.run('mentora/command-naming', rule('command-naming'), {
 // The twelve suffix rules, sampled through the factory (2 rules exhaustively +
 // each remaining rule with one valid and one invalid case).
 tester.run('mentora/policy-naming', rule('policy-naming'), {
-  valid: ['class AgreementCancellationPolicy {}', 'class ConsentDefinitivenessPolicy {}', 'class Unrelated {}'],
-  invalid: [
-    { code: 'class AgreementPolicy {}', errors: [{ messageId: 'tooFewWords' }] },
-    { code: 'const Policy = class {};', errors: [{ messageId: 'tooFewWords' }] },
+  valid: [
+    'class AgreementCancellationPolicy {}',
+    'class ReschedulePolicy {}', // ratified single-stem policy (F3.3 §6)
+    'class ConfirmationPolicy {}',
+    'class Unrelated {}',
   ],
+  invalid: [{ code: 'const Policy = class {};', errors: [{ messageId: 'tooFewWords' }] }],
 });
 
 tester.run('mentora/adapter-naming', rule('adapter-naming'), {
@@ -141,8 +143,8 @@ tester.run('mentora/adapter-naming', rule('adapter-naming'), {
 });
 
 tester.run('mentora/query-naming', rule('query-naming'), {
-  valid: ['class ConsentValidityQuery {}'],
-  invalid: [{ code: 'class DataQuery {}', errors: [{ messageId: 'tooFewWords' }] }],
+  valid: ['class ConsentValidityQuery {}', 'class MembershipQuery {}'], // F3.3 §5
+  invalid: [{ code: 'const Query = class {};', errors: [{ messageId: 'tooFewWords' }] }],
 });
 
 tester.run('mentora/specification-naming', rule('specification-naming'), {

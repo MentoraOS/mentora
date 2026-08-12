@@ -4,8 +4,8 @@
 - [MENTORA0002](rules/MENTORA0002.md) — `mentora/no-forbidden-suffixes`: Forbids the transverse banned name parts: -Manager, -Helper, -Util(s), -Impl, -Data, -Info, -Common, -Shared suffixes, Base-/Abstract- prefixes, and the bare generic -Service.
 - [MENTORA0003](rules/MENTORA0003.md) — `mentora/event-naming`: In event files (events/ directories, *.event.ts), every exported PascalCase declaration must be <Truth><PastParticiple> (…ed, or a ratified irregular: Struck, Withdrawn, Kept, Undeliverable).
 - [MENTORA0004](rules/MENTORA0004.md) — `mentora/command-naming`: In command files (commands/ directories, *.command.ts), every exported declaration must be <Verb><Truth> (at least two words) and never start with the banned generics Set/Save.
-- [MENTORA0005](rules/MENTORA0005.md) — `mentora/query-naming`: Declarations ending in Query must be <Truth><Aspect>Query (≥ 2 words before the suffix).
-- [MENTORA0006](rules/MENTORA0006.md) — `mentora/policy-naming`: Declarations ending in Policy must be <Truth><Rule>Policy (≥ 2 words before the suffix).
+- [MENTORA0005](rules/MENTORA0005.md) — `mentora/query-naming`: Declarations ending in Query must carry a named truth/aspect (≥ 1 word before the suffix) — the ratified catalogue includes single-stem reads (MembershipQuery).
+- [MENTORA0006](rules/MENTORA0006.md) — `mentora/policy-naming`: Declarations ending in Policy must carry a named rule (≥ 1 word before the suffix) — the ratified catalogue includes single-stem policies (ReschedulePolicy, ConfirmationPolicy, F3.3 §6).
 - [MENTORA0007](rules/MENTORA0007.md) — `mentora/specification-naming`: Declarations ending in Specification must carry a named question (≥ 1 word before the suffix).
 - [MENTORA0008](rules/MENTORA0008.md) — `mentora/repository-naming`: Declarations ending in Repository must be <Truth>Repository (≥ 1 word before the suffix).
 - [MENTORA0009](rules/MENTORA0009.md) — `mentora/projection-naming`: Declarations ending in Projection must be <Name>Projection and those ending in ReadModel must be <Name>ReadModel (≥ 1 word before the suffix).

@@ -1,6 +1,6 @@
 # MENTORA0006 — `mentora/policy-naming`
 
-> Declarations ending in Policy must be <Truth><Rule>Policy (≥ 2 words before the suffix).
+> Declarations ending in Policy must carry a named rule (≥ 1 word before the suffix) — the ratified catalogue includes single-stem policies (ReschedulePolicy, ConfirmationPolicy, F3.3 §6).
 
 ## Justification
 
@@ -14,13 +14,13 @@ R2 source/constitution/04-bilingual-dictionary.md §9 (Policies `<Truth><Rule>Po
 
 ```ts
 AgreementCancellationPolicy
-ConsentDefinitivenessPolicy
+ReschedulePolicy
+ConfirmationPolicy
 ```
 
 ## Invalid
 
 ```ts
-AgreementPolicy
 Policy
 ```
 
