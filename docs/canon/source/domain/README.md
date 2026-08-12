@@ -3,7 +3,7 @@ doc: canon-source-f3
 title: F3 — Domaine (Source)
 type: source
 titre: domain
-statut: "R2-Corpus Lot 4 — reconstruction en cours (F3.1, F3.2-A/B/C faits ; F3.2.99, F3.3 en attente)"
+statut: "R2-Corpus Lot 4 — reconstruction COMPLÈTE (F3.1 → F3.3 : 100 %)"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -26,6 +26,7 @@ domaines, lois tactiques R-A / R-B / R-C, provenance).
 | 02 | [Aggregates — Customer Journey Core](02-aggregates-customer-journey.md) | **fait** (Lot 4A) — 5 domaines, lois R-A/R-B |
 | 03 | [Aggregates — Identity & Collaboration](03-aggregates-identity-collaboration.md) | **fait** (Lot 4B) — Account, Enterprise, Consent, Messaging |
 | 04 | [Aggregates — Platform & Infrastructure](04-aggregates-platform-infrastructure.md) | **fait** (Lot 4B) — Economy, Augmentation, I&A, Settlement, Notification, Storage |
-| 05 | Grand Tactical Audit + Documentation Freeze | en attente (Lot 4C) |
+| 05 | [Grand Tactical Audit (propriétaire de R-C)](05-grand-tactical-audit.md) | **fait** (Lot 4C) — 30 unités, R-C |
+| 06 | [Tactical Documentation Freeze](06-tactical-documentation-freeze.md) | **fait** (Lot 4C) — catalogues, R-A/R-B/R-C consolidées |
 
 Toute évolution passe par le **Titre VII**.
