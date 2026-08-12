@@ -3,7 +3,7 @@ doc: canon-source-f3
 title: F3 — Domaine (Source)
 type: source
 titre: domain
-statut: "R2-Corpus Lot 1 — contenant vide (aucun contenu constitutionnel)"
+statut: "R2-Corpus Lot 4 — reconstruction en cours (F3.1, F3.2-A faits ; F3.2-B/C, F3.2.99, F3.3 en attente)"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -11,7 +11,21 @@ cree_par: "R2-Corpus Lot 1"
 
 # F3 — Domaine tactique
 
-Contenant réservé à la Source du **Titre F3 — Domaine**
-(blocs de construction, agrégats, lois R-A / R-B / R-C, provenance).
+Source du **Titre F3 — Domaine** (blocs de construction, 25 agrégats sur 15
+domaines, lois tactiques R-A / R-B / R-C, provenance).
 
-> **Vide au Lot 1.**
+## Documents (reconstruction fidèle — R2-Corpus Lot 4)
+
+> Reconstruction fidèle depuis les sources de session ratifiées (jamais depuis
+> la mémoire), avec rapport de conformité. Découpage F3 en trois lots :
+> 4A (fondation tactique), 4B (cœur tactique), 4C (clôture tactique).
+
+| # | Document | Statut |
+|---|----------|--------|
+| 01 | [Tactical Building Blocks](01-tactical-building-blocks.md) | **fait** (Lot 4A) — 16 familles de blocs, 5 amendements |
+| 02 | [Aggregates — Customer Journey Core](02-aggregates-customer-journey.md) | **fait** (Lot 4A) — 5 domaines, lois R-A/R-B |
+| 03 | Aggregates — Identity & Collaboration | en attente (Lot 4B) |
+| 04 | Aggregates — Platform & Infrastructure | en attente (Lot 4B) |
+| 05 | Grand Tactical Audit + Documentation Freeze | en attente (Lot 4C) |
+
+Toute évolution passe par le **Titre VII**.
