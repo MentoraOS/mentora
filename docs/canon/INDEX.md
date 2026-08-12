@@ -49,7 +49,7 @@ aucun contenu**. Il prépare l'arrivée des documents.
 | Objet | Emplacement | Statut |
 |-------|-------------|--------|
 | Glossaire Officiel | [`projection/glossary/`](projection/glossary/) → [01](projection/glossary/01-official-glossary.md) | **projeté** (Lot 1) |
-| Vocabulary Diff | [`verification/diffs/`](verification/diffs/) | à venir (Lot 2) |
+| Vocabulary Diff | [`projection/glossary/`](projection/glossary/) → [02](projection/glossary/02-vocabulary-diff.md) | **projeté** (Lot 2) |
 | Handbook Officiel | [`projection/handbook/`](projection/handbook/) | à venir (Lot 3) |
 | Catalogues | [`projection/catalogs/`](projection/catalogs/) | à venir (Lot 4) |
 | Index dérivés | [`projection/indexes/`](projection/indexes/) | à venir |

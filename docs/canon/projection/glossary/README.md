@@ -20,6 +20,7 @@ jamais une source autonome.
 | # | Document | Statut |
 |---|----------|--------|
 | 01 | [Glossaire Officiel de Mentora (bilingue FR↔EN)](01-official-glossary.md) | **projeté** (Lot 1) — principes, dictionnaire du métier, vocabulaire de la Production, termes réservés, vocabulaire interdit, théorèmes, identités, dettes lexicales |
+| 02 | [Vocabulary Diff — gardien de l'intégrité lexicale](02-vocabulary-diff.md) | **projeté** (Lot 2) — VD-0001→VD-0105 : nouveaux termes, renommages, réservés, interdits, synonymes, corrections, dettes, historique ; divergences signalées |
 
 > Le Glossaire **rassemble** les termes ratifiés, il n'en crée aucun (PG-8) ; il
 > est reconstructible depuis la Source (PG-6/PG-12). Sa **vérification** contre la
