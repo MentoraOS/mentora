@@ -3,7 +3,7 @@ doc: canon-source-f5
 title: F5 — Production (Source)
 type: source
 titre: production
-statut: "R2-Corpus Lot 6 — reconstruction en cours (F5.1, F5.2 faits ; F5.3→F5.8, F5.99 en attente)"
+statut: "R2-Corpus Lot 6 — reconstruction en cours (F5.1→F5.4 faits ; F5.5→F5.8, F5.99 en attente)"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -26,8 +26,8 @@ R / S / O / T / RY / SC / OP / PG ; plus le Grand Audit F5.99 en douze Procès).
 |---|----------|--------|
 | 01 | [Production Runtime & Deployment](01-runtime.md) | **fait** (Lot 6A) — lois R-1→R-10, la Flotte |
 | 02 | [Persistence & Data Storage](02-persistence.md) | **fait** (Lot 6A) — lois S-1→S-10, la Fiche |
-| 03 | Observability, Telemetry & Operational Intelligence | en attente (Lot 6B) |
-| 04 | Security & Trust | en attente (Lot 6B) |
+| 03 | [Observability, Telemetry & Operational Intelligence](03-observability.md) | **fait** (Lot 6B) — lois O-1→O-10 |
+| 04 | [Security & Trust](04-security.md) | **fait** (Lot 6B) — lois T-1→T-32, 6 chaînes de preuve |
 | 05 | Reliability Engineering | en attente (Lot 6C) |
 | 06 | Scalability, Capacity & Multi-Tenant | en attente (Lot 6C) |
 | 07 | Incidents & Operations | en attente (Lot 6D) |
