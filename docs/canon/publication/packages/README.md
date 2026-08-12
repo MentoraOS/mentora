@@ -26,5 +26,13 @@ distribuer. **Distribution Package** — les six Livres officiels :
 
 > Un Livre **n'a aucune autorité** (N°41) : il référence les chapitres
 > propriétaires, il ne recopie jamais leur contenu (N°43). Ordre déterministe
-> (N°44), identité documentaire (N°45). *(Le Production Closure Package viendra au
-> Lot 6.)*
+> (N°44), identité documentaire (N°45).
+
+## Production Closure Package (Lot 6)
+
+| Sous-lot | Emplacement | Statut |
+|----------|-------------|--------|
+| 6A — Foundation Completion | [`production-closure/`](production-closure/) → [01](production-closure/01-foundation-completion-certificate.md) · [02](production-closure/02-foundation-completion-manifest.md) · [03](production-closure/03-foundation-identity.md) · [04](production-closure/04-foundation-version.md) · [05](production-closure/05-foundation-status.md) | **projeté** — Foundation COMPLÈTE |
+
+> Le Production Closure Package **atteste l'achèvement de la Foundation
+> documentaire** (N°56) ; il ne clôt jamais le développement logiciel (N°60).
