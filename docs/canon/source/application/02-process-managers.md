@@ -65,7 +65,7 @@ Rollback distribué, 2PC, undo, delete/update : tous morts (lois 14/17). **Mento
 
 ## 9. Crash recovery
 
-**Le mécanisme unique** : la réaction d'un PM est atomique — *(fait consommé via Inbox) + (position mise à jour + Commands émises dans son outbox)* en une écriture ; les relais portent ensuite. *(F4.99 nomme cet outbox « Outbox de commandes » — distinction de langue, ch. de clôture, Lot 5C.)* Les crashs (après commande émise → relais reprend ; avant enregistrement → re-livraison déterministe ; après publication → identité d'acte déduplique ; avant compensation → position « due », ré-émission idempotente ; pendant attente → Échéancier re-réveille). **La reprise ne re-décide jamais — elle re-livre** ; tout ce qui re-livre est dédupliqué (les trois étages de F4.1).
+**Le mécanisme unique** : la réaction d'un PM est atomique — *(fait consommé via Inbox) + (position mise à jour + Commands émises dans son outbox)* en une écriture ; les relais portent ensuite. *(F4.99 nomme cet outbox « Outbox de commandes » — distinction de langue, [chapitre 05](05-grand-application-audit.md).)* Les crashs (après commande émise → relais reprend ; avant enregistrement → re-livraison déterministe ; après publication → identité d'acte déduplique ; avant compensation → position « due », ré-émission idempotente ; pendant attente → Échéancier re-réveille). **La reprise ne re-décide jamais — elle re-livre** ; tout ce qui re-livre est dédupliqué (les trois étages de F4.1).
 
 ## 10. Plusieurs Process Managers
 

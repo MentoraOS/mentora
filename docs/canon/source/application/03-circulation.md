@@ -61,7 +61,7 @@ Le Bus ne possède **ni les événements** (l'Outbox du propriétaire est la sou
 
 ## 7. Inbox / Outbox
 
-*Outbox par domaine* (registre du propriétaire, écriture atomique état+faits) : **la seule constitutionnelle**. *Inbox par consommateur* : **la seule** (chacun son registre d'identités de faits traités ; par *consommateur*, jamais par domaine — deux consommateurs partageraient une mémoire). Les variantes globales/mémoire/broker : mortes (vérité déplacée, amnésie, délégation). *(F4.99 nomme l'Outbox du propriétaire « Outbox de faits » — distinction, ch. de clôture, Lot 5C.)*
+*Outbox par domaine* (registre du propriétaire, écriture atomique état+faits) : **la seule constitutionnelle**. *Inbox par consommateur* : **la seule** (chacun son registre d'identités de faits traités ; par *consommateur*, jamais par domaine — deux consommateurs partageraient une mémoire). Les variantes globales/mémoire/broker : mortes (vérité déplacée, amnésie, délégation). *(F4.99 nomme l'Outbox du propriétaire « Outbox de faits » — distinction, [chapitre 05](05-grand-application-audit.md).)*
 
 ## 8. Livraison — ce que Mentora garantit
 

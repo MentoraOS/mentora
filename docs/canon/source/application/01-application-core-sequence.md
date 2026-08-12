@@ -28,7 +28,7 @@ note: >-
 > État **final ratifié** : F4.1 amendé des cinq articles de F4.1.99 (dont l'ordre
 > corrigé de la Séquence). C'est **la première des trois Séquences d'exécution** ;
 > les deux autres (Réaction, Lecture) et la loi de clôture « trois chemins
-> seulement » vivent au chapitre de clôture (F4.99, Lot 5C).
+> seulement » vivent au [chapitre 05 (Grand Application Audit)](05-grand-application-audit.md).
 
 ## 1. L'Application Service — définition constitutionnelle
 

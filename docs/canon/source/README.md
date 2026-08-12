@@ -25,7 +25,7 @@ dérive et ne peut jamais la contredire.
 | F1 — Foundation | [`foundation/`](foundation/) | **matérialisé** (Lot 2, verbatim) |
 | F2 — Constitution | [`constitution/`](constitution/) | **matérialisé** (Lot 3, F2.1→F2.9, 100 %) |
 | F3 — Domaine | [`domain/`](domain/) | **matérialisé** (Lot 4, F3.1→F3.3, 100 %) |
-| F4 — Exécution | [`application/`](application/) | **en cours** (Lot 5, reconstruction ; F4.1 fait) |
+| F4 — Exécution | [`application/`](application/) | **matérialisé** (Lot 5, F4.1→F4.99, 100 %) |
 | F5 — Production | [`production/`](production/) | en attente |
 
 Évolution : **Titre VII uniquement**.

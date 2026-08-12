@@ -3,7 +3,7 @@ doc: canon-index
 title: Index canonique
 type: apparatus
 titre: canon
-statut: "R2-Corpus Lot 5B — F1, F2, F3 matérialisés (100 %) ; F4 en cours (F4.1, F4.2, F4.3 faits) ; F5 en attente"
+statut: "R2-Corpus Lot 5C — F1, F2, F3, F4 matérialisés (100 %) ; F5 en attente"
 corpus_ref: "foundation-v1.0.0 (8d095ee)"
 proprietaire: Conseil Constitutionnel de Mentora
 cree_par: "R2-Corpus Lot 1"
@@ -34,7 +34,7 @@ aucun contenu**. Il prépare l'arrivée des documents.
 | **F1 — Foundation** | [`source/foundation/`](source/foundation/) → [01-foundation-constitution.md](source/foundation/01-foundation-constitution.md) | **matérialisé** (Lot 2, verbatim) |
 | **F2 — Constitution** | [`source/constitution/`](source/constitution/) → [01](source/constitution/01-domain-landscape.md) · [02](source/constitution/02-context-map.md) · [03](source/constitution/03-language-responsibilities-contracts.md) · [04](source/constitution/04-bilingual-dictionary.md) · [05](source/constitution/05-rules-invariants-failure-modes.md) · [06](source/constitution/06-architecture-constitution.md) | **matérialisé** (Lot 3f : F2.1→F2.9, 100 %) |
 | **F3 — Domaine** | [`source/domain/`](source/domain/) → [01](source/domain/01-tactical-building-blocks.md) · [02](source/domain/02-aggregates-customer-journey.md) · [03](source/domain/03-aggregates-identity-collaboration.md) · [04](source/domain/04-aggregates-platform-infrastructure.md) · [05](source/domain/05-grand-tactical-audit.md) · [06](source/domain/06-tactical-documentation-freeze.md) | **matérialisé** (Lot 4C : F3.1→F3.3, 100 %) |
-| **F4 — Exécution** | [`source/application/`](source/application/) → [01](source/application/01-application-core-sequence.md) · [02](source/application/02-process-managers.md) · [03](source/application/03-circulation.md) | **en cours** (Lot 5B : F4.1, F4.2, F4.3 faits) |
+| **F4 — Exécution** | [`source/application/`](source/application/) → [01](source/application/01-application-core-sequence.md) · [02](source/application/02-process-managers.md) · [03](source/application/03-circulation.md) · [04](source/application/04-infrastructure-composition-runtime.md) · [05](source/application/05-grand-application-audit.md) | **matérialisé** (Lot 5C : F4.1→F4.99, 100 %) |
 | **F5 — Production** | [`source/production/`](source/production/) | contenant vide |
 
 ## Vérification (à matérialiser)
