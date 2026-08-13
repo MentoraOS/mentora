@@ -1,27 +1,14 @@
+import type { AgreementRefusalReason } from '@mentora/contracts-agreement';
+
 /**
- * The Refusal — the negative Decision (F3.1.14: "la Décision négative — métier,
- * attendue, saine"; it is a VALUE of full rank, never an exception; the refusal
- * is half of the P4 contract). Every Command on the Agreement yields
- * Result<Agreement, AgreementRefusal> — the Decision, motivated by a Reason.
- *
- * Ratified reasons (R2): TimeSlotUnavailable (F3.2-A amendment 1 — official VO
- * + the `-Unavailable` family), OutsideAvailabilityFrame,
- * ConfirmationConditionsMissing. TransitionUnavailable follows the ratified
- * `-Unavailable` family for acts arriving on a state that cannot serve them
- * (frozen machine, F3.3 §8). The remaining names are engineering names pending
- * Titre VII ratification of the full Reason family (F2.5.2 §20 is not
- * enumerated in the materialized corpus — SIGNALED, not invented as law).
+ * The Refusal — the negative Decision (F3.1.14: a VALUE of full rank, never an
+ * exception; the refusal is half of the P4 contract). The REASON UNION is
+ * owned by the published language (@mentora/contracts-agreement) — single
+ * definition, re-exported here; this module owns the in-memory Decision shape
+ * the unit returns.
  */
 
-export type AgreementRefusalReason =
-  | 'TimeSlotUnavailable'
-  | 'OutsideAvailabilityFrame'
-  | 'ConfirmationConditionsMissing'
-  | 'TransitionUnavailable'
-  | 'SlotBoundsInvalid'
-  | 'CancellationWindowClosed'
-  | 'RescheduleWindowClosed'
-  | 'RescheduleLimitReached';
+export type { AgreementRefusalReason } from '@mentora/contracts-agreement';
 
 export interface AgreementRefusal {
   readonly reason: AgreementRefusalReason;

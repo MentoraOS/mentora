@@ -143,7 +143,11 @@ tester.run('mentora/adapter-naming', rule('adapter-naming'), {
 });
 
 tester.run('mentora/query-naming', rule('query-naming'), {
-  valid: ['class ConsentValidityQuery {}', 'class MembershipQuery {}'], // F3.3 §5
+  valid: [
+    'class ConsentValidityQuery {}',
+    'class MembershipQuery {}', // F3.3 §5
+    'const validateAgreementQuery = () => 1;', // camelCase helpers are not building blocks
+  ],
   invalid: [{ code: 'const Query = class {};', errors: [{ messageId: 'tooFewWords' }] }],
 });
 

@@ -35,6 +35,9 @@
     },
     {
       "path": "./packages/domain-agreement/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/contracts-agreement/tsconfig.build.json"
     }
   ]
 }

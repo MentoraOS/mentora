@@ -1,8 +1,8 @@
 {
-  "name": "@mentora/domain-agreement",
+  "name": "@mentora/contracts-agreement",
   "version": "0.0.0",
   "private": true,
-  "description": "The Agreement domain (Engagement bounded context) - the golden path of Mentora. Pure business truth per R2 F3.2-A; no framework, no I/O.",
+  "description": "The published language of the Agreement domain (Engagement bounded context): wire-level command/event/query contracts, schemas, validators, serializers, versioning. Types and contract validation only - no business logic, no implementation.",
   "license": "UNLICENSED",
   "type": "module",
   "sideEffects": false,
@@ -37,8 +37,7 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@mentora/kernel": "workspace:*",
-    "@mentora/shared": "workspace:*",
-    "@mentora/contracts-agreement": "workspace:*"
+    "@mentora/contracts": "workspace:*",
+    "@mentora/kernel": "workspace:*"
   }
 }

@@ -1,35 +1,28 @@
-import type { Id } from '@mentora/kernel';
+import type { AgreementId, ClientId, CommandId, ExpertId, OfferId } from '@mentora/contracts-agreement';
 
 import { AgreementIdentifierBlankException } from '../errors/agreement-exceptions.js';
 
 /**
- * Opaque, stable identifiers (F3.1.99 §4: an Identifier is opaque, stable,
- * never recycled, never derived from mutable data, never meaningful). Foreign
- * truths are referenced by Identifier ONLY (F3.1: "il référence toute autre
- * vérité par Identifier seul, jamais par objet").
- *
- * ClientId / ExpertId derive from the ratified Actor Dictionary (F2.5 §7:
- * Client, Expert) + the `<Truth>Id` naming law; ExpertId is used verbatim by
- * R2 (F3.2-C: FundsLedger identity = ExpertId). OfferId is cited by
- * AgreementConditions (F3.2-A). CommandId is the ratified "identité d'acte"
- * (F4.1 §3: idempotence by act identity).
+ * Identifiers of the Agreement domain. The TYPES are owned by the published
+ * language (@mentora/contracts-agreement — the seam every package speaks;
+ * single definition, no duplication) and re-exported here; the domain adds its
+ * own construction GUARDS (a blank id is a malformed call — the Exception
+ * door, F3.1). CommandId (act identity, F4.1 §3) comes from the technical
+ * core through the same seam.
  */
 
-export type AgreementId = Id<'AgreementId'>;
-export type OfferId = Id<'OfferId'>;
-export type ClientId = Id<'ClientId'>;
-export type ExpertId = Id<'ExpertId'>;
-export type CommandId = Id<'CommandId'>;
+export type { AgreementId, OfferId, ClientId, ExpertId, CommandId } from '@mentora/contracts-agreement';
 
-const brandId = <T extends string>(value: string, label: string): Id<T> => {
+const guarded = (value: string, label: string): string => {
   if (value.trim().length === 0) {
     throw new AgreementIdentifierBlankException(`${label} must not be blank`);
   }
-  return value as Id<T>;
+  return value;
 };
 
-export const agreementIdOf = (value: string): AgreementId => brandId(value, 'AgreementId');
-export const offerIdOf = (value: string): OfferId => brandId(value, 'OfferId');
-export const clientIdOf = (value: string): ClientId => brandId(value, 'ClientId');
-export const expertIdOf = (value: string): ExpertId => brandId(value, 'ExpertId');
-export const commandIdOf = (value: string): CommandId => brandId(value, 'CommandId');
+export const agreementIdOf = (value: string): AgreementId =>
+  guarded(value, 'AgreementId') as AgreementId;
+export const offerIdOf = (value: string): OfferId => guarded(value, 'OfferId') as OfferId;
+export const clientIdOf = (value: string): ClientId => guarded(value, 'ClientId') as ClientId;
+export const expertIdOf = (value: string): ExpertId => guarded(value, 'ExpertId') as ExpertId;
+export const commandIdOf = (value: string): CommandId => guarded(value, 'CommandId') as CommandId;

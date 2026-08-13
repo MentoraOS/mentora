@@ -35,8 +35,11 @@ export const createSuffixRule = (
         if (!name.endsWith(spec.suffix)) {
           continue;
         }
-        // Longest-suffix wins is not needed: specs within a rule never overlap,
-        // except ApplicationService vs Service handled by rule separation.
+        // Building-block naming laws govern PascalCase (type-level) names;
+        // camelCase helpers (validateAgreementQuery…) are not building blocks.
+        if (!/^[A-Z]/.test(name)) {
+          return;
+        }
         if (!isPascalCase(name)) {
           context.report({
             node,

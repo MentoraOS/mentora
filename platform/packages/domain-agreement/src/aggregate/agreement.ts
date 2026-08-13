@@ -32,6 +32,7 @@ import type { CancellationRecord } from '../value-objects/cancellation-record.js
 import type { RescheduleRecord } from '../value-objects/reschedule-record.js';
 import type { TimeSlot } from '../value-objects/time-slot.js';
 import { timeSlotOf } from '../value-objects/time-slot.js';
+
 import type { AgreementDomainEvent } from './agreement-domain-event.js';
 
 /**
