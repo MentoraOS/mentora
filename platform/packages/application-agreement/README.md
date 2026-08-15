@@ -7,12 +7,12 @@ only (F4.1 §1: the Application Service owns the Sequence, the transaction, the
 ports it commands, its correlated journal — never a rule, an invariant, a fact,
 a truth, or state between two calls).
 
-> **Status — Lot 1C-3 (Command side complete).** 1C-1 shipped the frozen
-> skeleton; 1C-2 moved the generic pipeline into `@mentora/application-kernel`
-> (this package re-exports and instantiates it); 1C-3 ships the **eight
-> Application Services** and their **SequenceDefinitions**. **No query side,
-> no process manager, no projection yet** — later sub-lots, each on explicit
-> CTO order.
+> **Status — Lot 1C-4 (Command + Query sides complete).** 1C-1 shipped the
+> frozen skeleton; 1C-2 moved the generic pipeline into
+> `@mentora/application-kernel`; 1C-3 shipped the **eight Application
+> Services**; 1C-4 ships the **Query side** (the Séquence de Lecture
+> instantiated for the ONE ratified read). **No process manager, no
+> projection yet** — later sub-lots, each on explicit CTO order.
 
 ## The architecture (what each folder is)
 
@@ -61,6 +61,57 @@ six, and the state-machine law ("aucune transition sans commande") requires
 the two time-tooling commands. The mandate's word "Handler" has no R2 basis on
 the command side: F4.1 §8 freezes `<UseCase>ApplicationService`, and "handler"
 in F4.99 designates only the FACT consumer of the Séquence de Réaction.
+
+## The Query side (Lot 1C-4) — the Séquence de Lecture
+
+The read engine is GENERIC (same law as 1C-2: the pipeline belongs to no
+domain) — it lives in `@mentora/application-kernel` (`read/`, additive
+module); this package injects the ONE ratified Agreement read.
+
+**The six frozen steps** (F4.99 §1): *réception → identité → R-C → lecture →
+réponse → journal*. No mutation, no retention, no publication, no retry, no
+time injection — "il n'existe aucun quatrième chemin d'exécution".
+
+**The read flow**:
+
+```
+payload (wire)                                 @mentora/application-kernel
+  │
+  ▼
+QueryDispatch (F4.1 §6)  — table fermée, UN lecteur par Query, fail closed
+  │  routes 'AgreementStateQuery' → its ONE reader
+  ▼
+AgreementStateQueryApplicationService  — boring: ONE delegation
+  ▼
+ReadExecutor (the six steps)
+  1 Reception   — receiveAgreementQuery (published language, tolerant V-2)
+  2 Identity    — the injected ActorRef (A-6); NO time step
+  3 R-C         — AgreementReadRightsPort: the DECLARED grid (F3.3 §5:
+                  "les parties, l'outillage du temps"); missing → refused
+                  'RightMissing' (a VALUE)
+  4 Reading     — AgreementStateReadPort.stateOf(id): the Read Model row
+                  (AgreementStateView) — the domain NEVER exits directly;
+                  nothing readable → refused 'AgreementUnavailable'
+  5 Response    — pure mapping view → AgreementStateResponse (1B): parties
+                  STRIPPED — "l'état ⊘ les conditions à des tiers"
+  6 Journal     — one correlated record per step (A-10; Journal ≠ Log)
+```
+
+**Query-side signals (R2 gagne)**:
+- the mandate's port name "AgreementQueryRepository" was corrected to
+  **`AgreementStateReadPort`** + **`AgreementReadRightsPort`**: a Repository
+  is the DOMAIN's registry of ONE truth (F3.1; the Agreement owns exactly
+  one — 1A) and F4.1 §7 guards "contre le Repository métier"; a read port is
+  a capability port, frozen naming `<Capability>Port` (F2.5 §9);
+- `ListAgreement`/`SearchAgreement`/`BrowseAgreement`/`FindAgreement` were
+  NOT built — no such read exists in R2 (F3.3 §4: "ExpressSearch supprimée";
+  the catalogue ratifies `AgreementStateQuery` alone);
+- the two read refusal reasons (`RightMissing`, `AgreementUnavailable`)
+  follow the ratified patterns (R-C's "si le droit manque"; the
+  `-Unavailable` family) and are SIGNALED to Titre VII (1B precedent);
+- no second `composition/` home was created under `query/`: the Root is
+  unique per executable (I-2/I-3) — the existing empty `composition/` stays
+  the single home until 1C-7.
 
 ## The mandated improvement — STOPPED (règle constitutionnelle : R2 gagne)
 

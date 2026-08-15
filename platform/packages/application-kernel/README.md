@@ -16,6 +16,17 @@ Order corrected by F4.1.99: Loading PRECEDES the validities. There is **no**
 Authorization step (dispatch, R-C/A-8) and **no** Projection step (parallel
 readers of published facts, F4.99) — R2 wins.
 
+## The six frozen steps of the Lecture (F4.99 §1 — added Lot 1C-4, additive)
+
+`Reception → IdentityInjection → RightsCheck (R-C) → Reading → Response →
+Journal` — "réception → identité → R-C → lecture → réponse → journal".
+Closure law: THREE Sequences (Commande 10, Réaction 6, Lecture 6), no fourth
+path. The Lecture never mutates, never retains, never publishes, never
+retries (a technical throw is a Failure VALUE; transport retries are M-8's).
+No TimeInjection: the frozen six hold no time step. `read/` carries the
+generic `ReadDefinition`/`ReadExecutor` and the `QueryDispatch` (F4.1 §6:
+table fermée, ONE reader per Query, fail closed at assembly).
+
 ## Shape
 
 - `step/` — the frozen `SEQUENCE_STEPS` constant + the ten stage classes.

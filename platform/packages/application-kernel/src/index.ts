@@ -32,5 +32,17 @@ export * from './journal/sequence-journal.port.js';
 export * from './executor/sequence-executor.js';
 export * from './builder/sequence-builder.js';
 
+// The Séquence de Lecture (F4.99 §1: six frozen steps, born at the Grand
+// Audit) and the Query Dispatch (F4.1 §6) — the READ engine, generic like the
+// command pipeline: each context injects its ReadDefinition. Additive module
+// (Lot 1C-4); nothing of the Séquence de Commande above was touched.
+export * from './read/read-steps.js';
+export * from './read/read-definition.js';
+export * from './read/read-outcome.js';
+export * from './read/read-journal.port.js';
+export * from './read/read-executor.js';
+export * from './read/query-dispatch.js';
+
 // Test doubles.
 export * from './testing/recording-journal.js';
+export * from './testing/recording-read-journal.js';

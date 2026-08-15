@@ -34,6 +34,16 @@ export * from './definitions/cancel-agreement.definition.js';
 export * from './definitions/lapse-agreement-request.definition.js';
 export * from './definitions/elapse-agreement.definition.js';
 
+// The Query side (1C-4) — the Séquence de Lecture instantiated for the ONE
+// ratified Agreement read (F3.3 §5), plus its dispatch entries and ports.
+export * from './query/ports/agreement-state-read.port.js';
+export * from './query/errors/agreement-read-refusal.js';
+export * from './query/validators/agreement-query-reception.js';
+export * from './query/definitions/agreement-state-query.definition.js';
+export * from './query/services/agreement-state-query.application-service.js';
+export * from './query/dispatch/agreement-query-dispatch.js';
+export * from './query/testing/agreement-read-doubles.js';
+
 // The eight Application Services (F4.1 §8: `<UseCase>ApplicationService`) —
 // guardians of execution, one Command each (A-1), zero business logic.
 export * from './services/agreement-sequence.application-service.js';
