@@ -1,0 +1,45 @@
+{
+  "name": "@mentora/application-agreement",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The application layer of the Agreement domain: the Sequence de Commande (F4.1) orchestration harness. Orchestration only - the domain decides, adapters execute. No business rule, no framework.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/contracts": "workspace:*",
+    "@mentora/contracts-agreement": "workspace:*",
+    "@mentora/domain-agreement": "workspace:*",
+    "@mentora/kernel": "workspace:*"
+  }
+}
