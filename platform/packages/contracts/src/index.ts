@@ -15,6 +15,7 @@ export type * from './dto/pagination.js';
 // Transverse types (type-only).
 export type * from './types/cross-cutting.js';
 export type * from './types/act-identity.js';
+export type * from './types/actor-ref.js';
 
 // Transport envelopes (M-3: correlation/causation ride the envelope, never the fact).
 export * from './messages/envelopes.js';

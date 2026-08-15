@@ -1,8 +1,8 @@
 {
-  "name": "@mentora/application-agreement",
+  "name": "@mentora/application-kernel",
   "version": "0.0.0",
   "private": true,
-  "description": "The application layer of the Agreement domain: the Sequence de Commande (F4.1) orchestration harness. Orchestration only - the domain decides, adapters execute. No business rule, no framework.",
+  "description": "The official Sequence de Commande pipeline of Mentora (F4.1): the ten frozen steps as a generic, domain-agnostic harness. Every application-* package instantiates it; it depends on NO domain.",
   "license": "UNLICENSED",
   "type": "module",
   "sideEffects": false,
@@ -34,13 +34,11 @@
     "eslint": "catalog:",
     "rimraf": "6.0.1",
     "typescript": "catalog:",
+    "@mentora/testing-clock": "workspace:*",
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@mentora/application-kernel": "workspace:*",
     "@mentora/contracts": "workspace:*",
-    "@mentora/contracts-agreement": "workspace:*",
-    "@mentora/domain-agreement": "workspace:*",
     "@mentora/kernel": "workspace:*"
   }
 }
