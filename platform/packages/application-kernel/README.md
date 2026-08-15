@@ -27,6 +27,24 @@ No TimeInjection: the frozen six hold no time step. `read/` carries the
 generic `ReadDefinition`/`ReadExecutor` and the `QueryDispatch` (F4.1 §6:
 table fermée, ONE reader per Query, fail closed at assembly).
 
+## The six frozen steps of the Réaction (F4.99 §1 — added Lot 1C-5, additive)
+
+`FactReception (Inbox — dedup by FACT IDENTITY, M-4) → Injections
+(propagated correlation, ONE instant — A-6) → Reaction (PURE function:
+position/mapping → commands) → AtomicRetention (Inbox mark + position +
+emitted commands, ONE write — the Outbox de commandes, F4.99 §2) → Relay
+(structural: the command-outbox relay dispatches at-least-once) → Journal.`
+
+The third and last execution path — "il n'existe aucun quatrième chemin".
+NO Refusal channel exists here: a Process Manager never decides (P-3);
+a journey dead-end is a POSITION (Abandoned + Signal, P-8), never a
+pipeline outcome. Duplicates are absorbed (at-least-once, loi 15);
+technical Failures retry from pas 3 within a bounded budget (M-8), then
+ABANDON with a journaled witness. `reaction/` carries the generic
+`ReactionDefinition`/`ReactionExecutor`/`ReactionBuilder` and the
+`ReactionDispatch` (M-5: routing = a projection of declared subscriptions,
+closed table, no dynamic discovery, no runtime reflection).
+
 ## Shape
 
 - `step/` — the frozen `SEQUENCE_STEPS` constant + the ten stage classes.

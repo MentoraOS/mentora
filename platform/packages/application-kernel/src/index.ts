@@ -43,6 +43,21 @@ export * from './read/read-journal.port.js';
 export * from './read/read-executor.js';
 export * from './read/query-dispatch.js';
 
+// The Séquence de Réaction (F4.99 §1: six frozen steps, born at the Grand
+// Audit) and the ReactionDispatch (M-5: routing = a projection of declared
+// subscriptions) — the third and last execution path ("aucun quatrième
+// chemin"). Additive module (Lot 1C-5); nothing frozen above was touched.
+export * from './reaction/reaction-steps.js';
+export * from './reaction/reaction-definition.js';
+export * from './reaction/reaction-outcome.js';
+export * from './reaction/reaction-journal.port.js';
+export * from './reaction/reaction-errors.js';
+export * from './reaction/reaction-context.js';
+export * from './reaction/reaction-executor.js';
+export * from './reaction/reaction-builder.js';
+export * from './reaction/reaction-dispatch.js';
+
 // Test doubles.
 export * from './testing/recording-journal.js';
 export * from './testing/recording-read-journal.js';
+export * from './testing/recording-reaction-journal.js';

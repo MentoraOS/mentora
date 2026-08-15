@@ -124,6 +124,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.9.0
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.5(vitest@2.1.5(@types/node@22.9.0))
       eslint:
         specifier: 'catalog:'
         version: 9.15.0
