@@ -27,7 +27,9 @@
   },
   "devDependencies": {
     "@mentora/eslint-config": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
     "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-clock": "workspace:*",
     "@mentora/testing-config": "workspace:*",
     "@mentora/tsconfig": "workspace:*",
     "@types/node": "catalog:",

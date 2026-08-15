@@ -22,3 +22,26 @@ export * from './validators/reception.js';
 
 // The wire → domain seam (injected instant, VO doors).
 export * from './factories/agreement-command-factory.js';
+
+// The eight SequenceDefinitions — what Agreement injects into the Golden Pipeline.
+export * from './definitions/agreement-sequence-definition.js';
+export * from './definitions/request-agreement.definition.js';
+export * from './definitions/accept-agreement.definition.js';
+export * from './definitions/reject-agreement.definition.js';
+export * from './definitions/confirm-agreement.definition.js';
+export * from './definitions/reschedule-agreement.definition.js';
+export * from './definitions/cancel-agreement.definition.js';
+export * from './definitions/lapse-agreement-request.definition.js';
+export * from './definitions/elapse-agreement.definition.js';
+
+// The eight Application Services (F4.1 §8: `<UseCase>ApplicationService`) —
+// guardians of execution, one Command each (A-1), zero business logic.
+export * from './services/agreement-sequence.application-service.js';
+export * from './services/request-agreement.application-service.js';
+export * from './services/accept-agreement.application-service.js';
+export * from './services/reject-agreement.application-service.js';
+export * from './services/confirm-agreement.application-service.js';
+export * from './services/reschedule-agreement.application-service.js';
+export * from './services/cancel-agreement.application-service.js';
+export * from './services/lapse-agreement-request.application-service.js';
+export * from './services/elapse-agreement.application-service.js';
