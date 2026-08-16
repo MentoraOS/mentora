@@ -44,6 +44,36 @@
     },
     {
       "path": "./packages/application-agreement/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-clock/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-identity/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-config/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-logging/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-metrics/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-tracing/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-health/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-serialization/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-security/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-bootstrap/tsconfig.build.json"
     }
   ]
 }

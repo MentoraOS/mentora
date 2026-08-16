@@ -1,0 +1,12 @@
+{
+  "//": "Emit/build project (composite, reference target). Source only. Node types: these packages ARE the runtime vestibule.",
+  "extends": "@mentora/tsconfig/library",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/*.spec.ts"]
+}
