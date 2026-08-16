@@ -6,31 +6,69 @@
     ".npmrc",
     "pnpm-workspace.yaml"
   ],
-  "globalEnv": ["NODE_ENV", "CI"],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "tsconfig*.json", "package.json"],
-      "outputs": ["dist/**", "build/**", ".tsbuildinfo"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": [
+        "dist/**",
+        "build/**",
+        ".tsbuildinfo"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "tsconfig*.json", "package.json"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "tsconfig*.json",
+        "package.json"
+      ],
       "outputs": []
     },
     "lint": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "*.{js,mjs,cjs,ts}", "package.json"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "*.{js,mjs,cjs,ts}",
+        "package.json"
+      ],
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "vitest.config.*", "package.json"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "vitest.config.*",
+        "package.json"
+      ],
       "outputs": []
     },
     "test:unit": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "package.json"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
       "outputs": []
     },
     "clean": {
@@ -40,5 +78,8 @@
       "cache": false,
       "persistent": true
     }
-  }
+  },
+  "globalPassThroughEnv": [
+    "MENTORA_AGREEMENT_DATABASE_URL"
+  ]
 }

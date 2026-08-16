@@ -26,3 +26,9 @@ catalog:
   prettier: 3.3.3
   vitest: 2.1.5
   '@vitest/coverage-v8': 2.1.5
+
+onlyBuiltDependencies:
+  - prisma
+  - "@prisma/client"
+  - "@prisma/engines"
+  - esbuild

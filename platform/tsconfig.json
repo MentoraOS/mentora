@@ -74,6 +74,9 @@
     },
     {
       "path": "./packages/runtime-bootstrap/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/adapters-persistence-agreement/tsconfig.build.json"
     }
   ]
 }
