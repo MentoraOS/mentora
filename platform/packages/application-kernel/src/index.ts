@@ -32,6 +32,10 @@ export * from './journal/sequence-journal.port.js';
 export * from './executor/sequence-executor.js';
 export * from './builder/sequence-builder.js';
 
+// The Command Dispatcher (F4.1 §6: one carrier per Command, act identity
+// demanded, closed table owned by the Root). Additive module (Lot 1C-7).
+export * from './dispatch/command-dispatch.js';
+
 // The Séquence de Lecture (F4.99 §1: six frozen steps, born at the Grand
 // Audit) and the Query Dispatch (F4.1 §6) — the READ engine, generic like the
 // command pipeline: each context injects its ReadDefinition. Additive module

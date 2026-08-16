@@ -44,6 +44,11 @@ export * from './query/services/agreement-state-query.application-service.js';
 export * from './query/dispatch/agreement-query-dispatch.js';
 export * from './query/testing/agreement-read-doubles.js';
 
+// The Composition of the Agreement context (1C-7) — Pure DI, the whole
+// graph built explicitly; the executable's Root calls composeAgreement with
+// its real ports and validated configuration (F4.4 §2, unique per executable).
+export * from './composition/agreement-composition.js';
+
 // The eight Application Services (F4.1 §8: `<UseCase>ApplicationService`) —
 // guardians of execution, one Command each (A-1), zero business logic.
 export * from './services/agreement-sequence.application-service.js';
