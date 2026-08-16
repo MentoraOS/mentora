@@ -77,6 +77,9 @@
     },
     {
       "path": "./packages/adapters-persistence-agreement/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/runtime-relay/tsconfig.build.json"
     }
   ]
 }
