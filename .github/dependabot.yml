@@ -1,0 +1,78 @@
+# MentoraOS — Dependabot (R5 Phase 2, Lot 5)
+#
+# « Une dépendance n'est jamais mise à jour parce qu'elle est plus
+# récente. Elle est mise à jour parce qu'elle est gouvernée. »
+#
+# STRATÉGIE : hebdomadaire (lundi 06:00 UTC) — la quotidienne noie une
+# équipe de 2 sous le bruit, la mensuelle laisse dormir des correctifs ;
+# l'hebdomadaire s'aligne sur les rituels et laisse la Nightly prouver
+# chaque nuit que rien n'a dérivé. Les SECURITY UPDATES, elles, arrivent
+# dès publication de l'advisory (mécanisme distinct, activé dans les
+# settings du dépôt) — la sécurité n'attend pas le lundi.
+#
+# GROUPING : un train patch+minor par écosystème = 2 PR par semaine au
+# maximum, jamais 50. Les MAJORS npm sont IGNORÉS ici, à dessein : un
+# major est une décision (ADR, politique de versions — voir
+# docs/governance/supply-chain-policy.md), pas une notification ; ils
+# restent visibles via le supply-chain report (pnpm outdated). Leçon
+# fondatrice : Prisma 7 a changé son modèle de config en plein lot — le
+# major s'instruit, il ne se subit pas.
+#
+# ÉCOSYSTÈMES : uniquement ceux RÉELLEMENT présents — npm/pnpm
+# (platform/) et GitHub Actions (.github/). Docker-compose est
+# volontairement EXCLU : l'unique compose (platform/infra) est un
+# artefact hérité du Lot 0A déclarant des composants non ratifiés
+# (redis, rabbitmq, opensearch…) — gouverner leurs mises à jour les
+# légitimerait ; le compose attend son lot d'hygiène R5. Les images des
+# service containers de workflows ne sont pas couvertes par Dependabot :
+# le supply-chain report les surveille.
+
+version: 2
+updates:
+  - package-ecosystem: npm # pnpm : lockfile + catalog pnpm-workspace.yaml
+    directory: /platform
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - supply-chain
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      npm-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+    ignore:
+      # Les majors sont une décision d'ingénierie (ADR + migration +
+      # release candidate), jamais une PR automatique — politique de
+      # versions, supply-chain-policy.md.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - supply-chain
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      actions-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+    # Les majors d'actions restent en PR individuelles : rares, et
+    # chacun change potentiellement le contrat du workflow.
