@@ -78,12 +78,13 @@ jobs:
           node-version-file: platform/.nvmrc
 
       - name: Setup pnpm (corepack épinglé — la version de pnpm vient toujours du champ packageManager)
-        # Le corepack embarqué dans Node 22.11 (0.29.x) ne connaît que
-        # l'ANCIENNE clé de signature du registre npm (tournée en janvier
-        # 2025) : il refuse pnpm@9.12.3 avec « Cannot find matching keyid ».
-        # On épingle corepack 0.31.0 — première version portant les clés
-        # tournées — ce qui CONSERVE la vérification de signature (jamais
-        # désactivée) et laisse packageManager comme unique source de
+        # Le corepack embarqué varie avec la version de Node et les plus
+        # anciens (≤0.29) ne portent que l'ANCIENNE clé de signature du
+        # registre npm (tournée en janvier 2025) — symptôme : « Cannot
+        # find matching keyid ». On épingle corepack 0.31.0 (première
+        # version portant les clés tournées) : DÉTERMINISTE quel que soit
+        # le corepack embarqué, la vérification de signature reste active
+        # (jamais désactivée), et packageManager reste l'unique source de
         # vérité de la version de pnpm.
         run: |
           npm install -g corepack@0.31.0

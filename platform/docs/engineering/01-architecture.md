@@ -45,7 +45,7 @@ platform/
 ├── .editorconfig            editor defaults (LF, 2-space, final newline)
 ├── .gitignore               node/turbo ignores (scoped to platform/)
 ├── .npmrc                   pnpm policy: no hoist, strict peers, frozen lockfile
-├── .nvmrc                   Node 22.11.0
+├── .nvmrc                   Node 22.23.2 (LTS Jod — baseline corrigée par le smoke CI R5)
 ├── package.json             workspace root: scripts + dev toolchain only
 ├── pnpm-workspace.yaml       workspace globs + shared version catalog
 ├── turbo.json               task graph, inputs/outputs, caching
