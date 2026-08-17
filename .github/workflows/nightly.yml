@@ -76,9 +76,16 @@ jobs:
         # (Sur un runner neuf ces chemins sont quasi vides — l'étape les
         # détruit EXPLICITEMENT pour que la garantie soit écrite, pas
         # supposée.) Aucun actions/cache dans ce workflow, à dessein.
+        # Le store pnpm est résolu DYNAMIQUEMENT (`pnpm store path`) :
+        # son emplacement varie selon les versions de pnpm/corepack et
+        # l'image du runner — un chemin codé en dur purgerait le mauvais
+        # endroit en silence le jour où il bouge.
         run: |
-          rm -rf ~/.cache ~/.pnpm-store ~/.local/share/pnpm/store
-          rm -rf node_modules .turbo
+          STORE=$(pnpm store path)
+          rm -rf "$STORE"
+          rm -rf node_modules
+          rm -rf .turbo
+          rm -rf ~/.cache
           find . -maxdepth 4 -type d \( -name node_modules -o -name .turbo \) -prune -exec rm -rf {} +
 
       - name: Install (lockfile gelé — aucun contournement)
