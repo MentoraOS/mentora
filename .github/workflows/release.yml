@@ -1,31 +1,52 @@
-# MentoraOS — Release Pipeline (R5 Phase 2, Lot 3)
+# MentoraOS — Release Pipeline (R5 Phase 2, Lot 3 + Hardening)
 #
 # LA RELEASE N'INVENTE RIEN. Elle certifie, documente et prouve que la
-# vérité déjà produite par la CI est publiable. Ce pipeline NE DÉPLOIE
-# PAS : il prépare une Release parfaitement vérifiée, avec la preuve
-# complète de ce qui serait livré (artefact + SBOM + provenance +
-# empreintes). Aucune commande recomposée à la main : les scripts du
-# dépôt (`pnpm build`, `pnpm verify`) sont les seuls exécutés.
+# vérité déjà produite par la CI est publiable. Aucune certification
+# partielle : chaque étape de `certify` est bloquante.
 #
-# Actions officielles uniquement, épinglées par SHA (résolus depuis les
-# dépôts sources). Même fondation que ci.yml/nightly.yml : Node par
-# .nvmrc, corepack 0.31.0, PostgreSQL éphémère identique — la gate de
-# release EST la gate officielle, base réelle comprise.
+# ARCHITECTURE DES CANAUX :
+#   workflow_dispatch  -> RELEASE CANDIDATE (0.0.0-rc.<sha>) — artefacts
+#                         de workflow (90 j), pour validation humaine.
+#   push tag v*        -> OFFICIAL RELEASE — même certification, PLUS le
+#                         job `publish` qui grave les artefacts dans une
+#                         GitHub Release permanente. Le tag est l'acte
+#                         officiel ; la validation d'une candidate le
+#                         précède toujours.
+#
+# PROVENANCE — l'échelle SLSA, sans reconstruction future :
+#   Niveau garanti  : provenance.json auto-porté + SHA256SUMS (toujours).
+#   Niveau signé    : Artifact Attestations (SLSA v1, Sigstore) — job
+#                     `attest` séparé, sujets transmis par artefacts ;
+#                     best-effort tant que le plan GitHub ne l'offre pas.
+#   Vers SLSA L3    : la séparation build/attestation par jobs et le flux
+#                     des sujets par empreintes sont DÉJÀ la topologie
+#                     requise — la promotion consistera à extraire
+#                     certify+attest en reusable workflow épinglé, sans
+#                     changer une seule étape.
+#
+# SBOM — indépendant de GitHub : syft (binaire unique, épinglé par
+# version ET par SHA-256 officiel), scanné depuis le LOCKFILE commité —
+# reproductible localement, en CI, sur tout plan. Sorties SPDX 2.3 ET
+# CycloneDX. Aucune dépendance ajoutée au dépôt, aucune action tierce.
 
 name: release
 
 on:
-  workflow_dispatch: {} # préparer une release candidate à la demande, sans tag
+  workflow_dispatch: {} # canal CANDIDATE
   push:
     tags:
-      - "v*" # les tags de release (protégés par le plan Rulesets : nés immuables)
+      - "v*" # canal OFFICIAL (tags protégés par le plan Rulesets)
 
 permissions:
-  contents: read # le pipeline lit et prouve ; il ne modifie rien
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false # une certification se termine, elle ne s'annule pas
+
+env:
+  SYFT_VERSION: 1.51.0
+  SYFT_SHA256: 2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f # syft_1.51.0_linux_amd64.tar.gz (checksums officiels anchore)
 
 jobs:
   certify:
@@ -36,12 +57,12 @@ jobs:
         working-directory: platform
     outputs:
       version: ${{ steps.version.outputs.version }}
+      channel: ${{ steps.version.outputs.channel }}
 
     services:
       postgres:
         # La gate officielle inclut les preuves d'intégration sur moteur
-        # réel : une release qui les sauterait certifierait MOINS que la
-        # CI. Service strictement identique à ci.yml.
+        # réel — service strictement identique à ci.yml.
         image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: mentora
@@ -72,16 +93,16 @@ jobs:
           npm install -g corepack@0.31.0
           corepack enable
 
-      - name: Version — le tag fait foi ; un dispatch produit une candidate datée
+      - name: Version & canal — le tag est l'acte officiel
         id: version
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            VERSION="${GITHUB_REF_NAME}"
+            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "channel=official" >> "$GITHUB_OUTPUT"
           else
-            VERSION="0.0.0-rc.$(git rev-parse --short HEAD)"
+            echo "version=0.0.0-rc.$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+            echo "channel=candidate" >> "$GITHUB_OUTPUT"
           fi
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Version certifiée : ${VERSION}"
 
       - name: Install (lockfile gelé)
         run: pnpm install --frozen-lockfile
@@ -98,22 +119,23 @@ jobs:
       - name: Verify — rien ne se publie sans avoir repassé LA gate
         run: pnpm verify
 
-      - name: SBOM — l'inventaire officiel GitHub (SPDX, zéro outil tiers)
-        # Le dépôt ne possède aucun outil SBOM : le choix est l'API
-        # Dependency-Graph de GitHub (SPDX 2.x) — officielle, dérivée du
-        # lockfile réellement commité, sans dépendance ni action tierce.
-        # Si l'API refuse, le Dependency Graph est désactivé dans les
-        # settings : la release ÉCHOUE avec l'instruction — une release
-        # sans inventaire ne se certifie pas.
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: SBOM — syft épinglé + vérifié, depuis le lockfile commité
+        # Indépendant de GitHub : binaire unique téléchargé par version
+        # épinglée et VÉRIFIÉ contre le SHA-256 des checksums officiels
+        # anchore avant toute exécution. La source du SBOM est le
+        # LOCKFILE — l'inventaire exact de ce que le build a résolu —
+        # d'où la reproductibilité locale/CI à l'identique.
         run: |
-          mkdir -p ../release-out
-          if ! gh api "repos/${GITHUB_REPOSITORY}/dependency-graph/sbom" > ../release-out/sbom.spdx.json; then
-            echo '::error::SBOM indisponible — activer Settings > Advanced Security > Dependency graph, puis relancer.'
-            exit 1
-          fi
-          echo "SBOM SPDX généré ($(wc -c < ../release-out/sbom.spdx.json) octets)"
+          mkdir -p ../release-out /tmp/syft
+          curl -sSfL -o /tmp/syft/syft.tar.gz \
+            "https://github.com/anchore/syft/releases/download/v${SYFT_VERSION}/syft_${SYFT_VERSION}_linux_amd64.tar.gz"
+          echo "${SYFT_SHA256}  /tmp/syft/syft.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/syft/syft.tar.gz -C /tmp/syft syft
+          /tmp/syft/syft scan file:pnpm-lock.yaml \
+            -o spdx-json=../release-out/sbom.spdx.json \
+            -o cyclonedx-json=../release-out/sbom.cdx.json \
+            --quiet
+          node -e "const s=require('../release-out/sbom.spdx.json'); if (!s.packages || s.packages.length < 100) { throw new Error('SBOM suspect : ' + (s.packages?.length ?? 0) + ' paquets'); } console.log('SBOM: ' + s.packages.length + ' paquets (' + s.spdxVersion + ') + CycloneDX');"
 
       - name: Empaqueter l'artefact serveur (versionné, traçable)
         run: |
@@ -125,28 +147,68 @@ jobs:
           tar -czf "../release-out/mentora-server-${VERSION}.tar.gz" -C ../release-out "mentora-server-${VERSION}"
           rm -rf "$STAGE"
 
-      - name: Empreintes + provenance documentaire (toujours produites)
-        # Provenance de niveau 1 — AUTO-PORTÉE, non signée, toujours
-        # disponible quel que soit le plan GitHub : QUI (workflow/run),
-        # QUOI (empreintes SHA-256 des artefacts), D'OÙ (commit/ref),
-        # QUAND. L'attestation cryptographique native est le job `attest`.
+      - name: Provenance documentaire + empreintes (toujours produites)
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           cd ../release-out
-          sha256sum "mentora-server-${VERSION}.tar.gz" sbom.spdx.json > SHA256SUMS
+          sha256sum "mentora-server-${VERSION}.tar.gz" sbom.spdx.json sbom.cdx.json > SHA256SUMS
           cat > provenance.json <<EOF
           {
             "version": "${VERSION}",
+            "channel": "${{ steps.version.outputs.channel }}",
             "commit": "${GITHUB_SHA}",
             "ref": "${GITHUB_REF}",
             "workflow": "${GITHUB_WORKFLOW}",
             "run": "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}",
             "runner": "${RUNNER_OS}-${RUNNER_ARCH}",
             "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "subjects": $(sha256sum "mentora-server-${VERSION}.tar.gz" sbom.spdx.json | awk '{printf "%s{\"name\":\"%s\",\"sha256\":\"%s\"}", sep, $2, $1; sep=","} END {print ""}' | sed 's/^/[/;s/$/]/')
+            "subjects": $(sha256sum "mentora-server-${VERSION}.tar.gz" sbom.spdx.json sbom.cdx.json | awk '{printf "%s{\"name\":\"%s\",\"sha256\":\"%s\"}", sep, $2, $1; sep=","} END {print ""}' | sed 's/^/[/;s/$/]/')
           }
           EOF
-          cat provenance.json
+
+      - name: Release Manifest — LA référence officielle de la release
+        # Tout artefact de la release se retrouve depuis ce manifest :
+        # empreintes, noms, versions d'outillage, provenance, run.
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          NODE_V=$(node -v)
+          PNPM_V=$(pnpm -v)
+          TURBO_V=$(node -p "require('./package.json').devDependencies.turbo")
+          PRISMA_V=$(node -p "require('./packages/adapters-persistence-agreement/package.json').devDependencies.prisma")
+          cd ../release-out
+          SHA_TAR=$(sha256sum "mentora-server-${VERSION}.tar.gz" | awk '{print $1}')
+          SHA_SPDX=$(sha256sum sbom.spdx.json | awk '{print $1}')
+          SHA_CDX=$(sha256sum sbom.cdx.json | awk '{print $1}')
+          SHA_PROV=$(sha256sum provenance.json | awk '{print $1}')
+          cat > release-manifest.json <<EOF
+          {
+            "version": "${VERSION}",
+            "channel": "${{ steps.version.outputs.channel }}",
+            "commit": "${GITHUB_SHA}",
+            "branch": "${GITHUB_REF_NAME}",
+            "node": "${NODE_V}",
+            "pnpm": "${PNPM_V}",
+            "prisma": "${PRISMA_V}",
+            "turbo": "${TURBO_V}",
+            "syft": "${SYFT_VERSION}",
+            "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "sha256": "${SHA_TAR}",
+            "artifact": "mentora-server-${VERSION}.tar.gz",
+            "sbom": {
+              "spdx": { "file": "sbom.spdx.json", "sha256": "${SHA_SPDX}" },
+              "cyclonedx": { "file": "sbom.cdx.json", "sha256": "${SHA_CDX}" }
+            },
+            "provenance": {
+              "documentary": { "file": "provenance.json", "sha256": "${SHA_PROV}" },
+              "attestation": "job attest (Artifact Attestations, best-effort — voir le run)"
+            },
+            "workflow": "${GITHUB_WORKFLOW}",
+            "run": "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}",
+            "runner": "${RUNNER_OS}-${RUNNER_ARCH}"
+          }
+          EOF
+          sha256sum release-manifest.json >> SHA256SUMS
+          cat release-manifest.json
 
       - name: Publier l'artefact serveur
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -156,39 +218,40 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Publier le SBOM
+      - name: Publier les SBOM (SPDX + CycloneDX)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: mentora-sbom-${{ steps.version.outputs.version }}
-          path: release-out/sbom.spdx.json
+          path: |
+            release-out/sbom.spdx.json
+            release-out/sbom.cdx.json
           if-no-files-found: error
           retention-days: 90
 
-      - name: Publier provenance + empreintes
+      - name: Publier manifest + provenance + empreintes
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: mentora-provenance-${{ steps.version.outputs.version }}
+          name: mentora-manifest-${{ steps.version.outputs.version }}
           path: |
+            release-out/release-manifest.json
             release-out/provenance.json
             release-out/SHA256SUMS
           if-no-files-found: error
           retention-days: 90
 
   attest:
-    # Provenance de niveau 2 — l'ATTESTATION NATIVE GitHub (Artifact
-    # Attestations, SLSA v1, signée Sigstore) : la meilleure stratégie
-    # GitHub actuelle. BEST-EFFORT DÉCLARÉ : sur un dépôt privé sans
-    # plan Enterprise, GitHub refuse la création d'attestation — ce job
-    # est alors rouge-toléré (continue-on-error) et le run le MONTRE ;
-    # la provenance de niveau 1 (job certify) reste la preuve garantie.
+    # Attestation native (SLSA v1, Sigstore) — BEST-EFFORT DÉCLARÉ tant
+    # que le plan GitHub ne l'offre pas sur dépôt privé ; le run montre
+    # son état. La topologie (job séparé, sujets par artefacts) est déjà
+    # celle exigée pour monter vers SLSA L3 par reusable workflow.
     name: attest (best-effort — exige Artifact Attestations)
     needs: certify
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       contents: read
-      id-token: write # jeton OIDC éphémère du run — l'identité de la signature
-      attestations: write # écrire l'attestation dans le registre du dépôt
+      id-token: write # identité OIDC éphémère du run — ce qui signe
+      attestations: write # écrire au registre d'attestations du dépôt
     steps:
       - name: Récupérer l'artefact serveur
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -199,3 +262,32 @@ jobs:
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-path: mentora-server-${{ needs.certify.outputs.version }}.tar.gz
+
+  publish:
+    # OFFICIAL uniquement : grave la release certifiée dans une GitHub
+    # Release permanente — des artefacts de workflow qui expirent à 90 j
+    # ne peuvent pas porter une release officielle. Ne s'exécute que si
+    # certify a ENTIÈREMENT réussi (aucune certification partielle).
+    name: publish (official)
+    if: github.ref_type == 'tag'
+    needs: [certify, attest]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # créer la GitHub Release et y attacher les artefacts — SEULE élévation, portée à ce job
+    steps:
+      - name: Récupérer tous les artefacts certifiés
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          merge-multiple: true
+
+      - name: Créer la GitHub Release (le tag certifié devient la release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ needs.certify.outputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --verify-tag \
+            --title "Mentora ${{ needs.certify.outputs.version }}" \
+            --notes "Release certifiée par le pipeline (gate complète, SBOM SPDX+CycloneDX, provenance, manifest). Référence officielle : release-manifest.json — tous les artefacts s'y retrouvent par empreinte." \
+            "mentora-server-${{ needs.certify.outputs.version }}.tar.gz" \
+            release-manifest.json provenance.json SHA256SUMS sbom.spdx.json sbom.cdx.json
