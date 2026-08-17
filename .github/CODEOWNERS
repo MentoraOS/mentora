@@ -1,0 +1,131 @@
+############################################################
+# MentoraOS — CODEOWNERS v1.0 (GitHub Governance, Lot 1)
+############################################################
+# Généré depuis la structure RÉELLE du dépôt (aucun chemin fictif).
+# Sémantique GitHub : LA DERNIÈRE règle qui matche l'emporte.
+# Le fichier se lit donc du GÉNÉRAL vers le SPÉCIFIQUE : les règles
+# les plus spécifiques sont physiquement en bas = priorité maximale.
+# Propriétaires : ÉQUIPES uniquement (jamais des personnes), alignées
+# sur les frontières DDD de l'Engineering Organization (gelée).
+# La Constitution (docs/canon/) n'est modifiable que par Titre VII :
+# son ownership CODEOWNERS route la review, il ne crée aucun droit.
+############################################################
+
+############################################################
+# Fallback global (dernier recours, justifié : tout chemin
+# non classé est une question de gouvernance, pas un no-man's-land)
+############################################################
+
+*                                                   @MentoraOS/architecture
+
+############################################################
+# Application mobile Flutter (héritage racine, intact)
+############################################################
+
+/android/                                           @MentoraOS/mobile
+/assets/                                            @MentoraOS/mobile
+/integration_test/                                  @MentoraOS/mobile
+/ios/                                               @MentoraOS/mobile
+/lib/                                               @MentoraOS/mobile
+/test/                                              @MentoraOS/mobile
+/web/                                               @MentoraOS/mobile
+/windows/                                           @MentoraOS/mobile
+/pubspec.yaml                                       @MentoraOS/mobile
+/pubspec.lock                                       @MentoraOS/mobile
+/analysis_options.yaml                              @MentoraOS/mobile
+/.metadata                                          @MentoraOS/mobile
+/firebase.json                                      @MentoraOS/mobile
+
+############################################################
+# Documentation
+############################################################
+
+/docs/                                              @MentoraOS/docs
+/docs/baseline/                                     @MentoraOS/docs
+/docs/philosophy/                                   @MentoraOS/docs
+/docs/architecture/                                 @MentoraOS/architecture
+/docs/organization/                                 @MentoraOS/architecture @MentoraOS/docs
+/docs/governance/                                   @MentoraOS/architecture
+
+############################################################
+# Constitution (docs/canon) — GELÉE, Titre VII uniquement
+############################################################
+
+/docs/canon/                                        @MentoraOS/architecture
+
+############################################################
+# Platform — monorepo, build, infrastructure
+############################################################
+
+/platform/                                          @MentoraOS/platform
+/platform/docs/                                     @MentoraOS/architecture @MentoraOS/docs
+/platform/infra/                                    @MentoraOS/platform
+
+############################################################
+# Developer Experience — outillage & générateurs
+############################################################
+
+/platform/tooling/                                  @MentoraOS/devex
+/platform/turbo/                                    @MentoraOS/devex
+
+############################################################
+# Socle gelé — kernel, contrats, application-kernel
+# (Architecture Office ; modification = ADR + ratification CTO)
+############################################################
+
+/platform/packages/kernel/                          @MentoraOS/architecture
+/platform/packages/shared/                          @MentoraOS/architecture
+/platform/packages/contracts/                       @MentoraOS/architecture
+/platform/packages/application-kernel/              @MentoraOS/architecture
+
+############################################################
+# Runtime Foundation — gelée (Platform Engineering)
+############################################################
+
+/platform/packages/runtime-bootstrap/               @MentoraOS/platform
+/platform/packages/runtime-clock/                   @MentoraOS/platform
+/platform/packages/runtime-config/                  @MentoraOS/platform
+/platform/packages/runtime-health/                  @MentoraOS/platform
+/platform/packages/runtime-identity/                @MentoraOS/platform
+/platform/packages/runtime-logging/                 @MentoraOS/platform
+/platform/packages/runtime-metrics/                 @MentoraOS/platform
+/platform/packages/runtime-relay/                   @MentoraOS/platform
+/platform/packages/runtime-serialization/           @MentoraOS/platform
+/platform/packages/runtime-tracing/                 @MentoraOS/platform
+/platform/packages/runtime-security/                @MentoraOS/platform @MentoraOS/security
+
+############################################################
+# Backend Domain — Engagement (le premier des 15 domaines ;
+# chaque nouveau domaine ajoutera ici sa section)
+############################################################
+
+/platform/packages/contracts-agreement/             @MentoraOS/backend
+/platform/packages/domain-agreement/                @MentoraOS/backend
+/platform/packages/application-agreement/           @MentoraOS/backend
+/platform/packages/adapters-persistence-agreement/  @MentoraOS/backend
+/platform/packages/adapters-persistence-agreement/prisma/  @MentoraOS/backend @MentoraOS/security
+
+############################################################
+# Qualité — la stratégie de preuve
+############################################################
+
+/platform/packages/testing/                         @MentoraOS/qa
+/platform/packages/testing-clock/                   @MentoraOS/qa
+/platform/packages/testing-config/                  @MentoraOS/qa
+/platform/packages/testing-contracts/               @MentoraOS/qa
+/platform/packages/testing-id/                      @MentoraOS/qa
+/platform/packages/testing-performance/             @MentoraOS/qa
+/platform/packages/testing-architecture/            @MentoraOS/architecture @MentoraOS/qa
+
+############################################################
+# Exécutables — contenu métier (backend) + machinerie (platform)
+############################################################
+
+/platform/apps/server/                              @MentoraOS/backend @MentoraOS/platform
+
+############################################################
+# Gouvernance GitHub — ce fichier et le dossier .github
+############################################################
+
+/.github/                                           @MentoraOS/platform
+/.github/CODEOWNERS                                 @MentoraOS/architecture @MentoraOS/security
