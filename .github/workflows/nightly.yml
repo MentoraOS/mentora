@@ -1,0 +1,137 @@
+# MentoraOS — Nightly Cold Gate (R5 Phase 2, Lot 2)
+#
+# COMPLÈTE ci.yml, ne le remplace jamais. La CI applique les
+# Foundations, elle ne les remplace jamais.
+#
+# Mission : prouver chaque nuit que la plateforme reste parfaitement
+# DÉTERMINISTE même quand personne n'a travaillé — validation
+# totalement froide (tous caches détruits AVANT install), puis la gate
+# exécutée DEUX FOIS : si Run 1 ≠ Run 2, la plateforme est déclarée
+# non déterministe et le workflow échoue en ouvrant une issue.
+#
+# Entre les deux passes, SEULE la mémoïsation turbo est purgée : sans
+# cette purge, la seconde passe ne serait qu'un replay de cache et ne
+# prouverait rien — le mandat exige deux EXÉCUTIONS réelles du même
+# arbre, pas une exécution et son écho.
+
+name: nightly
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC, quotidien — la nuit de l'équipe
+  workflow_dispatch: {} # exécution manuelle (diagnostic, re-validation à la demande)
+
+permissions:
+  contents: read # lecture seule par défaut ; l'élévation issues:write vit au SEUL job qui en a besoin
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false # une preuve nocturne ne s'annule pas, elle se termine
+
+jobs:
+  cold-verify:
+    name: cold-verify
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+
+    services:
+      postgres:
+        # STRICTEMENT le service de ci.yml : même image, même healthcheck,
+        # mêmes variables, même base éphémère (données de spec, S-9).
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: mentora
+          POSTGRES_PASSWORD: mentora-ci-ephemeral
+          POSTGRES_DB: mentora_agreement_test
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U mentora -d mentora_agreement_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      MENTORA_AGREEMENT_DATABASE_URL: postgresql://mentora:mentora-ci-ephemeral@localhost:5432/mentora_agreement_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Node (version du repo — .nvmrc fait foi)
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version-file: platform/.nvmrc
+
+      - name: Setup pnpm (corepack épinglé — même stratégie que ci.yml)
+        run: |
+          npm install -g corepack@0.31.0
+          corepack enable
+
+      - name: Cold start — destruction de TOUT cache avant install
+        # La nuit ne fait confiance à rien : ni au store pnpm, ni aux
+        # caches utilisateur, ni à des node_modules/.turbo résiduels.
+        # (Sur un runner neuf ces chemins sont quasi vides — l'étape les
+        # détruit EXPLICITEMENT pour que la garantie soit écrite, pas
+        # supposée.) Aucun actions/cache dans ce workflow, à dessein.
+        run: |
+          rm -rf ~/.cache ~/.pnpm-store ~/.local/share/pnpm/store
+          rm -rf node_modules .turbo
+          find . -maxdepth 4 -type d \( -name node_modules -o -name .turbo \) -prune -exec rm -rf {} +
+
+      - name: Install (lockfile gelé — aucun contournement)
+        id: install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate (identique à ci.yml)
+        id: generate
+        run: pnpm --filter @mentora/adapters-persistence-agreement prisma:generate
+
+      - name: Prisma migrate deploy (identique à ci.yml)
+        id: migrate
+        run: pnpm --filter @mentora/adapters-persistence-agreement exec prisma migrate deploy
+
+      - name: Verify — passe 1 (à froid intégral)
+        id: verify1
+        run: pnpm verify
+
+      - name: Purge de la mémoïsation turbo entre les deux passes
+        # Sans cette purge, la passe 2 serait un replay de cache (~30 s,
+        # succès garanti) et le test de déterminisme serait un mensonge.
+        run: |
+          rm -rf .turbo
+          find . -maxdepth 4 -type d -name .turbo -prune -exec rm -rf {} +
+
+      - name: Verify — passe 2 (même arbre, aucune modification intermédiaire)
+        id: verify2
+        run: pnpm verify
+
+  report-failure:
+    name: report-failure
+    needs: cold-verify
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # SEULE élévation du workflow, portée à ce seul job : créer l'issue d'alerte
+    steps:
+      - name: Ouvrir l'issue « Nightly CI failed »
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "Nightly CI failed" \
+            --body "La gate nocturne froide a échoué — la plateforme n'est plus prouvée déterministe.
+
+          - **SHA** : \`${{ github.sha }}\`
+          - **Branche** : \`${{ github.ref_name }}\`
+          - **Date (UTC)** : $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          - **Run** : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          - **Étape en échec** : voir le run ci-dessus (la première étape rouge du job cold-verify) ; si les passes 1 et 2 divergent, le verdict est NON-DÉTERMINISME.
+
+          Équipe responsable : @${{ github.repository_owner }}/platform — politique : Handbook §9 (qualifier d'abord), CI/CD Strategy §8 (un échec répété devient une issue nommée avec propriétaire).
+
+          _Issue ouverte automatiquement par le workflow nightly (Lot 2). L'assignation individuelle est impossible par construction : GitHub n'assigne pas d'équipes, et le dépôt ne déclare aucun login mainteneur (l'auteur des commits est l'identité de genèse). Premier lecteur : l'équipe platform._"
