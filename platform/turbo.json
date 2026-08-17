@@ -60,6 +60,19 @@
       ],
       "outputs": []
     },
+    "@mentora/app-server#test": {
+      "dependsOn": [
+        "^build",
+        "@mentora/adapters-persistence-agreement#test"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "vitest.config.*",
+        "package.json"
+      ],
+      "outputs": []
+    },
     "test:unit": {
       "dependsOn": [
         "^build"

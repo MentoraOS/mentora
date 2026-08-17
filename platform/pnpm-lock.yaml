@@ -45,6 +45,91 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
 
+  apps/server:
+    dependencies:
+      '@mentora/adapters-persistence-agreement':
+        specifier: workspace:*
+        version: link:../../packages/adapters-persistence-agreement
+      '@mentora/application-agreement':
+        specifier: workspace:*
+        version: link:../../packages/application-agreement
+      '@mentora/application-kernel':
+        specifier: workspace:*
+        version: link:../../packages/application-kernel
+      '@mentora/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@mentora/domain-agreement':
+        specifier: workspace:*
+        version: link:../../packages/domain-agreement
+      '@mentora/kernel':
+        specifier: workspace:*
+        version: link:../../packages/kernel
+      '@mentora/runtime-bootstrap':
+        specifier: workspace:*
+        version: link:../../packages/runtime-bootstrap
+      '@mentora/runtime-clock':
+        specifier: workspace:*
+        version: link:../../packages/runtime-clock
+      '@mentora/runtime-config':
+        specifier: workspace:*
+        version: link:../../packages/runtime-config
+      '@mentora/runtime-health':
+        specifier: workspace:*
+        version: link:../../packages/runtime-health
+      '@mentora/runtime-identity':
+        specifier: workspace:*
+        version: link:../../packages/runtime-identity
+      '@mentora/runtime-logging':
+        specifier: workspace:*
+        version: link:../../packages/runtime-logging
+      '@mentora/runtime-metrics':
+        specifier: workspace:*
+        version: link:../../packages/runtime-metrics
+      '@mentora/runtime-relay':
+        specifier: workspace:*
+        version: link:../../packages/runtime-relay
+      '@mentora/runtime-tracing':
+        specifier: workspace:*
+        version: link:../../packages/runtime-tracing
+      '@mentora/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+    devDependencies:
+      '@mentora/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint-config
+      '@mentora/eslint-plugin-mentora':
+        specifier: workspace:*
+        version: link:../../tooling/eslint-plugin-mentora
+      '@mentora/testing-clock':
+        specifier: workspace:*
+        version: link:../../packages/testing-clock
+      '@mentora/testing-config':
+        specifier: workspace:*
+        version: link:../../packages/testing-config
+      '@mentora/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.9.0
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.5(vitest@2.1.5(@types/node@22.9.0))
+      eslint:
+        specifier: 'catalog:'
+        version: 9.15.0(jiti@2.7.0)
+      rimraf:
+        specifier: 6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.6.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.5(@types/node@22.9.0)
+
   packages/adapters-persistence-agreement:
     dependencies:
       '@mentora/application-agreement':
@@ -68,6 +153,9 @@ importers:
       '@mentora/runtime-bootstrap':
         specifier: workspace:*
         version: link:../runtime-bootstrap
+      '@mentora/runtime-relay':
+        specifier: workspace:*
+        version: link:../runtime-relay
       '@mentora/runtime-serialization':
         specifier: workspace:*
         version: link:../runtime-serialization

@@ -19,4 +19,8 @@ export * from './read-model/prisma-agreement-state-read-adapter.js';
 export * from './module/agreement-persistence-module.js';
 export * from './testing/agreement-persistence-mother.js';
 export * from './testing/agreement-persistence-fixture.js';
-export * from './testing/agreement-persistence-contract-suite.js';
+// The contract suite lives on its OWN subpath ('@mentora/adapters-persistence-agreement/contract-suite'):
+// it imports the test runner, and the production barrel must stay loadable
+// by a living process (the executable imports this package at boot).
+export * from './relay/prisma-agreement-relay-source.js';
+export * from './client/agreement-prisma-client.js';

@@ -69,7 +69,10 @@ model AgreementOutbox {
   deliveryAttempts Int     @default(0)
   payload          String // wire fact (published language)
   occurredAtMs     BigInt
-  status           String  @default("pending") // pending | carried
+  status           String  @default("pending") // pending | published | quarantined
+  claimedUntilMs   BigInt  @default(0)
+  nextAttemptAtMs  BigInt  @default(0)
+  quarantineReason String?
 
   @@unique([agreementId, sequence])
   @@index([status, id])

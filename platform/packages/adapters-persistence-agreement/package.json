@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./contract-suite": {
+      "types": "./dist/testing/agreement-persistence-contract-suite.d.ts",
+      "import": "./dist/testing/agreement-persistence-contract-suite.js"
     }
   },
   "main": "./dist/index.js",
@@ -49,6 +53,7 @@
     "@mentora/kernel": "workspace:*",
     "@mentora/runtime-serialization": "workspace:*",
     "@prisma/client": "6.19.3",
-    "@mentora/runtime-bootstrap": "workspace:*"
+    "@mentora/runtime-bootstrap": "workspace:*",
+    "@mentora/runtime-relay": "workspace:*"
   }
 }

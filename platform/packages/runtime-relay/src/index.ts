@@ -21,4 +21,6 @@ export * from './dispatch/relay-dispatch.js';
 export * from './module/runtime-relay-module.js';
 export * from './testing/in-memory-relay-source.js';
 export * from './testing/memory-relay-publisher.js';
-export * from './testing/relay-contract-suite.js';
+// The contract suite lives on its OWN subpath ('@mentora/runtime-relay/contract-suite'):
+// it imports the test runner, and the production barrel must stay loadable
+// by a living process (the executable imports this package at boot).

@@ -1,0 +1,12 @@
+{
+  "//": "Emit/build project. The executable floor: node types lawful here.",
+  "extends": "@mentora/tsconfig/library",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/*.spec.ts"]
+}

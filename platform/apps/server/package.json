@@ -1,30 +1,18 @@
 {
-  "name": "@mentora/runtime-relay",
+  "name": "@mentora/app-server",
   "version": "0.0.0",
   "private": true,
-  "description": "The generic Outbox relay engine (F5.1 species Relay; A-4: publication reads retention) - envelope transport only, no domain, no business logic; abstract publisher port; bounded retries with backoff (M-8) into witnessed quarantine.",
+  "description": "The first Mentora executable - the Application species (F5.1) hosting the Agreement graph over PostgreSQL, the Outbox relay (dev-mixed, tolerated locally), and the runtime health surfaces. One Root, one boot, fail closed.",
   "license": "UNLICENSED",
   "type": "module",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./contract-suite": {
-      "types": "./dist/testing/relay-contract-suite.d.ts",
-      "import": "./dist/testing/relay-contract-suite.js"
-    }
-  },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "main": "./dist/main.js",
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run",
     "test:unit": "vitest run",
+    "start": "node dist/main.js",
     "clean": "rimraf dist .turbo"
   },
   "devDependencies": {
@@ -41,10 +29,20 @@
     "vitest": "catalog:"
   },
   "dependencies": {
+    "@mentora/adapters-persistence-agreement": "workspace:*",
+    "@mentora/application-agreement": "workspace:*",
+    "@mentora/application-kernel": "workspace:*",
+    "@mentora/contracts": "workspace:*",
+    "@mentora/domain-agreement": "workspace:*",
     "@mentora/kernel": "workspace:*",
     "@mentora/runtime-bootstrap": "workspace:*",
+    "@mentora/runtime-clock": "workspace:*",
+    "@mentora/runtime-config": "workspace:*",
     "@mentora/runtime-health": "workspace:*",
+    "@mentora/runtime-identity": "workspace:*",
+    "@mentora/runtime-logging": "workspace:*",
     "@mentora/runtime-metrics": "workspace:*",
+    "@mentora/runtime-relay": "workspace:*",
     "@mentora/runtime-tracing": "workspace:*",
     "@mentora/shared": "workspace:*"
   }
