@@ -1,0 +1,101 @@
+# MentoraOS — Documentation Pipeline (R5 Phase 2, Lot 4)
+#
+# La documentation est un artefact de production. Le Canon est une loi.
+# Ce pipeline ne modifie jamais la documentation — il DÉMONTRE qu'elle
+# est cohérente : liens relatifs, fichiers référencés, images, ancres
+# internes et inter-fichiers, sur tout le Markdown du dépôt.
+#
+# PROTECTION DU CANON (le cœur du lot) : toute Pull Request qui touche
+# docs/canon/** échoue, SAUF si elle porte le label `titre-vii` — la
+# marque machine-vérifiable de la procédure d'amendement (posée par
+# l'Architecture Office/CTO). Un push direct qui toucherait le canon
+# (canal genèse, bypass tracé) est TÉMOIGNÉ par une annotation — jamais
+# silencieux. L'outil est premier-parti, zéro dépendance
+# (.github/scripts/docs-audit.mjs) : le même en local et en CI.
+#
+# Ni corepack ni pnpm install ICI, à dessein : l'outil n'utilise que les
+# builtins de Node — installer un gestionnaire de paquets sans le
+# consommer serait du mécanisme sans usage. Node vient de .nvmrc.
+
+name: docs
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+      - release
+      - "release/**"
+      - arch-008-candidate
+  workflow_dispatch: {}
+
+permissions:
+  contents: read # lecture seule — le diff canon se calcule en git pur (fetch-depth 0), aucune API supplémentaire
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-audit:
+    name: docs-audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (historique complet — le diff du canon se calcule en git pur)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node (version du repo — .nvmrc fait foi)
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version-file: platform/.nvmrc
+
+      - name: Détection des modifications du Canon
+        id: canon
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          HAS_TITRE_VII: ${{ contains(github.event.pull_request.labels.*.name, 'titre-vii') }}
+        run: |
+          CHANGED=""
+          AUTHORIZED="true"
+          if [ "$EVENT" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only "$BASE_SHA...$HEAD_SHA" -- 'docs/canon/**' || true)
+            # Une PR qui touche le canon N'EST AUTORISÉE que par le label
+            # titre-vii — la procédure d'amendement rendue machine-vérifiable.
+            AUTHORIZED="$HAS_TITRE_VII"
+          elif [ "$EVENT" = "push" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            CHANGED=$(git diff --name-only "$BEFORE" "$AFTER" -- 'docs/canon/**' || true)
+            # Un push direct (canal genèse / bypass tracé) n'échoue pas ici
+            # — il est TÉMOIGNÉ, haut et fort, jamais silencieux.
+            AUTHORIZED="true"
+            if [ -n "$CHANGED" ]; then
+              echo "::warning title=Canon modifié par push direct::Vérifier l'ordre Titre VII correspondant. Fichiers : $(echo "$CHANGED" | tr '\n' ' ')"
+            fi
+          fi
+          {
+            echo "changed<<EOF"
+            echo "$CHANGED"
+            echo "EOF"
+            echo "authorized=$AUTHORIZED"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Audit documentaire exhaustif (liens, fichiers, images, ancres, canon)
+        env:
+          DOCS_CANON_CHANGED: ${{ steps.canon.outputs.changed }}
+          DOCS_CANON_AUTHORIZED: ${{ steps.canon.outputs.authorized }}
+        run: node .github/scripts/docs-audit.mjs .
+
+      - name: Publier le rapport documentaire
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: docs-report
+          path: docs-report.json
+          if-no-files-found: error
+          retention-days: 90
