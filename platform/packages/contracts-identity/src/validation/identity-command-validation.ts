@@ -1,7 +1,7 @@
 import type { Result } from '@mentora/kernel';
 import { err, ok } from '@mentora/kernel';
 
-import type { EstablishCredential, IdentityCommandContract } from '../commands/identity-command-contracts.js';
+import type { IdentityCommandContract } from '../commands/identity-command-contracts.js';
 import { IDENTITY_COMMAND_TYPES } from '../commands/identity-command-contracts.js';
 
 /**
@@ -49,25 +49,36 @@ export const validateIdentityCommand = (
   if (payload['contractVersion'] !== 1) {
     violations.push(violation('CONTRACT.UNKNOWN_GENERATION', 'contractVersion', 'must be 1'));
   }
-  for (const field of ['commandId', 'credentialId', 'personId']) {
+  for (const field of ['commandId', 'credentialId']) {
     if (blankString(payload[field])) {
       violations.push(violation('CONTRACT.MALFORMED', field, 'must be a non-blank string'));
     }
   }
-  const factor = payload['principalFactor'];
-  if (!isRecord(factor)) {
-    violations.push(violation('CONTRACT.MALFORMED', 'principalFactor', 'must be an object'));
-  } else {
-    for (const field of ['factorId', 'kind', 'strength']) {
-      if (blankString(factor[field])) {
-        violations.push(
-          violation('CONTRACT.MALFORMED', `principalFactor.${field}`, 'must be a non-blank string'),
-        );
+  if (type === 'EstablishCredential') {
+    if (blankString(payload['personId'])) {
+      violations.push(violation('CONTRACT.MALFORMED', 'personId', 'must be a non-blank string'));
+    }
+    const factor = payload['principalFactor'];
+    if (!isRecord(factor)) {
+      violations.push(violation('CONTRACT.MALFORMED', 'principalFactor', 'must be an object'));
+    } else {
+      for (const field of ['factorId', 'kind', 'strength']) {
+        if (blankString(factor[field])) {
+          violations.push(
+            violation(
+              'CONTRACT.MALFORMED',
+              `principalFactor.${field}`,
+              'must be a non-blank string',
+            ),
+          );
+        }
       }
     }
+  } else if (blankString(payload['motive'])) {
+    violations.push(violation('CONTRACT.MALFORMED', 'motive', 'must be a non-blank string'));
   }
   if (violations.length > 0) {
     return err(violations);
   }
-  return ok(payload as unknown as EstablishCredential);
+  return ok(payload as unknown as IdentityCommandContract);
 };

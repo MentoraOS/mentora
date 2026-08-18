@@ -4,8 +4,8 @@ import type { CredentialId, FactorId, PersonId } from '../identifiers.js';
 
 /**
  * The wire commands of the Identity & Access context — the published
- * language's single definition (catalog 70-74; Story #16 ships
- * EstablishCredential, the remaining wires arrive with their stories).
+ * language's single definition (catalog 70-74; Stories #16/#21 ship the
+ * Credential pair, the Session wires arrive with their stories).
  * The wire NEVER carries an instant (A-6: time is injected at pas 3) and
  * NEVER carries secret material (the factor's nature and weight only —
  * the material lives with the mechanisms under the vault discipline).
@@ -29,6 +29,12 @@ export interface EstablishCredential extends IdentityCommandBase {
   };
 }
 
-export type IdentityCommandContract = EstablishCredential;
+export interface RevokeCredential extends IdentityCommandBase {
+  readonly type: 'RevokeCredential';
+  /** Dictionary motive — a reference, never secret material. */
+  readonly motive: string;
+}
 
-export const IDENTITY_COMMAND_TYPES = ['EstablishCredential'] as const;
+export type IdentityCommandContract = EstablishCredential | RevokeCredential;
+
+export const IDENTITY_COMMAND_TYPES = ['EstablishCredential', 'RevokeCredential'] as const;

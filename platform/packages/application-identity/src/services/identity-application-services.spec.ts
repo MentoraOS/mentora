@@ -133,3 +133,83 @@ describe('EstablishCredentialApplicationService — conformity to the Séquence'
     expect(outcome.kind).toBe('refused');
   });
 });
+
+import { RevokeCredentialApplicationService } from './revoke-credential.application-service.js';
+
+const revokeWireOf = (over: Record<string, unknown> = {}): Record<string, unknown> => ({
+  type: 'RevokeCredential',
+  contractVersion: 1,
+  commandId: 'cmd-r1',
+  credentialId: 'cred-1',
+  motive: 'device-lost',
+  ...over,
+});
+
+describe('RevokeCredentialApplicationService — conformity to the Séquence', () => {
+  const revokeHarness = () => {
+    const repository = new InMemoryCredentialRepository();
+    const machinery: IdentitySequenceMachinery = {
+      clock: FakeClock.at(T0),
+      journal: new RecordingJournal(),
+    };
+    const establish = new EstablishCredentialApplicationService({ repository }, machinery);
+    const revoke = new RevokeCredentialApplicationService({ repository }, machinery);
+    return { repository, establish, revoke };
+  };
+
+  it('revokes end to end: Active → Revoked retained, prioritary and terminal', async () => {
+    const { repository, establish, revoke } = revokeHarness();
+    await establish.execute({ payload: wireOf(), actor: ACTOR, correlationId: CORRELATION });
+    const outcome = await revoke.execute({
+      payload: revokeWireOf(),
+      actor: ACTOR,
+      correlationId: CORRELATION,
+    });
+    expect(outcome.kind).toBe('executed');
+    const retained = await repository.byId('cred-1' as Credential['id']);
+    expect(retained.some && retained.value.state.kind).toBe('Revoked');
+  });
+
+  it('refuses to revoke an absent Identifier — a motivated Decision, never an error', async () => {
+    const { revoke } = revokeHarness();
+    const outcome = await revoke.execute({
+      payload: revokeWireOf({ credentialId: 'cred-ghost' }),
+      actor: ACTOR,
+      correlationId: CORRELATION,
+    });
+    expect(outcome.kind).toBe('refused');
+    if (outcome.kind === 'refused') expect(outcome.refusal.reason).toBe('TransitionUnavailable');
+  });
+
+  it('refuses the second revocation — terminal state, R-B', async () => {
+    const { establish, revoke } = revokeHarness();
+    await establish.execute({ payload: wireOf(), actor: ACTOR, correlationId: CORRELATION });
+    await revoke.execute({ payload: revokeWireOf(), actor: ACTOR, correlationId: CORRELATION });
+    const second = await revoke.execute({
+      payload: revokeWireOf({ commandId: 'cmd-r2' }),
+      actor: ACTOR,
+      correlationId: CORRELATION,
+    });
+    expect(second.kind).toBe('refused');
+  });
+
+  it('the A-1 guard is ALIVE again: an Establish wire on the Revoke carrier is the caller defect', async () => {
+    const { revoke } = revokeHarness();
+    const outcome = await revoke.execute({
+      payload: wireOf(),
+      actor: ACTOR,
+      correlationId: CORRELATION,
+    });
+    expect(outcome.kind).toBe('exception');
+  });
+
+  it('malformed revoke wire (blank motive) dies at reception', async () => {
+    const { revoke } = revokeHarness();
+    const outcome = await revoke.execute({
+      payload: revokeWireOf({ motive: ' ' }),
+      actor: ACTOR,
+      correlationId: CORRELATION,
+    });
+    expect(outcome.kind).toBe('exception');
+  });
+});
