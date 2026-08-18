@@ -118,6 +118,34 @@
         "package.json"
       ],
       "outputs": []
+    },
+    "@mentora/adapters-persistence-identity#lint": {
+      "dependsOn": [
+        "@mentora/adapters-persistence-identity#build",
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "*.{js,mjs,cjs,ts}",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "@mentora/adapters-persistence-identity#build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "prisma/**",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": [
+        "dist/**",
+        "src/generated/prisma/**"
+      ]
     }
   },
   "globalPassThroughEnv": [
