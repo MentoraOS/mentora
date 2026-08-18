@@ -111,6 +111,7 @@
 
 /platform/packages/contracts-identity/              @MentoraOS/backend @MentoraOS/security
 /platform/packages/domain-identity/                 @MentoraOS/backend @MentoraOS/security
+/platform/packages/application-identity/            @MentoraOS/backend @MentoraOS/security
 
 ############################################################
 # Qualité — la stratégie de preuve

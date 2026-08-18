@@ -1,0 +1,46 @@
+{
+  "name": "@mentora/application-identity",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Application layer of the Identity & Access context - the guardians of execution for the ratified commands 70-74 (Story #16 ships EstablishCredential). The Golden Pipeline is REUSED, never reimplemented.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-clock": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/application-kernel": "workspace:*",
+    "@mentora/contracts": "workspace:*",
+    "@mentora/contracts-identity": "workspace:*",
+    "@mentora/domain-identity": "workspace:*",
+    "@mentora/kernel": "workspace:*"
+  }
+}
