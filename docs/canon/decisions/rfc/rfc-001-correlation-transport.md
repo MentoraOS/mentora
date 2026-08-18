@@ -1,6 +1,8 @@
 # RFC-001 — Transport de la corrélation à travers le port de rétention
 
-**Dossier d'instruction Titre VII** · Statut : **EN INSTRUCTION — aucune ratification, AUCUN CODE avant décision CTO** · Story bloquée : #88 (FEATURE-005, Sprint 3)
+**Dossier d'instruction Titre VII** · Statut : **RATIFIÉE — Option A retenue (décision CTO du 2026-08-18)** · Story débloquée : #88 (FEATURE-005, Sprint 3)
+
+> **Ratification (Titre VII)** — Le CTO ratifie l'**Option A** : `RetentionContext` devient un **paramètre optionnel** du port de rétention (`retain(unit, context?)`), valeurs d'enveloppe seules (`correlationId?`, `causationId?`, `traceparent?`). Migration **additive** : aucun contrat public cassé ; les implémentations existantes restent valides ; les ports nés après cette date naissent avec le paramètre. Le Sprint 3 (story #88) est officiellement débloqué.
 
 ## Problème
 
@@ -25,4 +27,4 @@ La loi F5.3/M-3 veut que la corrélation (`CorrelationId`, `CausationId`) voyage
 
 **Option A**, comme **amendement additif** du contrat de port (paramètre optionnel `context` ; défaut = comportement actuel) : les implémentations existantes restent valides pendant la migration ; la contract suite gagne les promesses de transport ; aucune matière métier ne traverse (identifiants opaques seuls, conforme A-9/M-3). Périmètre d'impact : `domain-agreement` (signature du port), `application-kernel` (pas 8 transmet), `adapters-persistence-agreement` (OutboxStore écrit les colonnes déjà présentes en base), suites contractuelles. Aucun changement de schéma (colonnes créées dès 0001).
 
-**Décision demandée au CTO** : ratifier l'Option A (ou trancher autrement). Jusqu'à ratification : story #88 et toute story dépendante restent bloquées, zéro code.
+**Décision CTO (2026-08-18)** : **Option A ratifiée.** Le blocage de la story #88 est levé. Ordre de mise en œuvre : les ports I&A naissants (Sprint 2) portent le paramètre dès leur amendement ; le port Agreement et le pas 8 de la Séquence migrent avec la story #88 (Sprint 3) — expansion additive, jamais un big-bang.

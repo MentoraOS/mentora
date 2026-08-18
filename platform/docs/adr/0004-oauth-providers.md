@@ -1,6 +1,8 @@
 # ADR-0004 — Fournisseurs OAuth externes (Google, Apple, GitHub)
 
-**Statut : PROPOSÉ — en attente de ratification CTO. Aucun code OAuth avant.** · Story : #108 (FEATURE-006, Sprint 4) · Propriétaires : `security` + `backend`
+**Statut : ACCEPTÉE — ratifiée par le CTO le 2026-08-18.** · Story : #108 (FEATURE-006, Sprint 4) · Propriétaires : `security` + `backend`
+
+> **Ratification** — Architecture retenue telle que proposée : **OIDC Authorization Code + PKCE**, fournisseurs **Google, GitHub, Apple** (ordre de livraison Google → GitHub → Apple), **aucun SDK fournisseur**, tous les fournisseurs sont des **adaptateurs** (`adapters-identity-federation`), le domaine reste totalement indépendant. Le code OAuth reste hors périmètre jusqu'au Sprint 4 (FEATURE-006).
 
 ## Contexte
 
@@ -22,4 +24,4 @@ I-7/A-9 : les types du fournisseur meurent dans l'adapter (une assertion Google 
 
 Trois paires client-id/secret au coffre (rotation 90 j, criticité 🟠, catalogue Lot 4 à étendre) ; page de conformité « Sign in with Apple » requise côté produit ; tests d'intégration avec fournisseurs simulés (jamais les vrais en CI). Alternatives rejetées : SDKs fournisseurs (surface supply-chain, lock-in) ; un adapter par fournisseur sans socle commun (triplication) ; IdP intermédiaire type Auth0 (dépendance structurelle non nécessaire, coût, données hors périmètre).
 
-**Décision demandée au CTO** : ratifier (ou amender) — le code de la story #108 n'existe pas avant.
+**Décision CTO (2026-08-18)** : **ratifiée sans amendement.** Le CTO n'est plus à solliciter sur cette ADR ; le code de la story #96+ (mécanismes) et de la fédération arrive au Sprint 4, jamais avant.
