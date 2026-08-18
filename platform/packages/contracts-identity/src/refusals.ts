@@ -19,3 +19,16 @@ export type CredentialRefusalReason = 'TransitionUnavailable';
 export const CREDENTIAL_REFUSAL_REASONS: readonly CredentialRefusalReason[] = [
   'TransitionUnavailable',
 ];
+
+/**
+ * Session refusal reasons. `ProofUnavailable` DERIVES from the ratified
+ * `-Unavailable` refusal family (F3.2-A — the family is law, the member
+ * derives): the presented proof does not satisfy the ProofRequirementPolicy.
+ * Dictionary ruling recorded as pending alongside the R-A reason gap.
+ */
+export type SessionRefusalReason = 'TransitionUnavailable' | 'ProofUnavailable';
+
+export const SESSION_REFUSAL_REASONS: readonly SessionRefusalReason[] = [
+  'TransitionUnavailable',
+  'ProofUnavailable',
+];
