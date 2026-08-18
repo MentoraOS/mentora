@@ -1,4 +1,4 @@
-import type { Option, Result } from '@mentora/kernel';
+import type { Option, Result, RetentionContext } from '@mentora/kernel';
 
 import type { Credential } from '../aggregate/credential.js';
 import type { CredentialRefusal } from '../decisions/credential-refusal.js';
@@ -9,12 +9,15 @@ import type { CredentialId, PersonId } from '../ids/identifiers.js';
  * shaped EXACTLY like the frozen precedent (AgreementRepository): Option for
  * presence, Result<void> for the atomic retention verdict. The registry
  * applies the DECLARED R-A key at retention (one ACTIVE credential per
- * person × principal-factor kind) and refuses structurally — the refusal
- * REASON name for that key is a recorded canon gap, settled at the
- * persistence lot (Story #64/#68).
+ * person × principal-factor kind) and refuses structurally with the settled
+ * reason `CredentialAlreadyExists` (the ratified `<Truth>AlreadyExists`
+ * family — F3.2-B `MembershipAlreadyExists` precedent; gap closed at the
+ * persistence lot as prescribed).
  *
  * retain() is ONE atomic act (A-3): version control → facts → snapshot →
- * outbox — the implementations' law, proven by the contract suite.
+ * outbox — the implementations' law, proven by the contract suite. The
+ * OPTIONAL `context` is RFC-001 (Option A, RATIFIED): envelope values the
+ * outbox transports when they exist — never domain truth, never required.
  */
 export interface CredentialRepository {
   byId(id: CredentialId): Promise<Option<Credential>>;
@@ -23,5 +26,8 @@ export interface CredentialRepository {
     personId: PersonId,
     principalFactorKind: string,
   ): Promise<Option<Credential>>;
-  retain(credential: Credential): Promise<Result<void, CredentialRefusal>>;
+  retain(
+    credential: Credential,
+    context?: RetentionContext,
+  ): Promise<Result<void, CredentialRefusal>>;
 }

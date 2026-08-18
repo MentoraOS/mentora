@@ -6,18 +6,21 @@
  * (R-B — same word as the Agreement precedent): the unit was asked a verb its
  * current state does not offer.
  *
- * CANON GAP, recorded, not invented: the corpus declares the Credential R-A
- * key ("one active Credential per person × principal factor") but does NOT
- * name its refusal reason (the Agreement precedent had `TimeSlotUnavailable`
- * ratified by name). The persistence lot (Story #64/#68) will need that name:
- * it must be settled against the dictionary THEN — until ratified, this union
- * deliberately does not carry it.
+ * `CredentialAlreadyExists` — the R-A key's refusal, SETTLED at the
+ * persistence lot (Story #64/#68) exactly as the recorded gap prescribed:
+ * the dictionary ratifies the `<Truth>AlreadyExists` family for R-A
+ * uniqueness keys by name (F3.2-B, Enterprise registres: « R-A sur "une
+ * appartenance active par (Organisation, Personne)" — Décision
+ * `MembershipAlreadyExists` »). The member DERIVES from that ratified
+ * family — never invented: an ACTIVE Credential already exists for this
+ * person × principal-factor kind.
  */
 
-export type CredentialRefusalReason = 'TransitionUnavailable';
+export type CredentialRefusalReason = 'TransitionUnavailable' | 'CredentialAlreadyExists';
 
 export const CREDENTIAL_REFUSAL_REASONS: readonly CredentialRefusalReason[] = [
   'TransitionUnavailable',
+  'CredentialAlreadyExists',
 ];
 
 /**

@@ -78,6 +78,7 @@ jobs:
 
     env:
       MENTORA_AGREEMENT_DATABASE_URL: postgresql://mentora:mentora-ci-ephemeral@localhost:5432/mentora_agreement_test
+      MENTORA_IDENTITY_DATABASE_URL: postgresql://mentora:mentora-ci-ephemeral@localhost:5432/mentora_identity_test
 
     steps:
       - name: Checkout
@@ -115,6 +116,11 @@ jobs:
 
       - name: Prisma migrate deploy (la gate inclut l'intégration réelle)
         run: pnpm --filter @mentora/adapters-persistence-agreement exec prisma migrate deploy
+      - name: Base identity (même serveur, seconde base — parité dev)
+        run: |
+          PGPASSWORD=mentora-ci-ephemeral psql -h localhost -U mentora -d mentora_agreement_test -tc "SELECT 1 FROM pg_database WHERE datname='mentora_identity_test'" | grep -q 1 || PGPASSWORD=mentora-ci-ephemeral psql -h localhost -U mentora -d mentora_agreement_test -c 'CREATE DATABASE mentora_identity_test'
+      - name: Prisma migrate deploy identity (les migrations gelées, base identity)
+        run: pnpm --filter @mentora/adapters-persistence-identity exec prisma migrate deploy
 
       - name: Verify — rien ne se publie sans avoir repassé LA gate
         run: pnpm verify

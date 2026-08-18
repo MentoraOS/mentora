@@ -1,0 +1,116 @@
+// The Identity & Access registries schema — STRICTLY the Canonical
+// Persistence Model (RC-1), replicated from the frozen Agreement precedent.
+// The engine is a mechanism (S-1); the R-A partial unique index lives in the
+// hand-authored migration SQL (the migration is the truth of the DDL).
+//
+// TWO registries, ONE deliberate asymmetry:
+// - Credential: photograph + fact stream + Outbox de faits + Inbox (the two
+//   ratified facts CredentialEstablished/CredentialRevoked circulate).
+// - Session: photograph ONLY. No SessionFact, no SessionOutbox, no
+//   SessionInbox — "aucun fait publié" (canon ch.04) is STRUCTURAL here
+//   exactly as it is in the unit (no pendingFacts field): what has no table
+//   cannot leak.
+//
+// The generator is `prisma-client` (ESM TypeScript into src/generated) —
+// NOT `prisma-client-js`: the workspace already generates the Agreement
+// client into the shared pnpm store location; a second default-output
+// generation would overwrite it. Package-local generated code is the
+// collision-free door (vendor floor stays @prisma/client runtime).
+
+generator client {
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("MENTORA_IDENTITY_DATABASE_URL")
+}
+
+// RC-1 §1/§2 — the PRIVATE photograph of the Credential (F3.1.11): one row
+// per unit, the latest makes faith; version = optimistic guard (F5.2 §4).
+// personId / principalFactorKind / stateKind are the MATERIALIZED INDEX of
+// the declared R-A key (one ACTIVE credential per person × principal-factor
+// kind) — derived from the photograph, never a second truth. NO SECRET
+// MATERIAL can reach this table: the snapshot shape has no field for it.
+model CredentialSnapshot {
+  credentialId        String @id
+  version             Int
+  payload             String // VersionedPayload (canonical JSON, formatVersion 1)
+  checksum            String // FNV-1a over the payload (corruption => Exception)
+  personId            String
+  principalFactorKind String
+  stateKind           String
+
+  @@index([personId, stateKind])
+}
+
+// RC-1 §3 — the append-only fact stream: EventIdentity = (credentialId,
+// sequence); wire payload of the published language (V-1); no UPDATE, no
+// DELETE of facts (S-9). Order is per unit subject only (F4.3 §4).
+model CredentialFact {
+  credentialId    String
+  sequence        Int
+  type            String
+  payload         String // wire fact, deterministic serialization
+  contractVersion Int
+  occurredAtMs    BigInt
+  checksum        String
+
+  @@id([credentialId, sequence])
+}
+
+// RC-1 §4 — the Outbox de faits: envelope fields + wire fact, born in the
+// SAME atomic retention (A-3); read by the Relay executable (A-4/M-4).
+// correlationId/causationId are filled from the OPTIONAL RetentionContext
+// (RFC-001 Option A, RATIFIED 2026-08-18) — "corrélation portée quand elle
+// existe" (F5.3 §2); delivery attempts live HERE, never in a position (P-4).
+model CredentialOutbox {
+  id               BigInt  @id @default(autoincrement())
+  messageId        String  @unique
+  credentialId     String
+  sequence         Int
+  correlationId    String?
+  causationId      String?
+  deliveryAttempts Int     @default(0)
+  payload          String // wire fact (published language)
+  occurredAtMs     BigInt
+  status           String  @default("pending") // pending | published | quarantined
+  claimedUntilMs   BigInt  @default(0)
+  nextAttemptAtMs  BigInt  @default(0)
+  quarantineReason String?
+
+  @@unique([credentialId, sequence])
+  @@index([status, id])
+}
+
+// RC-1 §5 — the per-CONSUMER register of processed fact identities (F4.3 §7:
+// "chacun son registre"). Unused today (no Identity reaction is ratified);
+// created because the model is canonical — same verdict as AgreementInbox.
+model CredentialInbox {
+  consumer      String
+  credentialId  String
+  sequence      Int
+  processedAtMs BigInt
+
+  @@id([consumer, credentialId, sequence])
+}
+
+// The Session photograph — STATE ONLY (the whole law of the unit). The
+// credentialId / stateKind columns are the materialized index of the
+// cascade probe activeByCredential (the port's declared walk) — derived,
+// never a second truth. THERE IS NO OTHER Session TABLE: no fact stream,
+// no outbox, no inbox — the absence is the proof.
+model SessionSnapshot {
+  sessionId    String @id
+  version      Int
+  payload      String
+  checksum     String
+  credentialId String
+  stateKind    String
+
+  @@index([credentialId, stateKind])
+}

@@ -67,6 +67,22 @@ export const credentialRepositoryContractSuite = (
       await repository.retain(bornCredential('cred-1', 'person-1', 'password'));
       const double = await repository.retain(bornCredential('cred-2', 'person-1', 'password'));
       expect(double.ok).toBe(false);
+      if (!double.ok) {
+        // The SETTLED reason — every registry voices the key identically
+        // (`<Truth>AlreadyExists`, the ratified F3.2-B family).
+        expect(double.error.reason).toBe('CredentialAlreadyExists');
+      }
+    });
+
+    it('accepts an OPTIONAL RetentionContext (RFC-001) without changing any verdict', async () => {
+      const { repository } = await provider.make();
+      const withContext = await repository.retain(
+        bornCredential('cred-ctx', 'person-ctx', 'password'),
+        { correlationId: 'corr-1', causationId: 'cause-1' },
+      );
+      expect(withContext.ok).toBe(true);
+      const back = await repository.byId(credentialIdOf('cred-ctx'));
+      expect(back.some).toBe(true);
     });
 
     it('the R-A key frees after revocation: re-entering is a NEW credential (R-B)', async () => {

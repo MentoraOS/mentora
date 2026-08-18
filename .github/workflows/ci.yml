@@ -67,6 +67,7 @@ jobs:
       # (globalPassThroughEnv). Les tests d'intégration s'activent
       # par sa présence — exactement comme sur le poste de dev.
       MENTORA_AGREEMENT_DATABASE_URL: postgresql://mentora:mentora-ci-ephemeral@localhost:5432/mentora_agreement_test
+      MENTORA_IDENTITY_DATABASE_URL: postgresql://mentora:mentora-ci-ephemeral@localhost:5432/mentora_identity_test
 
     steps:
       - name: Checkout
@@ -110,6 +111,11 @@ jobs:
 
       - name: Prisma migrate deploy (les migrations gelées, dans l'ordre, sur la base neuve)
         run: pnpm --filter @mentora/adapters-persistence-agreement exec prisma migrate deploy
+      - name: Base identity (même serveur, seconde base — parité dev)
+        run: |
+          PGPASSWORD=mentora-ci-ephemeral psql -h localhost -U mentora -d mentora_agreement_test -tc "SELECT 1 FROM pg_database WHERE datname='mentora_identity_test'" | grep -q 1 || PGPASSWORD=mentora-ci-ephemeral psql -h localhost -U mentora -d mentora_agreement_test -c 'CREATE DATABASE mentora_identity_test'
+      - name: Prisma migrate deploy identity (les migrations gelées, base identity)
+        run: pnpm --filter @mentora/adapters-persistence-identity exec prisma migrate deploy
 
       - name: Verify — LA gate, exactement la commande du développeur
         run: pnpm verify

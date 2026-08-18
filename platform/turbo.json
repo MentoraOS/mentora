@@ -90,9 +90,66 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "@mentora/adapters-persistence-identity#typecheck": {
+      "dependsOn": [
+        "@mentora/adapters-persistence-identity#build",
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "vitest.config.*",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "@mentora/adapters-persistence-identity#test": {
+      "dependsOn": [
+        "@mentora/adapters-persistence-identity#build",
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "vitest.config.*",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "@mentora/adapters-persistence-identity#lint": {
+      "dependsOn": [
+        "@mentora/adapters-persistence-identity#build",
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "*.{js,mjs,cjs,ts}",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "@mentora/adapters-persistence-identity#build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "prisma/**",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": [
+        "dist/**",
+        "src/generated/prisma/**"
+      ]
     }
   },
   "globalPassThroughEnv": [
-    "MENTORA_AGREEMENT_DATABASE_URL"
+    "MENTORA_AGREEMENT_DATABASE_URL",
+    "MENTORA_IDENTITY_DATABASE_URL"
   ]
 }
