@@ -7,7 +7,7 @@ import { AgreementPersistenceModule } from './module/agreement-persistence-modul
 import { PrismaAgreementStateReadAdapter } from './read-model/prisma-agreement-state-read-adapter.js';
 import { agreementPersistenceContractSuite } from './testing/agreement-persistence-contract-suite.js';
 import { AgreementPersistenceFixture } from './testing/agreement-persistence-fixture.js';
-import { AgreementPersistenceMother } from './testing/agreement-persistence-mother.js';
+import { AgreementPersistenceMother, MOTHER_T0 } from './testing/agreement-persistence-mother.js';
 
 /**
  * INTEGRATION against a real PostgreSQL — the schema applied once by
@@ -51,6 +51,19 @@ describe.skipIf(url === undefined)('PostgreSQL integration (real engine)', () =>
     expect(outbox).toHaveLength(3);
     expect(outbox.every((row) => row.status === 'pending' && row.deliveryAttempts === 0)).toBe(true);
     expect(new Set(outbox.map((row) => row.messageId)).size).toBe(3);
+  });
+
+  it('RFC-001: the RetentionContext rides to the Outbox de faits — and only when it exists', async () => {
+    await fixture.repository.retain(mother.requested({ id: 'agr-ctx' }), {
+      correlationId: 'corr-42',
+      causationId: 'cause-42',
+    });
+    await fixture.repository.retain(mother.requested({ id: 'agr-bare', slotStartMs: MOTHER_T0.epochMillis + 30 * 3_600_000 }));
+    const rows = await fixture.prisma.agreementOutbox.findMany({ orderBy: { id: 'asc' } });
+    expect(rows[0]?.correlationId).toBe('corr-42');
+    expect(rows[0]?.causationId).toBe('cause-42');
+    expect(rows[1]?.correlationId).toBeNull();
+    expect(rows[1]?.causationId).toBeNull();
   });
 
   it('a refused retention rolls back EVERYTHING — no fact, no outbox, no photo', async () => {

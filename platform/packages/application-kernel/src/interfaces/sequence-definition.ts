@@ -1,5 +1,5 @@
 import type { ActorRef, CommandId } from '@mentora/contracts';
-import type { Instant, Option, Result } from '@mentora/kernel';
+import type { Instant, Option, Result, RetentionContext } from '@mentora/kernel';
 
 import type {
   SequenceRefusalLike,
@@ -30,7 +30,13 @@ import type {
  *                             (a motivated Decision, e.g. TimeSlotUnavailable);
  *                             a thrown error is a technical Failure, retryable
  *                             (S-3: an optimistic conflict is a Failure, never
- *                             a Decision).
+ *                             a Decision). RFC-001 (RATIFIED, Option A): the
+ *                             stage hands the OPTIONAL RetentionContext built
+ *                             from the envelope (correlation = the input's,
+ *                             causation = the act identity) so the Outbox de
+ *                             faits can transport it — "corrélation portée
+ *                             quand elle existe" (F5.3 §2); implementations
+ *                             with the shorter signature remain conformant.
  */
 export interface SequenceDefinition<TWire, TCommand, TUnit, TRefusal extends SequenceRefusalLike> {
   commandTypeOf(wire: TWire): string;
@@ -39,5 +45,5 @@ export interface SequenceDefinition<TWire, TCommand, TUnit, TRefusal extends Seq
   load(wire: TWire): Promise<Option<TUnit>>;
   validate(wire: TWire, instant: Instant, actor: ActorRef): Promise<Result<TCommand, TRefusal>>;
   act(unit: Option<TUnit>, command: TCommand): Result<TUnit, TRefusal>;
-  retain(unit: TUnit): Promise<Result<void, TRefusal>>;
+  retain(unit: TUnit, context?: RetentionContext): Promise<Result<void, TRefusal>>;
 }

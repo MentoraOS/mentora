@@ -1,4 +1,5 @@
 import type { Agreement } from '@mentora/domain-agreement';
+import type { RetentionContext } from '@mentora/kernel';
 import type { Prisma } from '@prisma/client';
 
 import { previousVersionOf } from '../concurrency/agreement-optimistic-concurrency-guard.js';
@@ -25,7 +26,11 @@ export class AgreementRetentionEngine {
     private readonly outbox: AgreementOutboxStore,
   ) {}
 
-  async retainWithin(tx: Prisma.TransactionClient, unit: Agreement): Promise<void> {
+  async retainWithin(
+    tx: Prisma.TransactionClient,
+    unit: Agreement,
+    context?: RetentionContext,
+  ): Promise<void> {
     const facts = unit.pendingFacts;
     const row = toSnapshotRow(unit);
     const previousVersion = previousVersionOf(unit);
@@ -59,6 +64,6 @@ export class AgreementRetentionEngine {
     }
 
     // (4) the Outbox de faits — same atomic act (A-3); the relay will read.
-    await this.outbox.write(tx, facts);
+    await this.outbox.write(tx, facts, context);
   }
 }

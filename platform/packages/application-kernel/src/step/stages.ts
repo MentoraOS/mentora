@@ -215,7 +215,14 @@ export class AtomicRetentionStage<TWire, TCommand, TUnit, TRefusal extends Seque
   async run(state: ExecutionState<TWire, TCommand, TUnit, TRefusal>): Promise<StageSignal<TRefusal>> {
     invariant(state.unit !== undefined, 'Retention requires the acted unit (order is law)');
     try {
-      const retained = await this.definition.retain(state.unit);
+      // RFC-001 (RATIFIED, Option A) — the envelope values ride to the
+      // retention so the Outbox de faits transports them: correlation is
+      // the input's, causation is the ACT identity (the command caused the
+      // facts). Envelope values only, never domain truth (A-9).
+      const retained = await this.definition.retain(state.unit, {
+        correlationId: state.correlationId,
+        ...(state.commandId !== undefined ? { causationId: state.commandId } : {}),
+      });
       if (!retained.ok) {
         return { signal: 'refuse', refusal: retained.error };
       }
