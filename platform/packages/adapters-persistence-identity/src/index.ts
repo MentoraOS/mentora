@@ -20,6 +20,7 @@ export * from './retention/credential-retention-engine.js';
 export * from './retention/session-retention-engine.js';
 export * from './repository/prisma-credential-repository-adapter.js';
 export * from './repository/prisma-session-repository-adapter.js';
+export * from './read-model/prisma-identity-state-read-adapter.js';
 export * from './relay/prisma-identity-relay-source.js';
 export * from './module/identity-persistence-module.js';
 export * from './testing/identity-persistence-fixture.js';
