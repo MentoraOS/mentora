@@ -177,6 +177,16 @@ describe('the assembled graph runs — same injected instances everywhere', () =
     expect(new Set(entries.map((entry) => entry.correlationId))).toEqual(new Set([CORRELATION]));
   });
 
+  it('the technical retry budget flows from the Root into every pipeline (I-5/M-8)', async () => {
+    const { providers } = providersOf();
+    const assembly = composeIdentityAccess({
+      ...providers,
+      technical: { commandMaxAttempts: 2 },
+    });
+    expect((await dispatchThrough(assembly, establishPayload())).kind).toBe('executed');
+    expect((await dispatchThrough(assembly, openPayload())).kind).toBe('executed');
+  });
+
   it('an unknown Command has no carrier — the Exception channel (closed table)', async () => {
     const assembly = composeIdentityAccess(providersOf().providers);
     const outcome = await dispatchThrough(assembly, {
