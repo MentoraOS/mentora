@@ -76,6 +76,20 @@ describe('raw propagation from every I/O seam of the Séquence de Commande (A-7)
   });
 });
 
+describe('RFC-001 — the retention stage hands the envelope context (pas 8)', () => {
+  it('correlation is the input envelope; causation is the ACT identity', async () => {
+    let seen: unknown;
+    const outcome = await runCommand({
+      retain: (_unit, context): Promise<Result<void, Refusal>> => {
+        seen = context;
+        return Promise.resolve(ok(undefined));
+      },
+    });
+    expect(outcome.kind).toBe('executed');
+    expect(seen).toEqual({ correlationId: CORRELATION, causationId: 'act-u1' });
+  });
+});
+
 describe('the reaction channel edges', () => {
   const reactionDefinition: ReactionDefinition<{ id: string }, { n: number }, string> = {
     factTypeOf: () => 'ProbeFact',

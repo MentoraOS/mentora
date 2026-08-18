@@ -63,5 +63,6 @@ export const sessionSequenceDefinition = <TWire extends SessionCommandContract, 
   load: (wire) => repository.byId(wire.sessionId),
   validate: (wire, instant, actor) => Promise.resolve(useCase.map(wire, instant, actor)),
   act: (unit, command) => useCase.act(unit, command),
-  retain: (unit) => repository.retain(unit),
+  // RFC-001: the stage-built envelope context rides through to the registry.
+  retain: (unit, context) => repository.retain(unit, context),
 });

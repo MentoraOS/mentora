@@ -1,7 +1,7 @@
 import { agreementRefusal } from '@mentora/domain-agreement';
 import type { Agreement, AgreementRefusal, AgreementRepository } from '@mentora/domain-agreement';
 import type { AgreementId, ExpertId, TimeSlot } from '@mentora/domain-agreement';
-import type { Option, Result } from '@mentora/kernel';
+import type { Option, Result, RetentionContext } from '@mentora/kernel';
 import { err, none, ok, some } from '@mentora/kernel';
 import type { PrismaClient } from '@prisma/client';
 
@@ -51,11 +51,11 @@ export class PrismaAgreementRepositoryAdapter implements AgreementRepository {
     return rows.map(toUnit);
   }
 
-  async retain(unit: Agreement): Promise<Result<void, AgreementRefusal>> {
+  async retain(unit: Agreement, context?: RetentionContext): Promise<Result<void, AgreementRefusal>> {
     try {
       await this.prisma.$transaction(
         async (tx) => {
-          await this.engine.retainWithin(tx, unit);
+          await this.engine.retainWithin(tx, unit, context);
         },
         { isolationLevel: 'Serializable' },
       );

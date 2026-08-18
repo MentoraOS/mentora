@@ -1,4 +1,4 @@
-import type { Option, Result } from '@mentora/kernel';
+import type { Option, Result, RetentionContext } from '@mentora/kernel';
 
 import type { Agreement } from '../aggregate/agreement.js';
 import type { AgreementRefusal } from '../decisions/agreement-refusal.js';
@@ -33,7 +33,9 @@ export interface AgreementRepository {
    * Atomic retention (pas 8): state + pending facts in ONE registry act; the
    * declared unique key (expert × overlapping confirmed slot) is applied
    * structurally and refused as a motivated Decision — TimeSlotUnavailable —
-   * never an exception (F3.2-A, R-A).
+   * never an exception (F3.2-A, R-A). The OPTIONAL context is RFC-001
+   * (Option A, RATIFIED 2026-08-18): envelope values the Outbox de faits
+   * transports when they exist — never domain truth, never required.
    */
-  retain(agreement: Agreement): Promise<Result<void, AgreementRefusal>>;
+  retain(agreement: Agreement, context?: RetentionContext): Promise<Result<void, AgreementRefusal>>;
 }
