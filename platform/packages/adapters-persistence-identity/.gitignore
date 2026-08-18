@@ -1,0 +1,6 @@
+# Prisma emitter output — regenerated at build (prisma generate); the
+# platform-specific query engine binary must never be committed. The
+# committed src/generated/tsconfig.json stays: the generator's tsconfig
+# sniffer walks up from the output and must find a self-contained config
+# (the workspace preset chain breaks its resolver under pnpm symlinks).
+src/generated/prisma/

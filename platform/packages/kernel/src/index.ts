@@ -18,6 +18,7 @@ export * from './diagnostics/guard.js';
 // Ports (values + types).
 export * from './ports/id.js';
 export * from './ports/clock.js';
+export * from './ports/retention-context.js';
 
 // Type-only utilities.
 export type { Brand } from './types/brand.js';

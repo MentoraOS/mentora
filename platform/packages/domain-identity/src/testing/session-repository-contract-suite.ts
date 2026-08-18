@@ -92,5 +92,15 @@ export const sessionRepositoryContractSuite = (
       await repository.retain(session);
       await expect(repository.retain(session)).rejects.toThrow();
     });
+
+    it('accepts an OPTIONAL RetentionContext (RFC-001) — and still has NOTHING to carry it to', async () => {
+      const { repository } = await provider.make();
+      const retained = await repository.retain(openedSession('sess-ctx', 'cred-ctx'), {
+        correlationId: 'corr-1',
+      });
+      expect(retained.ok).toBe(true);
+      const back = await repository.byId(sessionIdOf('sess-ctx'));
+      expect(back.some && back.value.state.kind).toBe('Active');
+    });
   });
 };

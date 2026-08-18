@@ -16,8 +16,9 @@ import { ActiveCredentialUniquenessSpecification } from '../specifications/activ
  * concurrency, F5.2 §4). Pure class — no test-runner import: the barrel
  * stays loadable by a living process (the barrels lesson).
  *
- * The R-A refusal is voiced through the ratified transition family while
- * the dedicated reason name remains a recorded canon gap (persistence lot).
+ * The R-A refusal is voiced with the SETTLED reason `CredentialAlreadyExists`
+ * (the ratified `<Truth>AlreadyExists` family — F3.2-B precedent
+ * `MembershipAlreadyExists`; the recorded gap closed at the persistence lot).
  */
 export class InMemoryCredentialRepository {
   private readonly store = new Map<string, { credential: Credential; version: number }>();
@@ -59,7 +60,7 @@ export class InMemoryCredentialRepository {
         return Promise.resolve(
           err(
             credentialRefusal(
-              'TransitionUnavailable',
+              'CredentialAlreadyExists',
               'An ACTIVE Credential already exists for this person and principal factor (R-A key)',
             ),
           ),
