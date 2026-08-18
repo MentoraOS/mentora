@@ -12,10 +12,15 @@ import type { ProofStrength } from '../value-objects/proof-strength.js';
  * strengths are an explicit ALLOWLIST — no invented ordering between
  * opaque strengths; membership is the judgment.
  */
+/** The PRODUCT parameters (I-5) — published so the Root injects them (precedent: ReschedulePolicyParams). */
+export interface ProofRequirementPolicyParams {
+  readonly acceptedStrengths: readonly string[];
+}
+
 export class ProofRequirementPolicy {
   private readonly accepted: ReadonlySet<string>;
 
-  constructor(configuration: { readonly acceptedStrengths: readonly string[] }) {
+  constructor(configuration: ProofRequirementPolicyParams) {
     this.accepted = new Set(configuration.acceptedStrengths.map((value) => value.toLowerCase()));
   }
 

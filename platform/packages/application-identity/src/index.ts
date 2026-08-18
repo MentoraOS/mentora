@@ -15,3 +15,6 @@ export * from './definitions/revoke-credential.definition.js';
 export * from './services/revoke-credential.application-service.js';
 export * from './definitions/session-sequence-definition.js';
 export * from './services/session-application-services.js';
+export * from './read/ports/identity-state-read.port.js';
+export * from './read/testing/identity-read-doubles.js';
+export * from './composition/identity-composition.js';

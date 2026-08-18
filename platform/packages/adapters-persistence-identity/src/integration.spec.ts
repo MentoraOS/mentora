@@ -166,6 +166,29 @@ describe.skipIf(url === undefined)('PostgreSQL integration (real engine)', () =>
     ).rejects.toThrow();
   });
 
+  it('the gate read adapters serve VERIFIED views from the primary — and refuse corruption', async () => {
+    const { PrismaSessionStateReadAdapter, PrismaCredentialStateReadAdapter } = await import(
+      './read-model/prisma-identity-state-read-adapter.js'
+    );
+    await fixture.credentials.retain(mother.established('cred-1', 'person-1'));
+    await fixture.sessions.retain(mother.opened('sess-1', 'cred-1'));
+    const sessionRead = new PrismaSessionStateReadAdapter(fixture.prisma);
+    const credentialRead = new PrismaCredentialStateReadAdapter(fixture.prisma);
+
+    const session = await sessionRead.stateOf(sessionIdOf('sess-1'));
+    expect(session.some && session.value.stateKind).toBe('Active');
+    expect(session.some && session.value.credentialId).toBe(credentialIdOf('cred-1'));
+    const credential = await credentialRead.stateOf(credentialIdOf('cred-1'));
+    expect(credential.some && credential.value.personId).toBe(personIdOf('person-1'));
+    expect((await sessionRead.stateOf(sessionIdOf('sess-ghost'))).some).toBe(false);
+
+    await fixture.prisma.sessionSnapshot.update({
+      where: { sessionId: 'sess-1' },
+      data: { checksum: 'deadbeef' },
+    });
+    await expect(sessionRead.stateOf(sessionIdOf('sess-1'))).rejects.toThrow(/corrupted/);
+  });
+
   it('the persistence module lives and dies with the runtime lifecycle (I-11)', async () => {
     const localFixture = new IdentityPersistenceFixture(url ?? '');
     const container = new RuntimeBuilder()
