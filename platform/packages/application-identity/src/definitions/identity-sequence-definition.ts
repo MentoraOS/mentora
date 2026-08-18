@@ -2,8 +2,9 @@ import type { SequenceDefinition } from '@mentora/application-kernel';
 import type { ActorRef } from '@mentora/contracts';
 import type { IdentityCommandContract } from '@mentora/contracts-identity';
 import type { Credential, CredentialRefusal, CredentialRepository } from '@mentora/domain-identity';
+import { credentialRefusal } from '@mentora/domain-identity';
 import type { Instant, Option, Result } from '@mentora/kernel';
-import { ok } from '@mentora/kernel';
+import { err, ok } from '@mentora/kernel';
 
 import { receiveIdentityCommand } from '../validators/reception.js';
 
@@ -31,6 +32,18 @@ export interface IdentityUseCase<TWire extends IdentityCommandContract, TCommand
   act(unit: Option<Credential>, command: TCommand): Result<Credential, CredentialRefusal>;
 }
 
+/**
+ * A command aimed at an Identifier under which no Credential lives: the
+ * frozen machine has no transition from nothingness — the ratified refusal
+ * family motivates the Decision (precedent: agreementAbsentRefusal). Not an
+ * Exception (the call is well-formed), not a Failure (nothing technical).
+ */
+export const credentialAbsentRefusal = (): CredentialRefusal =>
+  credentialRefusal(
+    'TransitionUnavailable',
+    'No Credential lives under this Identifier — the frozen machine offers no transition',
+  );
+
 export const identitySequenceDefinition = <TWire extends IdentityCommandContract, TCommand>(
   useCase: IdentityUseCase<TWire, TCommand>,
   repository: CredentialRepository,
@@ -45,10 +58,19 @@ export const identitySequenceDefinition = <TWire extends IdentityCommandContract
     if (!received.ok) {
       return received;
     }
-    // NOTE(#21): the A-1 cross-carrier guard (precedent: agreement) is
-    // statically dead while the published union has ONE member — a foreign
-    // type already dies at validation as UNKNOWN_CONTRACT. Reintroduce the
-    // guard the moment RevokeCredential joins the union (Story #21).
+    if (received.value.type !== useCase.commandType) {
+      // Reintroduced with Story #21 (the union now has two members): a
+      // well-formed command of ANOTHER use case reached this service — the
+      // dispatch table (one carrier per Command, A-8) was violated by the
+      // caller, a malformed call for THIS contract, the Exception channel.
+      return err([
+        {
+          code: 'CONTRACT.UNKNOWN_CONTRACT',
+          field: 'type',
+          message: `This service carries '${useCase.commandType}', not '${received.value.type}' (A-1: one Command, one Application Service)`,
+        },
+      ]);
+    }
     return ok(received.value as TWire);
   },
 

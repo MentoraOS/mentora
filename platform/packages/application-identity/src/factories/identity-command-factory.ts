@@ -1,4 +1,7 @@
-import type { EstablishCredential as EstablishCredentialContract } from '@mentora/contracts-identity';
+import type {
+  EstablishCredential as EstablishCredentialContract,
+  RevokeCredential as RevokeCredentialContract,
+} from '@mentora/contracts-identity';
 import {
   commandIdOf,
   credentialIdOf,
@@ -7,7 +10,7 @@ import {
   personIdOf,
   proofStrengthOf,
 } from '@mentora/domain-identity';
-import type { EstablishCredential } from '@mentora/domain-identity';
+import type { EstablishCredential, RevokeCredential } from '@mentora/domain-identity';
 import type { CredentialRefusal } from '@mentora/domain-identity';
 import type { Instant, Result } from '@mentora/kernel';
 import { ok } from '@mentora/kernel';
@@ -32,4 +35,15 @@ export const toEstablishCredential = (
       strength: proofStrengthOf(wire.principalFactor.strength),
     },
     establishedAt: instant,
+  });
+
+export const toRevokeCredential = (
+  wire: RevokeCredentialContract,
+  instant: Instant,
+): Result<RevokeCredential, CredentialRefusal> =>
+  ok({
+    commandId: commandIdOf(wire.commandId),
+    credentialId: credentialIdOf(wire.credentialId),
+    motive: wire.motive,
+    revokedAt: instant,
   });
