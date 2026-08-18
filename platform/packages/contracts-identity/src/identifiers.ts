@@ -9,9 +9,12 @@
 declare const credentialIdBrand: unique symbol;
 declare const factorIdBrand: unique symbol;
 declare const personIdBrand: unique symbol;
+declare const sessionIdBrand: unique symbol;
 
 export type CredentialId = string & { readonly [credentialIdBrand]: true };
 export type FactorId = string & { readonly [factorIdBrand]: true };
 export type PersonId = string & { readonly [personIdBrand]: true };
+/** Session — mot réservé AU domaine I&A (dictionnaire F2.5) : légitime ici, nulle part ailleurs. */
+export type SessionId = string & { readonly [sessionIdBrand]: true };
 
 export type { CommandId } from '@mentora/contracts';

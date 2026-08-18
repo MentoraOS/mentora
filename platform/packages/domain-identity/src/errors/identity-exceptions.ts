@@ -16,3 +16,6 @@ export class IdentityIdentifierBlankException extends IdentityDomainException {}
 
 /** A retained photograph that no longer maps to a lawful state (PERSIST.CORRUPTION). */
 export class CredentialSnapshotCorruptException extends IdentityDomainException {}
+
+/** A retained session photograph that no longer maps to a lawful state. */
+export class SessionSnapshotCorruptException extends IdentityDomainException {}

@@ -1,4 +1,4 @@
-import type { CommandId, CredentialId, FactorId, PersonId } from '@mentora/contracts-identity';
+import type { CommandId, CredentialId, FactorId, PersonId, SessionId } from '@mentora/contracts-identity';
 
 import { IdentityIdentifierBlankException } from '../errors/identity-exceptions.js';
 
@@ -10,7 +10,7 @@ import { IdentityIdentifierBlankException } from '../errors/identity-exceptions.
  * link lives in the ACL of the Account, never here (canon ch.04).
  */
 
-export type { CredentialId, FactorId, PersonId, CommandId } from '@mentora/contracts-identity';
+export type { CredentialId, FactorId, PersonId, SessionId, CommandId } from '@mentora/contracts-identity';
 
 const guarded = (value: string, label: string): string => {
   if (value.trim().length === 0) {
@@ -24,3 +24,5 @@ export const credentialIdOf = (value: string): CredentialId =>
 export const factorIdOf = (value: string): FactorId => guarded(value, 'FactorId') as FactorId;
 export const personIdOf = (value: string): PersonId => guarded(value, 'PersonId') as PersonId;
 export const commandIdOf = (value: string): CommandId => guarded(value, 'CommandId') as CommandId;
+
+export const sessionIdOf = (value: string): SessionId => guarded(value, 'SessionId') as SessionId;
