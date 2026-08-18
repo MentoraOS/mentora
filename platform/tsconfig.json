@@ -83,6 +83,12 @@
     },
     {
       "path": "./apps/server/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/contracts-identity/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/domain-identity/tsconfig.build.json"
     }
   ]
 }
