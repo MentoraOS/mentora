@@ -7,3 +7,5 @@
 
 export * from './identifiers.js';
 export * from './refusals.js';
+export * from './commands/identity-command-contracts.js';
+export * from './validation/identity-command-validation.js';

@@ -89,6 +89,9 @@
     },
     {
       "path": "./packages/domain-identity/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/application-identity/tsconfig.build.json"
     }
   ]
 }
