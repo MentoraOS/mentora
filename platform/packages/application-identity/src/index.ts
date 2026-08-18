@@ -13,3 +13,5 @@ export * from './services/identity-sequence.application-service.js';
 export * from './services/establish-credential.application-service.js';
 export * from './definitions/revoke-credential.definition.js';
 export * from './services/revoke-credential.application-service.js';
+export * from './definitions/session-sequence-definition.js';
+export * from './services/session-application-services.js';

@@ -1,6 +1,6 @@
 import type { CommandId } from '@mentora/contracts';
 
-import type { CredentialId, FactorId, PersonId } from '../identifiers.js';
+import type { CredentialId, FactorId, PersonId, SessionId } from '../identifiers.js';
 
 /**
  * The wire commands of the Identity & Access context — the published
@@ -38,3 +38,32 @@ export interface RevokeCredential extends IdentityCommandBase {
 export type IdentityCommandContract = EstablishCredential | RevokeCredential;
 
 export const IDENTITY_COMMAND_TYPES = ['EstablishCredential', 'RevokeCredential'] as const;
+
+/** Session — mot réservé au domaine I&A : légitime ici. Le wire porte la FORCE de la preuve vérifiée, jamais sa matière. */
+export interface OpenSession {
+  readonly contractVersion: 1;
+  readonly commandId: CommandId;
+  readonly sessionId: SessionId;
+  readonly credentialId: CredentialId;
+  readonly presentedStrength: string;
+  readonly type: 'OpenSession';
+}
+
+export interface EndSession {
+  readonly contractVersion: 1;
+  readonly commandId: CommandId;
+  readonly sessionId: SessionId;
+  readonly type: 'EndSession';
+}
+
+export interface RevokeSession {
+  readonly contractVersion: 1;
+  readonly commandId: CommandId;
+  readonly sessionId: SessionId;
+  readonly motive: string;
+  readonly type: 'RevokeSession';
+}
+
+export type SessionCommandContract = OpenSession | EndSession | RevokeSession;
+
+export const SESSION_COMMAND_TYPES = ['OpenSession', 'EndSession', 'RevokeSession'] as const;

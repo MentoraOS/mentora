@@ -82,3 +82,47 @@ export const validateIdentityCommand = (
   }
   return ok(payload as unknown as IdentityCommandContract);
 };
+
+import type { SessionCommandContract } from '../commands/identity-command-contracts.js';
+import { SESSION_COMMAND_TYPES } from '../commands/identity-command-contracts.js';
+
+/** Structural validation of the Session wires — same discipline: every violation listed. */
+export const validateSessionCommand = (
+  payload: unknown,
+): Result<SessionCommandContract, readonly IdentityContractViolation[]> => {
+  const violations: IdentityContractViolation[] = [];
+  if (!isRecord(payload)) {
+    return err([violation('CONTRACT.MALFORMED', '$', 'payload must be an object')]);
+  }
+  const type = payload['type'];
+  if (typeof type !== 'string' || !SESSION_COMMAND_TYPES.includes(type as never)) {
+    return err([
+      violation(
+        'CONTRACT.UNKNOWN_CONTRACT',
+        'type',
+        `type must be one of: ${SESSION_COMMAND_TYPES.join(', ')}`,
+      ),
+    ]);
+  }
+  if (payload['contractVersion'] !== 1) {
+    violations.push(violation('CONTRACT.UNKNOWN_GENERATION', 'contractVersion', 'must be 1'));
+  }
+  for (const field of ['commandId', 'sessionId']) {
+    if (blankString(payload[field])) {
+      violations.push(violation('CONTRACT.MALFORMED', field, 'must be a non-blank string'));
+    }
+  }
+  if (type === 'OpenSession') {
+    for (const field of ['credentialId', 'presentedStrength']) {
+      if (blankString(payload[field])) {
+        violations.push(violation('CONTRACT.MALFORMED', field, 'must be a non-blank string'));
+      }
+    }
+  } else if (type === 'RevokeSession' && blankString(payload['motive'])) {
+    violations.push(violation('CONTRACT.MALFORMED', 'motive', 'must be a non-blank string'));
+  }
+  if (violations.length > 0) {
+    return err(violations);
+  }
+  return ok(payload as unknown as SessionCommandContract);
+};
