@@ -1,0 +1,45 @@
+{
+  "name": "@mentora/domain-identity",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Identity & Access domain - Credential unit (Story #10): the proof of entry, never the person. Pure business truth per R2 F3.2-C ch.04; no framework, no I/O, no secret material ever.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/kernel": "workspace:*",
+    "@mentora/shared": "workspace:*",
+    "@mentora/contracts-identity": "workspace:*"
+  }
+}

@@ -106,6 +106,13 @@
 /platform/packages/adapters-persistence-agreement/prisma/  @MentoraOS/backend @MentoraOS/security
 
 ############################################################
+# Backend Domain — Identity & Access (EPIC-001 ; sécurité co-propriétaire)
+############################################################
+
+/platform/packages/contracts-identity/              @MentoraOS/backend @MentoraOS/security
+/platform/packages/domain-identity/                 @MentoraOS/backend @MentoraOS/security
+
+############################################################
 # Qualité — la stratégie de preuve
 ############################################################
 
@@ -129,3 +136,10 @@
 
 /.github/                                           @MentoraOS/platform
 /.github/CODEOWNERS                                 @MentoraOS/architecture @MentoraOS/security
+
+############################################################
+# Release Engineering
+############################################################
+
+/.github/workflows/     @MentoraOS/release
+/release/               @MentoraOS/release
