@@ -118,3 +118,10 @@ describe('Credential — invariants', () => {
     }
   });
 });
+
+it('the principalFactor getter is a corruption guard: a factorless carcass throws, never returns garbage', () => {
+  const carcass = Object.assign(Object.create(Credential.prototype) as Credential, {
+    factors: [],
+  });
+  expect(() => carcass.principalFactor).toThrow(CredentialSnapshotCorruptException);
+});

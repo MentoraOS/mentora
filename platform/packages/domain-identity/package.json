@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./contract-suite": {
+      "types": "./dist/testing/credential-repository-contract-suite.d.ts",
+      "import": "./dist/testing/credential-repository-contract-suite.js"
     }
   },
   "main": "./dist/index.js",

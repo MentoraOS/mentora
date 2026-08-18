@@ -20,3 +20,4 @@ export * from './aggregate/credential.js';
 export * from './factories/credential-factory.js';
 export * from './ports/credential-repository.js';
 export * from './specifications/active-credential-uniqueness.specification.js';
+export * from './testing/in-memory-credential-repository.js';
