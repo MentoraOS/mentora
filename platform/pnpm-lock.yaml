@@ -50,18 +50,30 @@ importers:
       '@mentora/adapters-persistence-agreement':
         specifier: workspace:*
         version: link:../../packages/adapters-persistence-agreement
+      '@mentora/adapters-persistence-identity':
+        specifier: workspace:*
+        version: link:../../packages/adapters-persistence-identity
       '@mentora/application-agreement':
         specifier: workspace:*
         version: link:../../packages/application-agreement
+      '@mentora/application-identity':
+        specifier: workspace:*
+        version: link:../../packages/application-identity
       '@mentora/application-kernel':
         specifier: workspace:*
         version: link:../../packages/application-kernel
       '@mentora/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@mentora/contracts-identity':
+        specifier: workspace:*
+        version: link:../../packages/contracts-identity
       '@mentora/domain-agreement':
         specifier: workspace:*
         version: link:../../packages/domain-agreement
+      '@mentora/domain-identity':
+        specifier: workspace:*
+        version: link:../../packages/domain-identity
       '@mentora/kernel':
         specifier: workspace:*
         version: link:../../packages/kernel
