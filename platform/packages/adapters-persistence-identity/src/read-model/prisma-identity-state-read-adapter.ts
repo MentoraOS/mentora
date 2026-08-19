@@ -71,6 +71,14 @@ export class PrismaCredentialStateReadAdapter implements CredentialStateReadPort
       personId: snapshot.value.personId as CredentialStateView['personId'],
       stateKind: snapshot.value.state.kind,
       version: snapshot.value.version,
+      // References and natures only (Story #96): no matter exists in the
+      // photograph by construction — nothing here can leak a secret.
+      factors: snapshot.value.factors.map((factor) => ({
+        factorId: factor.factorId,
+        kind: factor.kind,
+        strength: factor.strength,
+        principal: factor.principal,
+      })),
     });
   }
 }

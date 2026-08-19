@@ -104,3 +104,30 @@ describe('Session — opened on proof, two distinct terminals, never a fact', ()
     expect(() => Session.fromSnapshot(corrupt)).toThrow(SessionSnapshotCorruptException);
   });
 });
+
+describe('ProofRequirementPolicy.compose — MFA (Story #111/#113): the declared product table, nothing else', () => {
+  const composing = new ProofRequirementPolicy({
+    acceptedStrengths: ['elevated'],
+    compositions: [{ of: ['standard', 'standard'], yields: 'elevated' }],
+  });
+
+  it('one verified factor presents its own strength — composition is identity', () => {
+    const composed = composing.compose([proofStrengthOf('standard')]);
+    expect(composed.ok && composed.value).toBe('standard');
+  });
+
+  it('a DECLARED combination composes, order-insensitively', () => {
+    const composed = composing.compose([proofStrengthOf('standard'), proofStrengthOf('standard')]);
+    expect(composed.ok && composed.value).toBe('elevated');
+  });
+
+  it('an UNDECLARED combination refuses — fail closed, no guessed ordering', () => {
+    const composed = composing.compose([proofStrengthOf('standard'), proofStrengthOf('elevated')]);
+    expect(!composed.ok && composed.error.reason).toBe('ProofUnavailable');
+  });
+
+  it('nothing verified composes into nothing', () => {
+    const composed = composing.compose([]);
+    expect(!composed.ok && composed.error.reason).toBe('ProofUnavailable');
+  });
+});

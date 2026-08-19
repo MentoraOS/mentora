@@ -7,6 +7,7 @@ import {
   previousSessionVersionOf,
 } from './concurrency/identity-optimistic-concurrency-guard.js';
 import { toFactRow, toWireFact } from './fact-stream/credential-fact-mapper.js';
+import { ScryptPasswordHasher } from './proof/scrypt-password-hasher.js';
 import {
   identitySnapshotChecksum,
   serializeCredentialSnapshot,
@@ -120,5 +121,25 @@ describe('the concurrency guard — a comparison, never a lock', () => {
     ).toBe('version-conflict');
     expect(classifyIdentityEngineError(new Error('connection refused'))).toBe('engine');
     expect(classifyIdentityEngineError('not-an-error')).toBe('engine');
+  });
+});
+
+describe('ScryptPasswordHasher (Story #97) — the platform KDF, self-describing digest, constant-time verify', () => {
+  const hasher = new ScryptPasswordHasher();
+
+  it('hashes and verifies; two digests of the same material differ (fresh salt)', async () => {
+    const first = await hasher.hash('material-1');
+    const second = await hasher.hash('material-1');
+    expect(first).not.toBe(second);
+    expect(first.startsWith('scrypt$16384$8$1$')).toBe(true);
+    expect(await hasher.verify('material-1', first)).toBe(true);
+    expect(await hasher.verify('material-1', second)).toBe(true);
+  });
+
+  it('refuses the wrong material and every malformed digest — false, never a throw', async () => {
+    const digest = await hasher.hash('material-1');
+    expect(await hasher.verify('material-2', digest)).toBe(false);
+    expect(await hasher.verify('material-1', 'not-a-digest')).toBe(false);
+    expect(await hasher.verify('material-1', 'bcrypt$x$y$z$s$h')).toBe(false);
   });
 });

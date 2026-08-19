@@ -22,6 +22,12 @@ export interface EstablishCredential {
     readonly kind: FactorKind;
     readonly strength: ProofStrength;
   };
+  /** MFA (Story #111): additional factors born WITH the credential (V-2 additive). */
+  readonly secondaryFactors?: readonly {
+    readonly factorId: FactorId;
+    readonly kind: FactorKind;
+    readonly strength: ProofStrength;
+  }[];
   readonly establishedAt: Instant;
 }
 

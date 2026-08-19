@@ -79,3 +79,24 @@ describe('Credential — the frozen machine (Active → Revoked)', () => {
     expect(retained.state.kind).toBe('Active');
   });
 });
+
+describe('MFA birth (Story #111): secondary factors born WITH the credential', () => {
+  it('the unit carries principal + secondaries; exactly ONE principal; the fact names the principal alone', () => {
+    const born = establishCredential({
+      ...establishOf(),
+      secondaryFactors: [
+        { factorId: factorIdOf('factor-2'), kind: factorKindOf('password'), strength: proofStrengthOf('standard') },
+      ],
+    });
+    expect(born.ok).toBe(true);
+    if (!born.ok) return;
+    expect(born.value.factors).toHaveLength(2);
+    expect(born.value.factors.filter((factor) => factor.principal)).toHaveLength(1);
+    expect(born.value.factors[1]?.principal).toBe(false);
+    expect(born.value.factors[1]?.establishedAt).toBe(T0);
+    // The RATIFIED fact contract is untouched: principal references only.
+    const fact = born.value.pendingFacts[0];
+    expect(fact?.type).toBe('CredentialEstablished');
+    expect(Object.keys(fact ?? {})).not.toContain('secondaryFactors');
+  });
+});

@@ -26,3 +26,5 @@ export * from './module/identity-persistence-module.js';
 export * from './testing/identity-persistence-fixture.js';
 export * from './testing/identity-persistence-mother.js';
 export * from './testing/uuid-source.js';
+export * from './proof/scrypt-password-hasher.js';
+export * from './proof/prisma-proof-material-vault.js';

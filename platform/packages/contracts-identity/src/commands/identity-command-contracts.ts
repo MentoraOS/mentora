@@ -27,6 +27,12 @@ export interface EstablishCredential extends IdentityCommandBase {
     readonly kind: string;
     readonly strength: string;
   };
+  /** V-2 ADDITIVE (Story #111 MFA): optional factors born WITH the credential. */
+  readonly secondaryFactors?: readonly {
+    readonly factorId: FactorId;
+    readonly kind: string;
+    readonly strength: string;
+  }[];
 }
 
 export interface RevokeCredential extends IdentityCommandBase {
