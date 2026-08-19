@@ -63,7 +63,8 @@
     "@mentora/app-server#test": {
       "dependsOn": [
         "^build",
-        "@mentora/adapters-persistence-agreement#test"
+        "@mentora/adapters-persistence-agreement#test",
+        "@mentora/adapters-persistence-identity#test"
       ],
       "inputs": [
         "src/**",

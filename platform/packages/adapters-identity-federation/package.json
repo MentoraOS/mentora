@@ -1,0 +1,44 @@
+{
+  "name": "@mentora/adapters-identity-federation",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The federated-proof adapters of the vestibule (ADR-0004, ratified): generic OIDC Authorization Code + PKCE over the raw protocol - zero provider SDK. Google and Apple are OIDC; GitHub carries its identity sub-adapter. Provider types die HERE (I-7); secrets stay at the vault, addressed by reference (I-8). The entry flow lands with the Account ACL (A05) - the proof-person link lives there.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/kernel": "workspace:*",
+    "@mentora/runtime-security": "workspace:*"
+  }
+}
