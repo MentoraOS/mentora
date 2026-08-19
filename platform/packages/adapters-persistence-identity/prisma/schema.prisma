@@ -114,3 +114,16 @@ model SessionSnapshot {
 
   @@index([credentialId, stateKind])
 }
+
+// Story #96 — "hash sous coffre": the DEV VAULT table of proof material.
+// ONE place for the matter (I-8: "un secret n'a qu'un lieu ; ailleurs,
+// seulement son nom") — the unit, the facts and the views carry factor
+// REFERENCES only; this table holds the one-way scrypt digest, keyed by
+// that reference. A production vault is an alternative adapter of the same
+// port; rows are never read back as plaintext (the digest verifies, it
+// never reveals — T-24: "la cryptographie démontre ; elle ne décide jamais").
+model ProofMaterial {
+  factorId String @id
+  kind     String
+  digest   String
+}

@@ -57,3 +57,44 @@ describe('validateIdentityCommand — the published language validates its own w
     }
   });
 });
+
+describe('EstablishCredential secondaryFactors — V-2 additive (Story #111)', () => {
+  const base = {
+    type: 'EstablishCredential',
+    contractVersion: 1,
+    commandId: 'cmd-1',
+    credentialId: 'cred-1',
+    personId: 'person-1',
+    principalFactor: { factorId: 'factor-1', kind: 'password', strength: 'standard' },
+  };
+
+  it('absent: lawful (the old wire is the new wire)', () => {
+    expect(validateIdentityCommand(base).ok).toBe(true);
+  });
+
+  it('present and well-formed: lawful', () => {
+    expect(
+      validateIdentityCommand({
+        ...base,
+        secondaryFactors: [{ factorId: 'factor-2', kind: 'password', strength: 'standard' }],
+      }).ok,
+    ).toBe(true);
+  });
+
+  it('present and malformed: every violation voiced', () => {
+    const validated = validateIdentityCommand({
+      ...base,
+      secondaryFactors: [{ factorId: ' ', kind: 'password', strength: 'standard' }, 'not-an-object'],
+    });
+    expect(validated.ok).toBe(false);
+    if (validated.ok) return;
+    const fields = validated.error.map((violation) => violation.field);
+    expect(fields).toContain('secondaryFactors[0].factorId');
+    expect(fields).toContain('secondaryFactors[1]');
+  });
+
+  it('not an array: refused', () => {
+    const validated = validateIdentityCommand({ ...base, secondaryFactors: 'two' });
+    expect(validated.ok).toBe(false);
+  });
+});

@@ -53,11 +53,16 @@ export class Credential {
   // ------------------------------------------------------------------ birth
 
   /** INTERNAL to the domain: called by CredentialFactory only (the birth door, F3.1). */
-  static _born(id: CredentialId, personId: PersonId, principalFactor: Factor): Credential {
+  static _born(
+    id: CredentialId,
+    personId: PersonId,
+    principalFactor: Factor,
+    secondaryFactors: readonly Factor[] = [],
+  ): Credential {
     return new Credential(
       id,
       personId,
-      [principalFactor],
+      [principalFactor, ...secondaryFactors],
       { kind: 'Active', establishedAt: principalFactor.establishedAt },
       1,
       [

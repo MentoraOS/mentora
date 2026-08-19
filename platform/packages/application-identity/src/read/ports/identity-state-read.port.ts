@@ -33,6 +33,17 @@ export interface CredentialStateView {
   readonly personId: PersonId;
   readonly stateKind: 'Active' | 'Revoked';
   readonly version: number;
+  /**
+   * The factor REFERENCES AND NATURES (Story #96/#111): the vestibule's
+   * verification mechanisms resolve material BY factorId at the vault —
+   * no matter exists here by construction (the unit holds none).
+   */
+  readonly factors: readonly {
+    readonly factorId: string;
+    readonly kind: string;
+    readonly strength: string;
+    readonly principal: boolean;
+  }[];
 }
 
 /** The gate's lecture of ONE session's state, by Identifier, nothing else. */

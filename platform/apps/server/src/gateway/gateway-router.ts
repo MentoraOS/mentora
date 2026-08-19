@@ -9,6 +9,7 @@ import {
   readOutcomeReply,
   unauthenticatedReply,
 } from './http-mapping.js';
+import type { PresentedProof, ProofVerifier } from './proof-verifier.js';
 import type { SessionGate } from './session-gate.js';
 
 /**
@@ -18,10 +19,14 @@ import type { SessionGate } from './session-gate.js';
  *
  *   POST /entry/open-session  — the UNAUTHENTICATED vestibule act: the act
  *     of entry itself (a session cannot be required to open a session).
- *     The ONLY command admitted here is OpenSession — a closed list. The
- *     actor injected is the CLAIMED proof reference (the wire's
- *     credentialId, opaque): the act itself is the verification — the
- *     policy judges the presented proof, the registry holds the chain.
+ *     Since Story #96 the entry takes PRESENTED MATERIAL, not a declared
+ *     strength: {commandId, sessionId, credentialId, proofs:[{factorId,
+ *     material}]}. The ProofVerifier demonstrates the material at the
+ *     vault and the RATIFIED policy composes the verified strengths; the
+ *     gateway MINTS the wire's presentedStrength from that judgment — a
+ *     caller-declared strength is refused as the caller's defect (the
+ *     trust-the-client seam of the Sprint 3 interim is DEAD). Material
+ *     dies here (I-8); a failed proof is 401, one flat voice.
  *
  *   POST /commands — the AUTHENTICATED command surface: the SessionGate
  *     verifies the chain of proof and injects the PERSON's ActorRef
@@ -65,6 +70,7 @@ export class GatewayRouter {
     private readonly correlationIds: IdGenerator,
     /** The closed list of commands the AUTHENTICATED surface admits. */
     private readonly admittedCommands: ReadonlySet<string>,
+    private readonly proofs: ProofVerifier,
   ) {}
 
   /** undefined = not a gateway surface (the caller keeps its 404). */
@@ -85,14 +91,27 @@ export class GatewayRouter {
     const payload = parse(request.body);
     switch (request.url) {
       case '/entry/open-session': {
-        if (!isType(payload, 'OpenSession')) {
-          return notFoundReply(); // the entry admits ONE act — a closed door.
+        const entry = entryPayload(payload);
+        if (entry === undefined) {
+          return notFoundReply(); // the entry admits ONE act shape — a closed door.
         }
-        const claimed = claimedCredential(payload);
+        const verdict = await this.proofs.verify(entry.credentialId, entry.proofs);
+        if (verdict.kind === 'rejected') {
+          return unauthenticatedReply('proof rejected'); // one flat voice (Story #99).
+        }
+        // The gateway MINTS the wire — the verified judgment, never a claim.
+        const wire = {
+          type: 'OpenSession',
+          contractVersion: 1,
+          commandId: entry.commandId,
+          sessionId: entry.sessionId,
+          credentialId: entry.credentialId,
+          presentedStrength: verdict.strength,
+        };
         return commandOutcomeReply(
           await this.identityCommands.dispatch({
-            payload,
-            actor: claimed as ActorRef,
+            payload: wire,
+            actor: entry.credentialId as ActorRef,
             correlationId,
           }),
         );
@@ -132,10 +151,53 @@ const parse = (body: string): unknown => {
   }
 };
 
-const isType = (payload: unknown, type: string): boolean =>
-  typeof payload === 'object' &&
-  payload !== null &&
-  (payload as Record<string, unknown>)['type'] === type;
+/**
+ * The entry's OWN shape (mechanism, ours): material in, strength NEVER in.
+ * A payload carrying presentedStrength (or any unexpected claim) is not
+ * this shape — the door stays closed. `type` is tolerated when it says
+ * OpenSession (a well-meaning caller), required to say nothing else.
+ */
+interface EntryPayload {
+  readonly commandId: string;
+  readonly sessionId: string;
+  readonly credentialId: string;
+  readonly proofs: readonly PresentedProof[];
+}
+
+const entryPayload = (payload: unknown): EntryPayload | undefined => {
+  if (typeof payload !== 'object' || payload === null) {
+    return undefined;
+  }
+  const record = payload as Record<string, unknown>;
+  if (record['type'] !== undefined && record['type'] !== 'OpenSession') {
+    return undefined;
+  }
+  if (record['presentedStrength'] !== undefined) {
+    return undefined; // the declared-strength seam is DEAD (Story #99).
+  }
+  const { commandId, sessionId, credentialId, proofs } = record;
+  if (
+    typeof commandId !== 'string' ||
+    typeof sessionId !== 'string' ||
+    typeof credentialId !== 'string' ||
+    !Array.isArray(proofs)
+  ) {
+    return undefined;
+  }
+  const presented: PresentedProof[] = [];
+  for (const proof of proofs) {
+    if (
+      typeof proof !== 'object' ||
+      proof === null ||
+      typeof (proof as Record<string, unknown>)['factorId'] !== 'string' ||
+      typeof (proof as Record<string, unknown>)['material'] !== 'string'
+    ) {
+      return undefined;
+    }
+    presented.push(proof as unknown as PresentedProof);
+  }
+  return { commandId, sessionId, credentialId, proofs: presented };
+};
 
 const isAdmitted = (payload: unknown, admitted: ReadonlySet<string>): boolean => {
   if (typeof payload !== 'object' || payload === null) {
@@ -144,10 +206,3 @@ const isAdmitted = (payload: unknown, admitted: ReadonlySet<string>): boolean =>
   const type = (payload as Record<string, unknown>)['type'];
   return typeof type !== 'string' || admitted.has(type);
 };
-
-const claimedCredential = (payload: unknown): string =>
-  typeof payload === 'object' &&
-  payload !== null &&
-  typeof (payload as Record<string, unknown>)['credentialId'] === 'string'
-    ? ((payload as Record<string, unknown>)['credentialId'] as string)
-    : 'entrant-unproven';

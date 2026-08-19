@@ -238,6 +238,9 @@ importers:
       '@mentora/runtime-relay':
         specifier: workspace:*
         version: link:../runtime-relay
+      '@mentora/runtime-security':
+        specifier: workspace:*
+        version: link:../runtime-security
       '@mentora/runtime-serialization':
         specifier: workspace:*
         version: link:../runtime-serialization

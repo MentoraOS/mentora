@@ -20,6 +20,8 @@ import {
   PrismaSessionRepositoryAdapter,
   PrismaCredentialStateReadAdapter,
   PrismaSessionStateReadAdapter,
+  PrismaProofMaterialVault,
+  ScryptPasswordHasher,
   type IdentityPrismaClient,
 } from '@mentora/adapters-persistence-identity';
 import type { AgreementAssembly } from '@mentora/application-agreement';
@@ -51,6 +53,7 @@ import { cryptoTraceIdSource, MemorySpanSink, RuntimeTrace } from '@mentora/runt
 
 import type { ServerConfig } from '../config/server-config.js';
 import { GatewayRouter } from '../gateway/gateway-router.js';
+import { ProofVerifier } from '../gateway/proof-verifier.js';
 import { SessionGate } from '../gateway/session-gate.js';
 import { serverHealth } from '../health/server-health.js';
 import { EmptyRoutingPublisher } from '../modules/empty-routing-publisher.js';
@@ -83,6 +86,8 @@ export interface ServerGraph {
   readonly identity: IdentityAccessAssembly;
   readonly prisma: AgreementPrismaClient;
   readonly identityPrisma: IdentityPrismaClient;
+  /** The dev-vault of proof material — the ACL of the Account stores here (stand-in until A05). */
+  readonly proofVault: PrismaProofMaterialVault;
   readonly loggers: LoggerFactory;
   readonly metrics: MetricsRegistry;
   readonly health: HealthRegistry;
@@ -171,10 +176,22 @@ export const composeServer = (config: ServerConfig, overrides: ServerOverrides =
         acceptedStrengths: config.MENTORA_PRODUCT_PROOF_ACCEPTED_STRENGTHS.split(',')
           .map((value) => value.trim())
           .filter((value) => value !== ''),
+        // MFA (Story #111/#113): 'a+b=c' entries — the PRODUCT's declared
+        // composition table, judged by the ratified policy, never here.
+        compositions: config.MENTORA_PRODUCT_PROOF_COMPOSITIONS.split(',')
+          .map((value) => value.trim())
+          .filter((value) => value.includes('='))
+          .map((entry) => {
+            const [left, yields] = entry.split('=');
+            return { of: (left ?? '').split('+').map((value) => value.trim()), yields: (yields ?? '').trim() };
+          }),
       },
     },
     technical: { commandMaxAttempts: config.MENTORA_COMMAND_MAX_ATTEMPTS },
   });
+
+  // ---- (11b') the proof mechanisms (Story #96): scrypt digest, dev vault.
+  const proofVault = new PrismaProofMaterialVault(identityPrisma, new ScryptPasswordHasher());
 
   // ---- (11c) the GATEWAY (I-12 entering adapter; M-9 session-bounded).
   // The authenticated surface admits the AGREEMENT commands only — the
@@ -188,6 +205,11 @@ export const composeServer = (config: ServerConfig, overrides: ServerOverrides =
     identityAssembly.commandDispatch,
     identity,
     new Set(assembly.commandDispatch.commandTypes),
+    new ProofVerifier(
+      identityAssembly.readPorts.credentialState,
+      proofVault,
+      identityAssembly.policies.proofRequirement,
+    ),
   );
 
   // ---- (12) the relay over the SQL-bound Outbox de faits (2B-2 + binding).
@@ -268,6 +290,7 @@ export const composeServer = (config: ServerConfig, overrides: ServerOverrides =
     identity: identityAssembly,
     prisma,
     identityPrisma,
+    proofVault,
     loggers,
     metrics,
     health,

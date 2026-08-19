@@ -34,6 +34,15 @@ export const toEstablishCredential = (
       kind: factorKindOf(wire.principalFactor.kind),
       strength: proofStrengthOf(wire.principalFactor.strength),
     },
+    ...(wire.secondaryFactors !== undefined
+      ? {
+          secondaryFactors: wire.secondaryFactors.map((factor) => ({
+            factorId: factorIdOf(factor.factorId),
+            kind: factorKindOf(factor.kind),
+            strength: proofStrengthOf(factor.strength),
+          })),
+        }
+      : {}),
     establishedAt: instant,
   });
 

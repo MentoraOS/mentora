@@ -25,5 +25,12 @@ export const establishCredential = (
     principal: true,
     establishedAt: command.establishedAt,
   };
-  return ok(Credential._born(command.credentialId, command.personId, principal));
+  const secondaries: readonly Factor[] = (command.secondaryFactors ?? []).map((factor) => ({
+    factorId: factor.factorId,
+    kind: factor.kind,
+    strength: factor.strength,
+    principal: false,
+    establishedAt: command.establishedAt,
+  }));
+  return ok(Credential._born(command.credentialId, command.personId, principal, secondaries));
 };

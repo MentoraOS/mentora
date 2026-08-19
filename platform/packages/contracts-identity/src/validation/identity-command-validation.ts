@@ -74,6 +74,39 @@ export const validateIdentityCommand = (
         }
       }
     }
+    // V-2 additive (MFA, Story #111): the optional field validates ONLY when present.
+    const secondaries = payload['secondaryFactors'];
+    if (secondaries !== undefined) {
+      if (!Array.isArray(secondaries)) {
+        violations.push(
+          violation('CONTRACT.MALFORMED', 'secondaryFactors', 'must be an array when present'),
+        );
+      } else {
+        secondaries.forEach((entry, index) => {
+          if (!isRecord(entry)) {
+            violations.push(
+              violation(
+                'CONTRACT.MALFORMED',
+                `secondaryFactors[${String(index)}]`,
+                'must be an object',
+              ),
+            );
+            return;
+          }
+          for (const field of ['factorId', 'kind', 'strength']) {
+            if (blankString(entry[field])) {
+              violations.push(
+                violation(
+                  'CONTRACT.MALFORMED',
+                  `secondaryFactors[${String(index)}].${field}`,
+                  'must be a non-blank string',
+                ),
+              );
+            }
+          }
+        });
+      }
+    }
   } else if (blankString(payload['motive'])) {
     violations.push(violation('CONTRACT.MALFORMED', 'motive', 'must be a non-blank string'));
   }

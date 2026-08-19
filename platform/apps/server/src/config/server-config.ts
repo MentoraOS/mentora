@@ -41,6 +41,8 @@ export const SERVER_CONFIG_SCHEMA = {
   MENTORA_PRODUCT_CANCEL_MIN_NOTICE_MILLIS: { kind: 'number', min: 0, default: 3_600_000 },
   /** Comma-separated allowlist for the RATIFIED ProofRequirementPolicy. */
   MENTORA_PRODUCT_PROOF_ACCEPTED_STRENGTHS: { kind: 'string', nonBlank: true, default: 'standard,elevated' },
+  /** MFA composition table (Story #111): comma-separated 'a+b=c' entries; empty = none declared. */
+  MENTORA_PRODUCT_PROOF_COMPOSITIONS: { kind: 'string', default: 'standard+standard=elevated' },
 } as const;
 
 export type ServerConfig = ConfigValues<typeof SERVER_CONFIG_SCHEMA>;

@@ -7,6 +7,8 @@ import { environmentSource } from '@mentora/runtime-config';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { IdentityPersistenceModule } from './module/identity-persistence-module.js';
+import { PrismaProofMaterialVault } from './proof/prisma-proof-material-vault.js';
+import { ScryptPasswordHasher } from './proof/scrypt-password-hasher.js';
 import { IdentityPersistenceFixture } from './testing/identity-persistence-fixture.js';
 import { IdentityPersistenceMother } from './testing/identity-persistence-mother.js';
 
@@ -197,5 +199,25 @@ describe.skipIf(url === undefined)('PostgreSQL integration (real engine)', () =>
     expect((await container.boot()).ok).toBe(true);
     await container.shutdown();
     expect(container.state).toBe('Destroyed');
+  });
+});
+
+describe.skipIf(url === undefined)('the dev vault (Story #96) — one place, one-way, disownable', () => {
+  const fixture = new IdentityPersistenceFixture(url ?? '');
+  const vault = new PrismaProofMaterialVault(fixture.prisma, new ScryptPasswordHasher());
+  afterAll(async () => {
+    await fixture.dispose();
+  });
+
+  it('stores sealed, verifies by demonstration, re-seals on re-store, disowns on recovery', async () => {
+    await vault.store('factor-v1', 'password', 'first material');
+    expect(await vault.verify('factor-v1', 'first material')).toBe(true);
+    expect(await vault.verify('factor-v1', 'wrong material')).toBe(false);
+    expect(await vault.verify('factor-ghost', 'first material')).toBe(false);
+    await vault.store('factor-v1', 'password', 'second material');
+    expect(await vault.verify('factor-v1', 'first material')).toBe(false);
+    expect(await vault.verify('factor-v1', 'second material')).toBe(true);
+    await vault.disown(['factor-v1']);
+    expect(await vault.verify('factor-v1', 'second material')).toBe(false);
   });
 });
