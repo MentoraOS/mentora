@@ -1,10 +1,12 @@
 import { createServer } from 'node:http';
-import type { Server } from 'node:http';
+import type { IncomingMessage, Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
 import type { RuntimeModule } from '@mentora/runtime-bootstrap';
 import type { HealthRegistry, HealthReport } from '@mentora/runtime-health';
 import type { Logger } from '@mentora/shared';
+
+import type { GatewayRouter } from '../gateway/gateway-router.js';
 
 /**
  * HttpServerModule — the Application surface of this executable, I-11
@@ -12,12 +14,14 @@ import type { Logger } from '@mentora/shared';
  * AFTER Validation: "l'application ne répond qu'après validation complète",
  * F4.4 §6) → drainer (stop accepting, finish in-flight — R-8) → libérer.
  *
- * Runtime surfaces ONLY (R-6 — no business logic, no business judgment):
+ * Runtime surfaces (R-6 — no business logic, no business judgment):
  *   GET /live   → the Liveness verdict
  *   GET /ready  → the Readiness verdict
  *   GET /health → both reports
- * Everything else: 404 (no business endpoint exists yet — commands will
- * enter through the Dispatch when the API surface lot opens).
+ * Business entry (I-12 — the ENTERING adapter's unique mouth is the
+ * Dispatch): POST surfaces delegated to the injected GatewayRouter, which
+ * verifies the session at the gate (M-9) and dispatches. Everything else:
+ * 404 — a closed door.
  */
 export class HttpServerModule implements RuntimeModule {
   readonly name = 'http-server';
@@ -28,14 +32,32 @@ export class HttpServerModule implements RuntimeModule {
     private readonly port: number,
     private readonly health: HealthRegistry,
     private readonly logger: Logger,
+    private readonly gateway?: GatewayRouter,
   ) {}
 
   construct(): void {
     this.server = createServer((request, response) => {
-      void this.handle(request.method, request.url).then(({ status, body }) => {
+      void (async () => {
+        if (request.method === 'POST' && this.gateway !== undefined) {
+          const reply = await this.gateway.handle({
+            method: request.method,
+            url: request.url ?? '',
+            headers: request.headers,
+            body: await readBody(request),
+          });
+          if (reply !== undefined) {
+            response.writeHead(reply.status, {
+              'content-type': 'application/json',
+              'x-mentora-correlation': reply.correlationId,
+            });
+            response.end(reply.body);
+            return;
+          }
+        }
+        const { status, body } = await this.handle(request.method, request.url);
         response.writeHead(status, { 'content-type': 'application/json' });
         response.end(body);
-      });
+      })();
     });
   }
 
@@ -113,3 +135,14 @@ const render = (report: HealthReport): { status: number; body: string } => ({
   status: report.overall.kind === 'healthy' ? 200 : 503,
   body: JSON.stringify(report),
 });
+
+/** Collects the request body (bounded by Node's own limits; JSON expected). */
+const readBody = (request: IncomingMessage): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    request.on('data', (chunk: Buffer) => chunks.push(chunk));
+    request.on('end', () => {
+      resolve(Buffer.concat(chunks).toString('utf8'));
+    });
+    request.on('error', reject);
+  });

@@ -9,8 +9,23 @@ import {
   PrismaAgreementRepositoryAdapter,
   PrismaAgreementStateReadAdapter,
 } from '@mentora/adapters-persistence-agreement';
+import {
+  createIdentityPrismaClient,
+  IdentityPersistenceModule,
+  CredentialFactStreamStore,
+  CredentialOutboxStore,
+  CredentialRetentionEngine,
+  SessionRetentionEngine,
+  PrismaCredentialRepositoryAdapter,
+  PrismaSessionRepositoryAdapter,
+  PrismaCredentialStateReadAdapter,
+  PrismaSessionStateReadAdapter,
+  type IdentityPrismaClient,
+} from '@mentora/adapters-persistence-identity';
 import type { AgreementAssembly } from '@mentora/application-agreement';
 import { composeAgreement } from '@mentora/application-agreement';
+import type { IdentityAccessAssembly } from '@mentora/application-identity';
+import { composeIdentityAccess } from '@mentora/application-identity';
 import type { SequenceJournalPort, ReadJournalPort } from '@mentora/application-kernel';
 import type { ActorRef } from '@mentora/contracts';
 import type { Clock } from '@mentora/kernel';
@@ -35,6 +50,8 @@ import type { RelayPacer, RelayPublisherPort } from '@mentora/runtime-relay';
 import { cryptoTraceIdSource, MemorySpanSink, RuntimeTrace } from '@mentora/runtime-tracing';
 
 import type { ServerConfig } from '../config/server-config.js';
+import { GatewayRouter } from '../gateway/gateway-router.js';
+import { SessionGate } from '../gateway/session-gate.js';
 import { serverHealth } from '../health/server-health.js';
 import { EmptyRoutingPublisher } from '../modules/empty-routing-publisher.js';
 import { HttpServerModule } from '../modules/http-server-module.js';
@@ -63,7 +80,9 @@ export interface ServerOverrides {
 export interface ServerGraph {
   readonly container: RuntimeContainer;
   readonly assembly: AgreementAssembly;
+  readonly identity: IdentityAccessAssembly;
   readonly prisma: AgreementPrismaClient;
+  readonly identityPrisma: IdentityPrismaClient;
   readonly loggers: LoggerFactory;
   readonly metrics: MetricsRegistry;
   readonly health: HealthRegistry;
@@ -124,6 +143,53 @@ export const composeServer = (config: ServerConfig, overrides: ServerOverrides =
     technical: { commandMaxAttempts: config.MENTORA_COMMAND_MAX_ATTEMPTS },
   });
 
+  // ---- (11b) the Identity & Access context over ITS real registries
+  // (Sprint 2) — the vestibule of persons (F5.4 chain of proof (1)).
+  const identityPrisma = createIdentityPrismaClient(config.MENTORA_IDENTITY_DATABASE_URL);
+  const credentialRepository = new PrismaCredentialRepositoryAdapter(
+    identityPrisma,
+    new CredentialRetentionEngine(
+      new CredentialFactStreamStore(),
+      new CredentialOutboxStore(identity),
+    ),
+  );
+  const sessionRepository = new PrismaSessionRepositoryAdapter(
+    identityPrisma,
+    new SessionRetentionEngine(),
+  );
+  const credentialStateRead = new PrismaCredentialStateReadAdapter(identityPrisma);
+  const sessionStateRead = new PrismaSessionStateReadAdapter(identityPrisma);
+  const identityAssembly = composeIdentityAccess({
+    credentialRepository,
+    sessionRepository,
+    credentialStateRead,
+    sessionStateRead,
+    clock,
+    commandJournal,
+    product: {
+      proofRequirement: {
+        acceptedStrengths: config.MENTORA_PRODUCT_PROOF_ACCEPTED_STRENGTHS.split(',')
+          .map((value) => value.trim())
+          .filter((value) => value !== ''),
+      },
+    },
+    technical: { commandMaxAttempts: config.MENTORA_COMMAND_MAX_ATTEMPTS },
+  });
+
+  // ---- (11c) the GATEWAY (I-12 entering adapter; M-9 session-bounded).
+  // The authenticated surface admits the AGREEMENT commands only — the
+  // identity emitters (EstablishCredential: the Account ACL; the session
+  // verbs: RFC-002 emitter-rights instruction) stay un-admitted, a closed
+  // door until their law is ratified.
+  const gateway = new GatewayRouter(
+    new SessionGate(identityAssembly.readPorts.sessionState, identityAssembly.readPorts.credentialState),
+    assembly.commandDispatch,
+    assembly.queryDispatch,
+    identityAssembly.commandDispatch,
+    identity,
+    new Set(assembly.commandDispatch.commandTypes),
+  );
+
   // ---- (12) the relay over the SQL-bound Outbox de faits (2B-2 + binding).
   const relaySource = new PrismaAgreementRelaySource(prisma);
   const relayDispatch = new RelayDispatch(
@@ -152,16 +218,18 @@ export const composeServer = (config: ServerConfig, overrides: ServerOverrides =
 
   // ---- (6) health: the closed declared list of this executable's checks.
   const health = new HealthRegistry();
-  serverHealth(health, prisma, new RelayHealth(relaySource, clock));
+  serverHealth(health, prisma, identityPrisma, new RelayHealth(relaySource, clock));
 
   // ---- (13-14) the container + the Application surface.
   const http = new HttpServerModule(
     overrides.httpPort ?? config.MENTORA_HTTP_PORT,
     health,
     rootLogger,
+    gateway,
   );
   const container = new RuntimeBuilder()
     .withModule(new AgreementPersistenceModule(prisma))
+    .withModule(new IdentityPersistenceModule(identityPrisma))
     .withModule(relayModule)
     .withModule(http)
     .withValidator({
@@ -178,7 +246,31 @@ export const composeServer = (config: ServerConfig, overrides: ServerOverrides =
         }
       },
     })
+    .withValidator({
+      name: 'identity-database-reachable',
+      validate: async () => {
+        try {
+          await identityPrisma.$queryRaw`SELECT 1`;
+          return { ok: true as const, value: undefined };
+        } catch (error) {
+          return {
+            ok: false as const,
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
+      },
+    })
     .build();
 
-  return { container, assembly, prisma, loggers, metrics, health, http };
+  return {
+    container,
+    assembly,
+    identity: identityAssembly,
+    prisma,
+    identityPrisma,
+    loggers,
+    metrics,
+    health,
+    http,
+  };
 };

@@ -17,6 +17,7 @@ import type { ConfigViolation } from '@mentora/runtime-config';
 
 export const SERVER_CONFIG_SCHEMA = {
   MENTORA_AGREEMENT_DATABASE_URL: { kind: 'string', nonBlank: true },
+  MENTORA_IDENTITY_DATABASE_URL: { kind: 'string', nonBlank: true },
   MENTORA_HTTP_PORT: { kind: 'number', min: 0, max: 65_535, default: 3001 },
   MENTORA_LOG_THRESHOLD: {
     kind: 'choice',
@@ -38,6 +39,8 @@ export const SERVER_CONFIG_SCHEMA = {
   MENTORA_PRODUCT_RESCHEDULE_MIN_NOTICE_MILLIS: { kind: 'number', min: 0, default: 3_600_000 },
   MENTORA_PRODUCT_RESCHEDULE_MAX_COUNT: { kind: 'number', min: 0, default: 3 },
   MENTORA_PRODUCT_CANCEL_MIN_NOTICE_MILLIS: { kind: 'number', min: 0, default: 3_600_000 },
+  /** Comma-separated allowlist for the RATIFIED ProofRequirementPolicy. */
+  MENTORA_PRODUCT_PROOF_ACCEPTED_STRENGTHS: { kind: 'string', nonBlank: true, default: 'standard,elevated' },
 } as const;
 
 export type ServerConfig = ConfigValues<typeof SERVER_CONFIG_SCHEMA>;

@@ -22,6 +22,7 @@ import { runServerProcess } from './startup/run-server-process.js';
 import type { ProcessHost } from './startup/run-server-process.js';
 
 const url = environmentSource().read('MENTORA_AGREEMENT_DATABASE_URL');
+const identityUrl = environmentSource().read('MENTORA_IDENTITY_DATABASE_URL');
 
 /** Manual relay pacer: the spec drives ticks; nothing runs on wall timers. */
 const manualPacer = (): { pacer: RelayPacer; tick: () => Promise<void>; stops: () => number } => {
@@ -44,6 +45,7 @@ const manualPacer = (): { pacer: RelayPacer; tick: () => Promise<void>; stops: (
 const testSources = (extra: Record<string, string> = {}) => [
   inMemorySource('spec', {
     MENTORA_AGREEMENT_DATABASE_URL: url ?? 'postgresql://void',
+    MENTORA_IDENTITY_DATABASE_URL: identityUrl ?? 'postgresql://void',
     MENTORA_HTTP_PORT: '0',
     MENTORA_LOG_THRESHOLD: 'error',
     ...extra,
@@ -53,7 +55,7 @@ const testSources = (extra: Record<string, string> = {}) => [
 describe('configuration (fail closed, COMPLETE report)', () => {
   it('loads .env + environment with declared precedence and defaults', () => {
     const loaded = loadServerConfig([
-      inMemorySource('env', { MENTORA_AGREEMENT_DATABASE_URL: 'postgresql://one' }),
+      inMemorySource('env', { MENTORA_AGREEMENT_DATABASE_URL: 'postgresql://one', MENTORA_IDENTITY_DATABASE_URL: 'postgresql://id' }),
       inMemorySource('dotenv', {
         MENTORA_AGREEMENT_DATABASE_URL: 'postgresql://two',
         MENTORA_HTTP_PORT: '4000',
@@ -221,6 +223,7 @@ describe('boot refusals (fail closed — nothing serves)', () => {
       [
         inMemorySource('spec', {
           MENTORA_AGREEMENT_DATABASE_URL: 'postgresql://mentora:wrong@127.0.0.1:59999/void',
+          MENTORA_IDENTITY_DATABASE_URL: 'postgresql://mentora:wrong@127.0.0.1:59999/void',
           MENTORA_HTTP_PORT: '0',
           MENTORA_LOG_THRESHOLD: 'error',
         }),
@@ -259,6 +262,7 @@ describe('the Root builds the graph without serving (composition alone)', () => 
   const deadSources = [
     inMemorySource('dead', {
       MENTORA_AGREEMENT_DATABASE_URL: 'postgresql://mentora:wrong@127.0.0.1:59999/void',
+          MENTORA_IDENTITY_DATABASE_URL: 'postgresql://mentora:wrong@127.0.0.1:59999/void',
     }),
   ];
 
