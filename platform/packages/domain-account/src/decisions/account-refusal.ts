@@ -1,6 +1,8 @@
 import type {
   AccountRefusalReason,
   AvailabilityFrameRefusalReason,
+  SubscriptionRefusalReason,
+  SupportRequestRefusalReason,
 } from '@mentora/contracts-account';
 
 /**
@@ -31,3 +33,27 @@ export const availabilityFrameRefusal = (
   reason: AvailabilityFrameRefusalReason,
   message: string,
 ): AvailabilityFrameRefusal => ({ reason, message });
+
+// ---------------------------------------------------------------- Lot A02
+
+export type { SubscriptionRefusalReason, SupportRequestRefusalReason } from '@mentora/contracts-account';
+
+export interface SubscriptionRefusal {
+  readonly reason: SubscriptionRefusalReason;
+  readonly message: string;
+}
+
+export const subscriptionRefusal = (
+  reason: SubscriptionRefusalReason,
+  message: string,
+): SubscriptionRefusal => ({ reason, message });
+
+export interface SupportRequestRefusal {
+  readonly reason: SupportRequestRefusalReason;
+  readonly message: string;
+}
+
+export const supportRequestRefusal = (
+  reason: SupportRequestRefusalReason,
+  message: string,
+): SupportRequestRefusal => ({ reason, message });

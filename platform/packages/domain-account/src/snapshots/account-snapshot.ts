@@ -25,3 +25,30 @@ export interface AvailabilityFrameSnapshot {
   readonly windows: readonly { readonly startMs: number; readonly endMs: number }[];
   readonly version: number;
 }
+
+// ---------------------------------------------------------------- Lot A02
+
+export type SubscriptionSnapshotState =
+  | { readonly kind: 'Active'; readonly startedAtMs: number }
+  | { readonly kind: 'Ended'; readonly endedAtMs: number; readonly motive: string };
+
+export interface SubscriptionSnapshot {
+  readonly subscriptionId: string;
+  readonly personId: string;
+  readonly offerReference: string;
+  readonly state: SubscriptionSnapshotState;
+  readonly version: number;
+}
+
+/** STATE ONLY: a support request has no facts to photograph. */
+export type SupportRequestSnapshotState =
+  | { readonly kind: 'Opened'; readonly openedAtMs: number }
+  | { readonly kind: 'Handled'; readonly handledAtMs: number };
+
+export interface SupportRequestSnapshot {
+  readonly supportRequestId: string;
+  readonly requesterId: string;
+  readonly motive: string;
+  readonly state: SupportRequestSnapshotState;
+  readonly version: number;
+}
