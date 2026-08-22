@@ -1,6 +1,8 @@
 # RFC-002 — Le droit d'émettre une Command sur l'unité d'autrui (grille de droits d'émission)
 
-**Dossier d'instruction Titre VII** · Statut : **EN INSTRUCTION — aucune ratification, AUCUN CODE de grille avant décision CTO** · Stories affectées : session verbs au gateway (FEATURE-005) ; durcissement adversarial #121-#123 (Sprint 5)
+**Dossier d'instruction Titre VII** · Statut : **RATIFIÉE — Option C immédiatement, puis Option A comme architecture définitive (décision CTO du 2026-08-19)** · Le gateway reste seul responsable de la protection de l'entrée ; les domaines restent propriétaires de leurs décisions métier · Option A s'instruit avec l'ACL du Compte (FEATURE-A05) et le lot adversarial #121-#123 (Sprint 5)
+
+> **Ratification** — Option C est en vigueur dans le code (tables d'admission du gateway : les verbes Credential/Session ne sont pas admis — porte fermée 404). Option A (grille d'émission comme validité de source au pas 5, chez le propriétaire ; famille de refus à trancher au dictionnaire) est la cible, livrée avec la jonction preuve↔personne d'A05. Le CTO n'est plus à solliciter sur cette RFC.
 
 ## Problème
 

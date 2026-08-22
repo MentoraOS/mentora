@@ -33,8 +33,8 @@ import type { SessionGate } from './session-gate.js';
  *     (M-9: session-bounded; business rights stay at the dispatch and
  *     the owners). Commands admitted: the closed table the composition
  *     declared. EstablishCredential/RevokeCredential and the session
- *     verbs are NOT admitted here — their emitters await the RFC-002
- *     instruction (emitter rights) and the Account ACL (Sprint 4);
+ *     verbs are NOT admitted here — RFC-002 RATIFIED, Option C in force
+ *     (emitter rights land as Option A with the Account ACL, A05);
  *     an un-admitted command is 404, a closed door, never a Refusal.
  *
  *   POST /queries — the AUTHENTICATED read surface: same gate, then the
