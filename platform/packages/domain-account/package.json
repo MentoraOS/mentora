@@ -2,7 +2,7 @@
   "name": "@mentora/domain-account",
   "version": "0.0.0",
   "private": true,
-  "description": "The Account domain (canon F3.2-B, domaine 6) — Lot A01: Account and AvailabilityFrame units, their ports, memory references and contract suites. Pure business truth: no framework, no I/O, no clock.",
+  "description": "The Account domain (canon F3.2-B, domaine 6) — Lots A01+A02: Account, AvailabilityFrame, Subscription, SupportRequest units, their ports, memory references and contract suites. Pure business truth: no framework, no I/O, no clock.",
   "license": "UNLICENSED",
   "type": "module",
   "sideEffects": false,
@@ -18,6 +18,14 @@
     "./availability-frame-contract-suite": {
       "types": "./dist/testing/availability-frame-repository-contract-suite.d.ts",
       "import": "./dist/testing/availability-frame-repository-contract-suite.js"
+    },
+    "./subscription-contract-suite": {
+      "types": "./dist/testing/subscription-repository-contract-suite.d.ts",
+      "import": "./dist/testing/subscription-repository-contract-suite.js"
+    },
+    "./support-request-contract-suite": {
+      "types": "./dist/testing/support-request-repository-contract-suite.d.ts",
+      "import": "./dist/testing/support-request-repository-contract-suite.js"
     }
   },
   "main": "./dist/index.js",

@@ -19,3 +19,9 @@ export class AccountSnapshotCorruptException extends AccountDomainException {}
 
 /** A retained AvailabilityFrame photograph that no longer maps to a lawful state. */
 export class AvailabilityFrameSnapshotCorruptException extends AccountDomainException {}
+
+/** A retained Subscription photograph that no longer maps to a lawful state. */
+export class SubscriptionSnapshotCorruptException extends AccountDomainException {}
+
+/** A retained SupportRequest photograph that no longer maps to a lawful state. */
+export class SupportRequestSnapshotCorruptException extends AccountDomainException {}

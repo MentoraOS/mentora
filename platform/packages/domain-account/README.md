@@ -8,3 +8,9 @@ The Account **domain** (canon F3.2-B, domaine 6) — Lot A01 ships two of its fo
 - Ports owned here: `AccountRepository`, `AvailabilityFrameRepository` (`retain(unit, context?)` — RFC-001). Memory references exported from the barrel; contract suites on `./account-contract-suite` and `./availability-frame-contract-suite` — written once, replayed here, replayed on PostgreSQL in Lot A04 (its acceptance criterion).
 
 Copied exactly from the reference domain (`docs/reference/identity-reference-handbook.md` §2-§4, §6).
+
+## Lot A02 — Subscription & SupportRequest
+
+- `Subscription` — the holder's commercial contract; `Active → Ended` (terminal, R-B); **born Active** at `StartSubscription` (RFC-003 P4 — no `Pending`); terms frozen **by reference** (`offerReference`, never a price); `SubscriptionPolicy` (product allowlist of offers — P5) judges BEFORE the birth through the canon's `SubscriptionFactory` (`startSubscription`); `SubscriptionChangeSpecification` (the ratified change = ending an Active one); **R-A key** declared by `ActiveSubscriptionUniquenessSpecification`, applied AND released by the registry, refused as `SubscriptionAlreadyExists`; facts `SubscriptionStarted`/`SubscriptionEnded`.
+- `SupportRequest` — `Opened → Handled` (terminal); **no fact, structurally** (no `pendingFacts` field — precedent Session; key-surface test); `SupportRequester` qualified; motive by reference (the dialogue is a Conversation).
+- Ports: `SubscriptionRepository` (`byId`, `activeByHolder` probe, `retain`), `SupportRequestRepository` (state only). Suites on `./subscription-contract-suite` (7 promises incl. R-A applied/released) and `./support-request-contract-suite` (5, state-only).

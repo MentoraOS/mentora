@@ -27,3 +27,17 @@ export * from './specifications/coherent-frame.specification.js';
 export * from './policies/reachability.policy.js';
 export * from './ports/account-repository.js';
 export * from './testing/in-memory-account-repository.js';
+
+// ---------------------------------------------------------------- Lot A02
+export * from './value-objects/subscription-state.js';
+export * from './commands/subscription-commands.js';
+export * from './events/subscription-events.js';
+export * from './aggregate/subscription-domain-event.js';
+export * from './aggregate/subscription.js';
+export * from './aggregate/support-request.js';
+export * from './factories/subscription-factory.js';
+export * from './specifications/subscription-change.specification.js';
+export * from './specifications/active-subscription-uniqueness.specification.js';
+export * from './policies/subscription.policy.js';
+export * from './ports/subscription-repository.js';
+export * from './testing/in-memory-subscription-repository.js';
