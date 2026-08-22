@@ -558,3 +558,9 @@ flowchart TD
 ---
 
 *Ce manuel est la porte d'entrée de l'ingénierie Mentora. Il se lit avec la Constitution (`docs/canon/`), l'[Engineering Organization](engineering-organization.md) et l'[Engineering Career Ladder](engineering-career-ladder.md). En cas de conflit : la Constitution prévaut, toujours. Ce document est vivant — chaque leçon apprise le fait grandir, par PR.*
+
+---
+
+## 21. Le domaine de référence (ajout S4-Stabilization, 2026-08-19)
+
+Identity & Access est le **domaine de référence** de Mentora. Avant d'ouvrir, de construire ou de fermer quoi que ce soit dans un domaine, lis [`docs/reference/`](../reference/README.md) : le Handbook de référence (comment écrire chaque brique en copiant Identity), la Domain Checklist (obligatoire avant toute fermeture de Feature), la Production Readiness Checklist, la Definition of Done officielle et le New Domain Bootstrap Guide. Ces documents n'ajoutent aucune loi : ils montrent la Constitution appliquée une fois, à la lettre.
