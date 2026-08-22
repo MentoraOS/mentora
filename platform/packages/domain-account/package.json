@@ -1,0 +1,53 @@
+{
+  "name": "@mentora/domain-account",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Account domain (canon F3.2-B, domaine 6) — Lot A01: Account and AvailabilityFrame units, their ports, memory references and contract suites. Pure business truth: no framework, no I/O, no clock.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./account-contract-suite": {
+      "types": "./dist/testing/account-repository-contract-suite.d.ts",
+      "import": "./dist/testing/account-repository-contract-suite.js"
+    },
+    "./availability-frame-contract-suite": {
+      "types": "./dist/testing/availability-frame-repository-contract-suite.d.ts",
+      "import": "./dist/testing/availability-frame-repository-contract-suite.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/contracts": "workspace:*",
+    "@mentora/contracts-account": "workspace:*",
+    "@mentora/kernel": "workspace:*"
+  }
+}
