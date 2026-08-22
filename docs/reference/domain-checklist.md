@@ -42,7 +42,7 @@
 - [ ] Secrets par référence (`SecretReference`), jamais en clair dans config/tests/logs.
 
 ## G. Tests & gate
-- [ ] Couverture ≥ 95/95/95 par paquet ; `pnpm verify` 0 rouge ; 3 runs CI verts consécutifs pour toute modification de workflow.
+- [ ] Couverture ≥ 95/95/95 par paquet **mesurée et citée** (`vitest run --coverage`) — non gated à ce jour ; `pnpm verify` 0 rouge ; 3 runs CI verts consécutifs pour toute modification de workflow.
 - [ ] Intégration gated sur la variable déclarée ; `fileParallelism:false` + dépendances turbo si base partagée.
 - [ ] Aucun fournisseur réel, aucun réseau, aucune horloge ambiante dans les tests.
 
