@@ -112,6 +112,15 @@
 /platform/packages/contracts-identity/              @MentoraOS/backend @MentoraOS/security
 /platform/packages/domain-identity/                 @MentoraOS/backend @MentoraOS/security
 /platform/packages/application-identity/            @MentoraOS/backend @MentoraOS/security
+/platform/packages/adapters-persistence-identity/   @MentoraOS/backend @MentoraOS/security @MentoraOS/platform
+/platform/packages/adapters-identity-federation/    @MentoraOS/backend @MentoraOS/security
+
+############################################################
+# Backend Domain — Account (EPIC-002 ; le seul OHS métier, propriétaire des ACL)
+############################################################
+
+/platform/packages/contracts-account/               @MentoraOS/backend @MentoraOS/security
+/platform/packages/domain-account/                  @MentoraOS/backend @MentoraOS/security
 
 ############################################################
 # Qualité — la stratégie de preuve

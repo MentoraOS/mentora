@@ -1,0 +1,44 @@
+{
+  "name": "@mentora/contracts-account",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Published language of the Account context (EPIC-002, Story #156): identifiers (the Account IS the person — RFC-003 P1), refusal reasons, the eleven wire commands 36-46, the seven wire facts 40-46, validation and deterministic serialization.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/contracts": "workspace:*",
+    "@mentora/kernel": "workspace:*"
+  }
+}
