@@ -12,3 +12,4 @@ export * from './validation/account-command-validation.js';
 export * from './events/account-event-contracts.js';
 export * from './wire/event-union.js';
 export * from './serialization/account-event-serialization.js';
+export * from './queries/account-queries.js';
