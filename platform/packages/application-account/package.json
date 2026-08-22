@@ -1,0 +1,48 @@
+{
+  "name": "@mentora/application-account",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Account application layer (Lot A03): one generic Séquence plug for the four units, eleven boring carriers (catalogue 36-46), the TWO ratified lectures with their R-C grids, the declared choreography (RFC-003 P3/P4), the Settlement ACL port with its provisional development adapter, and composeAccount boot-validated.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@mentora/eslint-config": "workspace:*",
+    "@mentora/eslint-plugin-mentora": "workspace:*",
+    "@mentora/testing-clock": "workspace:*",
+    "@mentora/testing-config": "workspace:*",
+    "@mentora/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "rimraf": "6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@mentora/application-kernel": "workspace:*",
+    "@mentora/contracts": "workspace:*",
+    "@mentora/contracts-account": "workspace:*",
+    "@mentora/domain-account": "workspace:*",
+    "@mentora/kernel": "workspace:*"
+  }
+}

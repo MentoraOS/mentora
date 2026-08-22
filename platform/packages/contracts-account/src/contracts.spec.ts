@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { ACCOUNT_COMMAND_TYPES } from './commands/account-command-contracts.js';
+import { ACCOUNT_QUERY_TYPES, validateAccountQuery } from './queries/account-queries.js';
 import {
   deserializeAccountEvent,
   serializeAccountEvent,
@@ -98,5 +99,17 @@ describe('the Account language — the seven ratified facts (catalogue 40-46)', 
     const frame = validateAccountEvent({ contractVersion: 1, type: 'AvailabilityFrameChanged', personId: 'p', sequence: 1, occurredAtMs: 1, windows: 'x' });
     expect(!frame.ok && frame.error[0]?.field).toBe('windows');
     expect(deserializeAccountEvent('{not json').ok).toBe(false);
+  });
+});
+
+describe('the Account language — the two ratified lectures (catalogue 03 n°4 and n°10)', () => {
+  it('declares exactly the two; validates their wires; refuses the rest', () => {
+    expect([...ACCOUNT_QUERY_TYPES]).toEqual(['AvailabilityFrameQuery', 'ReachabilityQuery']);
+    expect(validateAccountQuery({ contractVersion: 1, type: 'AvailabilityFrameQuery', personId: 'p' }).ok).toBe(true);
+    expect(validateAccountQuery({ contractVersion: 1, type: 'ReachabilityQuery', personId: 'p' }).ok).toBe(true);
+    expect(validateAccountQuery({ contractVersion: 1, type: 'ProfileQuery', personId: 'p' }).ok).toBe(false);
+    expect(validateAccountQuery('x').ok).toBe(false);
+    const bad = validateAccountQuery({ contractVersion: 2, type: 'ReachabilityQuery', personId: ' ' });
+    expect(!bad.ok && bad.error.map((v) => v.field)).toEqual(['contractVersion', 'personId']);
   });
 });

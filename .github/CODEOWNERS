@@ -121,6 +121,7 @@
 
 /platform/packages/contracts-account/               @MentoraOS/backend @MentoraOS/security
 /platform/packages/domain-account/                  @MentoraOS/backend @MentoraOS/security
+/platform/packages/application-account/             @MentoraOS/backend @MentoraOS/security
 
 ############################################################
 # Qualité — la stratégie de preuve
