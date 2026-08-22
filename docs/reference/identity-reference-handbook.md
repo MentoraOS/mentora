@@ -100,7 +100,7 @@ Quatre couches, chacune avec son modèle réel :
 | Adapter | **Rejeu des contract suites sur PG réel**, atomicité (tout ou rien), corruption, cycle I-11, relais, mécanismes (hasher, coffre) ; unitaires sans DB pour mappers/sérialiseurs | `integration.spec.ts`, `relay-source.spec.ts`, `unit.spec.ts`, `federation.spec.ts` |
 | Exécutable | Boot réel, HTTP réel port éphémère, **la route entière** (entrée → commande → outbox → relais), adversarial (voix plate, couture morte, zéro matière par scan) | `apps/server/src/gateway.spec.ts`, `server.spec.ts` |
 
-Règles : planchers de couverture ≥ 95/95/95 tenus par paquet ; tests d'intégration **`describe.skipIf(url === undefined)`** sur la variable déclarée (la gate les exécute pour de vrai) ; `fileParallelism: false` dès que deux fichiers partagent une base ; aucune horloge ambiante (`FakeClock.at`), aucun réseau (coutures), aucun fournisseur réel en CI.
+Règles : cible de couverture ≥ 95/95/95 par paquet — **mesurée, pas encore gated** (audit S4-Stabilization : le preset ne déclare aucun seuil et la CI ne lance pas `--coverage` ; l'enforcement est une décision CTO ouverte) ; tests d'intégration **`describe.skipIf(url === undefined)`** sur la variable déclarée (la gate les exécute pour de vrai) ; `fileParallelism: false` dès que deux fichiers partagent une base ; aucune horloge ambiante (`FakeClock.at`), aucun réseau (coutures), aucun fournisseur réel en CI.
 
 ## 9. Comment ouvrir une PR
 
